@@ -18,7 +18,7 @@ namespace banggame {
             player_ptr origin;
             card_ptr origin_card;
             card_ptr target_card;
-            nullable_ref<destroy_flags> flags;
+            destroy_flags &flags;
         };
     }
 

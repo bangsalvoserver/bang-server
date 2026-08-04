@@ -9,18 +9,16 @@
 #include "card_serial.h"
 
 namespace banggame {
-
-    template<typename T>
-    concept aggregate_with_one_member = requires {
-        requires std::is_aggregate_v<T>;
-        requires (reflect::size<T>() == 1);
-    };
-
+    
     template<typename T>
     decltype(auto) unwrap_value(T &&value) {
-        if constexpr (aggregate_with_one_member<std::remove_cvref_t<T>>) {
-            auto &&[unwrapped] = std::forward<T>(value);
-            return (unwrapped);
+        if constexpr (std::is_aggregate_v<std::remove_cvref_t<T>>) {
+            auto &&[...fields] = std::forward<T>(value);
+            if constexpr (sizeof...(fields) == 1) {
+                return (fields...[0]);
+            } else {
+                return value;
+            }
         } else {
             return value;
         }

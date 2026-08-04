@@ -9,7 +9,7 @@ namespace banggame {
         struct get_selected_cards {
             card_ptr origin_card;
             player_ptr owner;
-            nullable_ref<card_list> result;
+            card_list &result;
         };
     }
     

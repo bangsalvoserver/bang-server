@@ -9,7 +9,7 @@ namespace banggame {
         struct count_usages {
             player_ptr origin;
             card_ptr origin_card;
-            nullable_ref<int> usages;
+            int &usages;
         };
     }
 

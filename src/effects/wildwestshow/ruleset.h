@@ -8,7 +8,7 @@ namespace banggame {
     namespace event_type {
         struct get_count_played_cards {
             player_ptr origin;
-            nullable_ref<int> value;
+            int &value;
         };
     }
 

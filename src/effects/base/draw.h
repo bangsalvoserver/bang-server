@@ -126,7 +126,7 @@ namespace banggame {
             player_ptr origin;
             card_ptr target_card;
             shared_request_draw req;
-            nullable_ref<bool> reveal;
+            bool &reveal;
         };
     }
 

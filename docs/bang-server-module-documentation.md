@@ -1,7 +1,7 @@
 # Module documentation — bang-server
 
 Repository: [bangsalvoserver/bang-server](https://github.com/bangsalvoserver/bang-server)
-Language: **C++23** (backend) + **Python 3** (build-time code generation)
+Language: **C++26** (backend) + **Python 3** (build-time code generation)
 
 This document describes in detail the internal architecture of the **Bang!** game server (bang.salvoserver.it), analyzing the structure under `src/` module by module.
 
@@ -85,7 +85,7 @@ The logical heart of the server: manages the state of a single match, the turn, 
 
 ### 3.2 Event and "disabler" system (the engine behind card interactions)
 
-- **`event_map.h`** — Implements a **typed event bus** based on compile-time reflection (`reflect::to<std::tuple>`), with no inheritance from a common event base class: any aggregate struct can be used as an "event" (`concept event`) — declaring the struct **is** the registration, no macro needed, unlike the `effects`/`target_types` vtable system. Two separate maps back this, each with a distinct job: `m_listeners` (keyed by `event_listener_key`) actually holds the listeners and dictates dispatch order — **descending priority** first, then ascending `card->order` (table/play order) as a deterministic tiebreak between equal priorities. Real `on_hit` listeners alone span priorities from 1 (*Bart Cassidy*) up to 20 (a global ruleset rule), precisely because each needed to fire in a specific position relative to the others. `m_map` (keyed by the plain `event_card_key`) holds only iterators *into* `m_listeners` and exists purely to support fast removal of a card's listeners when it leaves play — it plays no part in dispatch order. `listener_map::call_event<T>(value)` invokes listeners in that priority order; if `T` declares a `result_type`, the first listener whose return value is truthy stops the chain and becomes the event's result (e.g. `check_damage_response`'s `bool`, used to decide whether to delay resolving damage); without one, the event is void and every listener runs unconditionally as a pure broadcast.
+- **`event_map.h`** — Implements a **typed event bus** based on `to_event_tuple`, with no inheritance from a common event base class: any aggregate struct can be used as an "event" (`concept event`) — declaring the struct **is** the registration, no macro needed, unlike the `effects`/`target_types` vtable system. Two separate maps back this, each with a distinct job: `m_listeners` (keyed by `event_listener_key`) actually holds the listeners and dictates dispatch order — **descending priority** first, then ascending `card->order` (table/play order) as a deterministic tiebreak between equal priorities. Real `on_hit` listeners alone span priorities from 1 (*Bart Cassidy*) up to 20 (a global ruleset rule), precisely because each needed to fire in a specific position relative to the others. `m_map` (keyed by the plain `event_card_key`) holds only iterators *into* `m_listeners` and exists purely to support fast removal of a card's listeners when it leaves play — it plays no part in dispatch order. `listener_map::call_event<T>(value)` invokes listeners in that priority order; if `T` declares a `result_type`, the first listener whose return value is truthy stops the chain and becomes the event's result (e.g. `check_damage_response`'s `bool`, used to decide whether to delay resolving damage); without one, the event is void and every listener runs unconditionally as a pure broadcast.
 - **`disabler_map.h`** — A separate mechanism for temporarily switching a card's ongoing ability off *without* removing it from the table. `add_disabler`/`remove_disabler` register/unregister predicate functions (keyed by `event_card_key`, so they can be scoped and later removed the same way listeners are); whenever a predicate starts or stops matching a given card, the engine calls that card's own `on_disable`/`on_enable` — the exact same lifecycle hooks that normally fire when a card is actually equipped or leaves play — so a disabled card's passive listeners get suppressed (and later restored) through the ordinary equip machinery, not a separate code path. A good real example is *Belle Star* (`effects/dodgecity/bellestar.cpp`): on her own turn she registers a disabler matching every *other* player's table cards, switching off their weapons, Mustangs, and other passive equips for as long as her turn lasts, then removes it once her turn ends. A narrower variant, `is_usage_disabled`/`get_usage_disabler` (`disable_use=true`), excludes a card from certain player-facing actions specifically, without necessarily suppressing its passive ability.
 
   A single card can have more than one `equip_holder`, and an individual holder can opt out of this whole mechanism by nesting a marker type, `struct nodisable{};`, the same detection pattern as `serialize_context` (`build_equip_vtable` sets `is_nodisable` via `requires { typename T::nodisable; }`). The check actually lives in `player::enable_equip`/`disable_equip` (`game/player.cpp`): `if (!card_disabled || holder.is_nodisable()) holder.on_enable(...)`  — so a `nodisable` holder gets its `on_enable`/`on_disable` called *regardless* of whether the card is currently disabled, while an ordinary holder's is skipped entirely while disabled.
@@ -392,14 +392,13 @@ Reusable components independent of the "Bang!" domain, used across all other mod
 | `enum_map.h` | An enum-indexed associative array (used for `token_map`: token quantities per type). |
 | `enums.h` | Support functions on enums: to/from string conversion (`enums::from_string`), iteration, `is_between`. |
 | `fixed_string.h` | A constant string usable as a **template parameter** (C++20 NTTP), underpinning the `effect_vtable_map<utils::fixed_string Name>` mechanism that binds YAML names to C++ types. |
-| `function_ref.h` | A lightweight, non-owning reference to a function (an allocation-free alternative to `std::function`). |
 | `json_serial.h` | A generic JSON (de)serialization framework based on compile-time reflection (`serializer<T>`, `deserializer<T>`), used for all network messages and state updates. |
 | `parse_string.h` | Generic string→type parsing (`string_parser<T>`), used e.g. for `expansion_set` and `game_options::set_option`. |
 | `combinations.h` | `utils::combinations<T>(elems, n)`, a coroutine generator yielding every n-element combination of a vector — used by *Armed & Dangerous*'s `select_cubes` target type (`targeting_select_cubes::possible_targets`) to enumerate every valid way to pick `ncubes` cubes out of a player's available ones. |
 | `int_set.h` | An efficient set of small integers (bitset). |
 | `nullable.h` | A wrapper for optional values with custom semantics. |
 | `random_element.h` | Extraction of a uniformly random element from a range, throwing a plain `std::runtime_error` if the range is empty; used by several card effects that need a random pick from a non-empty collection. |
-| `range_utils.h` / `ranges_concat.h` | Extensions to C++20/23 ranges (e.g. `rotate_range` used in `game_table::range_all_players`, concatenation of heterogeneous ranges). |
+| `range_utils.h` | Extensions to C++20/26 ranges (e.g. `rotate_range` used in `game_table::range_all_players`, concatenation of heterogeneous ranges). |
 | `stable_queue.h` | A **stable** priority queue (preserves insertion order for equal priority) — used by `request_queue`. |
 | `static_map.h` | A compile-time-built map (`static_map_view`), used for card `tag_map`s. |
 | `tsqueue.h` | A thread-safe queue — used in `net/wsserver.h` as `utils::tsqueue<message_type> m_message_queue`, the queue of incoming raw messages (`client_handle` + `connected`/`disconnected`/raw string) handed off between the network I/O thread and the main tick loop. |
@@ -428,7 +427,7 @@ To clarify how all the modules collaborate, here is the complete path of a singl
 
 ## 10. Build system
 
-- **CMake ≥ 3.13**, **C++23** standard required.
+- **CMake ≥ 3.16**, **C++26** standard required.
 - Minimal external dependencies, some vendored under `external/` (`rapidjson`, `uwebsockets`, a `reflect` library for the compile-time reflection used by the event/JSON system) and others resolved from the system (`libuv`, `cxxopts`, `libpng`, `SQLite3`).
 - Each submodule (`net`, `game`, `cards` implicitly, `effects/<expansion>`, `target_types/<expansion>`, `config`) has its own `CMakeLists.txt`, aggregated by `src/CMakeLists.txt`.
 - The Python scripts in `config/` require `PyYAML` and `Pillow` and run as part of the pre-compilation code-generation step.
