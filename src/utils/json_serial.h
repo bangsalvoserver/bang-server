@@ -13,9 +13,9 @@
 #include <format>
 #include <reflect>
 
+#include "enums.h"
 #include "range_utils.h"
 #include "static_map.h"
-#include "misc.h"
 
 namespace json {
 
@@ -180,6 +180,14 @@ namespace json {
             } else {
                 writer.String("", 0);
             }
+        }
+    };
+
+    
+    template<enums::enumeral T, typename Context>
+    struct serializer<T, Context> {
+        static void write(const T &value, string_writer &writer) {
+            serialize(enums::to_string(value), writer);
         }
     };
 
@@ -361,6 +369,21 @@ namespace json {
                 throw deserialize_error("Cannot deserialize string");
             }
             return std::string{value.GetString(), value.GetStringLength()};
+        }
+    };
+
+    template<enums::enumeral T, typename Context>
+    struct deserializer<T, Context> {
+        static T read(const json &value) {
+            if (!value.IsString()) {
+                throw deserialize_error(std::format("Cannot deserialize {}: value is not a string", reflect::type_name<T>()));
+            }
+            std::string_view str{value.GetString(), value.GetStringLength()};
+            if (auto ret = enums::from_string<T>(str)) {
+                return *ret;
+            } else {
+                throw deserialize_error(std::format("Invalid {} value: {}", reflect::type_name<T>(), str));
+            }
         }
     };
     

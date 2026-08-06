@@ -4,7 +4,7 @@
 #include <reflect>
 #include <format>
 
-#include "json_serial.h"
+#include "range_utils.h"
 #include "static_map.h"
 #include "visit_indexed.h"
 
@@ -19,7 +19,7 @@ namespace enums {
     template<enumeral T> inline constexpr size_t enum_count = reflect::enumerators<T>.size();
     
     template<enumeral T>
-    constexpr bool is_linear_enum() {
+    inline constexpr bool is_linear_enum = []{
         constexpr const auto &values = reflect::enumerators<T>;
         for (size_t i=0; i<values.size(); ++i) {
             if (values[i].first != i) {
@@ -27,7 +27,7 @@ namespace enums {
             }
         }
         return true;
-    }
+    }();
 
     template<enumeral T>
     class enum_values_t {
@@ -45,7 +45,7 @@ namespace enums {
             explicit constexpr iterator(size_t index): m_index{index} {}
             
             constexpr value_type operator *() const {
-                if constexpr (is_linear_enum<T>()) {
+                if constexpr (is_linear_enum<T>) {
                     return static_cast<T>(m_index);
                 } else {
                     return static_cast<T>(reflect::enumerators<T>[m_index].first);
@@ -103,7 +103,7 @@ namespace enums {
         throw std::out_of_range("invalid enum index");
     }
     
-    template<enumeral T> requires (is_linear_enum<T>())
+    template<enumeral T> requires (is_linear_enum<T>)
     constexpr size_t indexof(T value) {
         size_t result = static_cast<size_t>(value);
         assert((result < enum_count<T>) && "enum index is out of bounds");
@@ -157,32 +157,6 @@ namespace enums {
         return visit_enum<return_type>(std::forward<Visitor>(visitor), value);
     }
     
-}
-
-namespace json {
-
-    template<enums::enumeral T, typename Context>
-    struct deserializer<T, Context> {
-        static T read(const json &value) {
-            if (!value.IsString()) {
-                throw deserialize_error(std::format("Cannot deserialize {}: value is not a string", reflect::type_name<T>()));
-            }
-            std::string_view str{value.GetString(), value.GetStringLength()};
-            if (auto ret = enums::from_string<T>(str)) {
-                return *ret;
-            } else {
-                throw deserialize_error(std::format("Invalid {} value: {}", reflect::type_name<T>(), str));
-            }
-        }
-    };
-
-    template<enums::enumeral T, typename Context>
-    struct serializer<T, Context> {
-        static void write(const T &value, string_writer &writer) {
-            serialize(enums::to_string(value), writer);
-        }
-    };
-
 }
 
 namespace std {
