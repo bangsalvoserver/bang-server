@@ -355,9 +355,7 @@ namespace banggame {
             .serialize_args = [](const effect_holder &effect, json::string_writer &writer) {
                 auto &&handler = effect_cast<T>(effect.target_value);
                 if constexpr (requires { handler.get_args(); }) {
-                    using args_t = std::remove_reference_t<decltype(handler.get_args())>;
-                    using serializer_type = json::aggregate_serializer<args_t, json::no_context>;
-                    serializer_type::write_fields(handler.get_args(), writer, {});
+                    json::write_object_fields(handler.get_args(), writer);
                 }
             },
 

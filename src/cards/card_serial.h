@@ -3,8 +3,7 @@
 
 #include "card_fwd.h"
 
-#include "utils/json_aggregate.h"
-#include "utils/tagged_variant.h"
+#include "utils/json_serial.h"
 
 namespace banggame {
     struct game_context {
