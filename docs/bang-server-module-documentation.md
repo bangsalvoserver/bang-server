@@ -403,7 +403,6 @@ Reusable components independent of the "Bang!" domain, used across all other mod
 | `static_map.h` | A compile-time-built map (`static_map_view`), used for card `tag_map`s. |
 | `tsqueue.h` | A thread-safe queue — used in `net/wsserver.h` as `utils::tsqueue<message_type> m_message_queue`, the queue of incoming raw messages (`client_handle` + `connected`/`disconnected`/raw string) handed off between the network I/O thread and the main tick loop. |
 | `type_name.h` | Compile-time type-name introspection (debug/log). |
-| `visit_indexed.h` | Support for `std::visit` with the index of the active alternative. |
 | `sqlite3_wrapper.h` | A minimal RAII wrapper around SQLite3, used by `net/tracking.cpp`. |
 | `base64.h` | Base64 encoding/decoding — used in `net/image_pixels.cpp`'s `image_from_png_data_url` to decode a `data:image/png;base64,...` URL (the format a user's uploaded profile picture arrives in) back into raw PNG bytes. |
 | `misc.h` | Miscellaneous utilities not otherwise categorized. |

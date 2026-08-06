@@ -6,15 +6,10 @@
 
 #include "range_utils.h"
 #include "static_map.h"
-#include "visit_indexed.h"
 
 namespace enums {
 
     template<typename T> concept enumeral = std::is_enum_v<T>;
-
-    template<enumeral auto E> struct enum_tag_t {};
-
-    template<enumeral auto E> inline constexpr enum_tag_t<E> enum_tag;
 
     template<enumeral T> inline constexpr size_t enum_count = reflect::enumerators<T>.size();
     
@@ -142,19 +137,6 @@ namespace enums {
             return it->second;
         }
         return std::nullopt;
-    }
-    
-    template<typename RetType, typename Visitor, enumeral ... E>
-    RetType visit_enum(Visitor &&visitor, E ... values) {
-        return utils::visit_indexed_r<RetType, enum_count<E> ...>([&](auto ... Is) {
-            return std::invoke(std::forward<Visitor>(visitor), enum_tag<enum_values<E>[Is]> ...);
-        }, indexof(values) ...);
-    }
-
-    template<typename Visitor, enumeral E>
-    decltype(auto) visit_enum(Visitor &&visitor, E value) {
-        using return_type = std::invoke_result_t<Visitor, enum_tag_t<enum_values<E>[0]>>;
-        return visit_enum<return_type>(std::forward<Visitor>(visitor), value);
     }
     
 }
