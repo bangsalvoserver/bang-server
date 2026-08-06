@@ -1,25 +1,33 @@
 #ifndef __ENUMS_H__
 #define __ENUMS_H__
 
-#include <reflect>
 #include <format>
 
 #include "range_utils.h"
 #include "static_map.h"
+#include "misc.h"
 
 namespace enums {
 
     template<typename T> concept enumeral = std::is_enum_v<T>;
+    
+    template<enumeral T> inline constexpr auto enumerators = std::define_static_array(std::meta::enumerators_of(^^T));
 
-    template<enumeral T> inline constexpr size_t enum_count = reflect::enumerators<T>.size();
+    template<enumeral T> inline constexpr size_t enum_count = enumerators<T>.size();
+
+    template<enumeral T>
+    consteval auto build_enum_values() {
+        std::array<T, enum_count<T>> values;
+        rn::copy(enumerators<T> | rv::transform(std::meta::extract<T>), values.begin());
+        return values;
+    }
     
     template<enumeral T>
     inline constexpr bool is_linear_enum = []{
-        constexpr const auto &values = reflect::enumerators<T>;
-        for (size_t i=0; i<values.size(); ++i) {
-            if (values[i].first != i) {
-                return false;
-            }
+        size_t i = 0;
+        for (std::meta::info e : enumerators<T>) {
+            if (static_cast<size_t>(std::meta::extract<T>(e)) != i) return false;
+            ++i;
         }
         return true;
     }();
@@ -43,7 +51,8 @@ namespace enums {
                 if constexpr (is_linear_enum<T>) {
                     return static_cast<T>(m_index);
                 } else {
-                    return static_cast<T>(reflect::enumerators<T>[m_index].first);
+                    static constexpr auto values = build_enum_values<T>();
+                    return values[m_index];
                 }
             }
 
@@ -89,9 +98,8 @@ namespace enums {
 
     template<enumeral T>
     constexpr size_t indexof(T value) {
-        constexpr const auto &values = enum_values<T>;
-        for (size_t i=0; i<values.size(); ++i) {
-            if (values[i] == value) {
+        for (size_t i=0; i<enum_values<T>.size(); ++i) {
+            if (enum_values<T>[i] == value) {
                 return i;
             }
         }
@@ -112,8 +120,10 @@ namespace enums {
     }
 
     template<enumeral T>
-    constexpr std::string_view to_string(T input) {
-        return reflect::enumerators<T>[indexof(input)].second;
+    consteval auto build_enum_names() {
+        std::array<std::string_view, enum_count<T>> names;
+        rn::copy(enumerators<T> | rv::transform(std::meta::identifier_of), names.begin());
+        return names;
     }
 
     template<enumeral E>
@@ -123,17 +133,28 @@ namespace enums {
     }
 
     template<enumeral T>
-    inline constexpr auto names_to_values_map = []<size_t ... Is>(std::index_sequence<Is ...>) {
-        constexpr auto &values = enum_values<T>;
-        return utils::make_static_map<std::string_view, T>({
-            { to_string(values[Is]), values[Is] } ...
-        });
-    }(std::make_index_sequence<enum_count<T>>());
+    inline constexpr auto enum_names = build_enum_names<T>();
+
+    template<enumeral T>
+    constexpr std::string_view to_string(T input) {
+        return enum_names<T>[indexof(input)];
+    }
+
+    template<enumeral T>
+    consteval auto build_names_to_values_map() {
+        return []<size_t ... Is>(std::index_sequence<Is ...>) {
+            return utils::make_static_map<std::string_view, T>({
+                { to_string(enum_values<T>[Is]), enum_values<T>[Is] } ...
+            });
+        }(std::make_index_sequence<enum_count<T>>());
+    }
+
+    template<enumeral T>
+    inline constexpr auto names_to_values_map = build_names_to_values_map<T>();
 
     template<enumeral T>
     constexpr std::optional<T> from_string(std::string_view str) {
-        const auto &names_map = names_to_values_map<T>;
-        if (auto it = names_map.find(str); it != names_map.end()) {
+        if (auto it = names_to_values_map<T>.find(str); it != names_to_values_map<T>.end()) {
             return it->second;
         }
         return std::nullopt;

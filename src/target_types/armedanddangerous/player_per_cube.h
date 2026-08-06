@@ -8,8 +8,7 @@
 namespace banggame {
 
     struct targeting_player_per_cube {
-        struct value_type {
-            struct transparent{};
+        struct [[=json::transparent]] value_type {
             card_list cubes;
             player_list players;
         };

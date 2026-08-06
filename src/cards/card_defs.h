@@ -126,9 +126,9 @@ namespace banggame {
 
     struct effect_holder {
         const effect_vtable *type;
-        const void *effect_value;
+        [[=json::ignore]] const void *effect_value;
         const targeting_vtable *target;
-        const void *target_value;
+        [[=json::ignore]] const void *target_value;
 
         explicit operator bool () const {
             return type != nullptr;
@@ -162,7 +162,7 @@ namespace banggame {
 
     struct equip_holder {
         const equip_vtable *type;
-        const void *effect_value;
+        [[=json::ignore]] const void *effect_value;
 
         explicit operator bool () const {
             return type != nullptr;
@@ -176,7 +176,7 @@ namespace banggame {
 
     struct modifier_holder {
         const modifier_vtable *type;
-        const void *effect_value;
+        [[=json::ignore]] const void *effect_value;
 
         explicit operator bool () const {
             return type != nullptr;
@@ -188,7 +188,7 @@ namespace banggame {
 
     struct mth_holder {
         const mth_vtable *type;
-        const void *effect_value;
+        [[=json::ignore]] const void *effect_value;
 
         explicit operator bool () const {
             return type != nullptr;

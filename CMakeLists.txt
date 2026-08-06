@@ -4,6 +4,8 @@ project(bangcardgame VERSION 0.1.0)
 set(CMAKE_CXX_STANDARD 26)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+add_compile_options(-freflection)
+
 if(WIN32)
     if (MSVC)
         add_compile_options(/bigobj)
@@ -25,11 +27,6 @@ add_library(banglibs INTERFACE)
 
 add_subdirectory(external/uwebsockets)
 target_link_libraries(banglibs INTERFACE uwebsockets)
-
-# reflect
-
-add_subdirectory(external/reflect)
-target_link_libraries(banglibs INTERFACE reflect)
 
 # sqlite
 
@@ -59,6 +56,7 @@ target_include_directories(bangserver PRIVATE src)
 target_link_libraries(bangserver PRIVATE banglibs)
 
 target_precompile_headers(bangserver PRIVATE
+    <meta>
     <ranges>
     <format>
     <variant>

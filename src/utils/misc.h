@@ -2,6 +2,8 @@
 #define __UTILS_H__
 
 #include <concepts>
+#include <string_view>
+#include <meta>
 
 #define FWD(x) std::forward<decltype(x)>(x)
 
@@ -36,5 +38,9 @@ struct argument_number<T> : argument_number<decltype(&T::operator())> {};
 
 template<typename Fun>
 inline constexpr size_t argument_number_v = argument_number<Fun>::value;
+
+consteval bool has_annotation(std::meta::info info, std::meta::info annotation_type) {
+    return !std::meta::annotations_of_with_type(info, annotation_type).empty();
+}
 
 #endif
