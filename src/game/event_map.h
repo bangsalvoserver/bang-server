@@ -16,8 +16,12 @@ namespace banggame {
 
     template<event T>
     auto to_event_tuple(const T &value) {
+#if defined(__cpp_structured_bindings) && __cpp_structured_bindings >= 202411L
         const auto &[...fields] = value;
         return std::tie(fields...);
+#else
+        return reflect::to<std::tuple>(value);
+#endif
     }
 
     template<event T>
