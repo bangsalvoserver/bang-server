@@ -128,22 +128,28 @@ namespace banggame {
         }
     };
 
+    template<card_deck_type E>
+    static bool give_card_fun(player_ptr target, card_ptr target_card) {
+        give_card_visitor<E> visitor;
+
+        if (!visitor.is_valid_card(target, target_card)) {
+            return false;
+        }
+
+        target->m_game->clear_request_status();
+        visitor.give_card(target, target_card);
+        target->m_game->commit_updates();
+
+        return true;
+    }
+
     bool give_card(player_ptr target, std::string_view card_name) {
+        static constexpr auto vtable = []<size_t ... Is>(std::index_sequence<Is ...>) {
+            return std::array{ give_card_fun<enums::enum_values<card_deck_type>[Is]> ... };
+        }(std::make_index_sequence<enums::enum_count<card_deck_type>>());
+
         for (card_ptr target_card : target->m_game->m_cards_storage | rv::values | rv::addressof) {
-            if (string_equal_icase(card_name, target_card->name)
-                && enums::visit_enum([&]<card_deck_type E>(enums::enum_tag_t<E>) {
-                    give_card_visitor<E> visitor;
-
-                    if (visitor.is_valid_card(target, target_card)) {
-                        target->m_game->clear_request_status();
-                        visitor.give_card(target, target_card);
-                        target->m_game->commit_updates();
-
-                        return true;
-                    }
-                    return false;
-                }, target_card->deck)
-            ) {
+            if (string_equal_icase(card_name, target_card->name) && vtable[enums::indexof(target_card->deck)](target, target_card)) {
                 return true;
             }
         }
