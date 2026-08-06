@@ -8,9 +8,14 @@
 
 #include <vector>
 #include <chrono>
+#include <variant>
 #include <stdexcept>
+#include <format>
+#include <reflect>
 
 #include "range_utils.h"
+#include "static_map.h"
+#include "misc.h"
 
 namespace json {
 
@@ -41,6 +46,14 @@ namespace json {
     template<typename T, typename Context> struct serializer;
 
     template<typename T, typename Context> struct deserializer;
+
+    template<typename T>
+    concept aggregate = std::is_aggregate_v<T>;
+    
+    template<typename T>
+    concept is_transparent = requires {
+        typename T::transparent;
+    };
 
     class raw_string {
     private:
@@ -223,6 +236,60 @@ namespace json {
             writer.EndArray();
         }
     };
+    
+    template<typename Context, typename ... Ts>
+    struct serializer<std::variant<Ts ...>, Context> {
+        using variant_type = std::variant<Ts ...>;
+
+        static void write(const variant_type &value, string_writer &writer, const Context &ctx) {
+            std::visit([&](const auto &inner_value) {
+                writer.StartObject();
+
+                auto key = reflect::type_name<std::remove_cvref_t<decltype(inner_value)>>();
+                writer.Key(key.data(), key.size());
+
+                serialize(inner_value, writer, ctx);
+
+                writer.EndObject();
+            }, value);
+        }
+    };
+
+    template<aggregate T, typename Context = no_context>
+    void write_object_fields(const T &value, string_writer &writer, const Context &ctx = {}) {
+        reflect::for_each<T>([&](auto I) {
+            using member_type = reflect::member_type<I, T>;
+            if constexpr (!requires { typename serializer<member_type, Context>::skip_field; }) {
+                std::string_view key = reflect::member_name<I, T>();
+                writer.Key(key.data(), key.size());
+                serialize(reflect::get<I>(value), writer, ctx);
+            }
+        });
+    }
+    
+    template<aggregate T, typename Context>
+    struct serializer<T, Context> {
+        static void write(const T &value, string_writer &writer, const Context &ctx) {
+            writer.StartObject();
+            write_object_fields(value, writer, ctx);
+            writer.EndObject();
+        }
+    };
+
+    template<aggregate T, typename Context> requires is_transparent<T>
+    struct serializer<T, Context> {
+        static void write(const T &value, string_writer &writer, const Context &ctx) {
+            if constexpr (reflect::size<T>() == 1) {
+                serialize(reflect::get<0>(value), writer, ctx);
+            } else {
+                writer.StartArray();
+                reflect::for_each<T>([&](auto I) {
+                    serialize(reflect::get<I>(value), writer, ctx);
+                });
+                writer.EndArray();
+            }
+        }
+    };
 
     template<typename Context>
     struct deserializer<json_document, Context> {
@@ -386,6 +453,90 @@ namespace json {
             }(std::index_sequence_for<Ts ...>());
         }
     };
+    
+    template<typename Context, typename ... Ts>
+    struct deserializer<std::variant<Ts ...>, Context> {
+        using variant_type = std::variant<Ts ...>;
+        
+        static variant_type read(const json &value, const Context &ctx) {
+            if (!value.IsObject()) {
+                throw deserialize_error("Cannot deserialize tagged variant: value is not an object");
+            }
+            if (value.MemberCount() != 1) {
+                throw deserialize_error("Cannot deserialize tagged variant: object must contain only one key");
+            }
+
+            using deserialize_fun = variant_type (*)(const json &inner_value, const Context &ctx);
+            static constexpr auto vtable = utils::make_static_map<std::string_view, deserialize_fun>({
+                {
+                    reflect::type_name<Ts>(),
+                    [](const json &inner_value, const Context &ctx) -> variant_type {
+                        return deserialize<Ts>(inner_value, ctx);
+                    }
+                } ...
+            });
+
+            auto key_it = value.MemberBegin();
+            std::string_view key{key_it->name.GetString(), key_it->name.GetStringLength()};
+
+            auto it = vtable.find(key);
+            if (it == vtable.end()) {
+                throw deserialize_error(std::format("Invalid variant type: {}", key));
+            }
+
+            return it->second(key_it->value, ctx);
+        }
+    };
+
+    template<aggregate T, typename Context = no_context>
+    void read_object_fields(T &result, const json &value, const Context &ctx = {}) {
+        if (!value.IsObject()) {
+            throw deserialize_error(std::format("Cannot deserialize {}: value is not an object", reflect::type_name<T>()));
+        }
+        reflect::for_each<T>([&](auto I) {
+            static constexpr auto name = reflect::member_name<I, T>();
+            using value_type = reflect::member_type<I, T>;
+            json key(rapidjson::StringRef(name.data(), name.size()));
+            if (auto it = value.FindMember(key); it != value.MemberEnd()) {
+                reflect::get<I>(result) = deserialize<value_type>(it->value, ctx);
+            } else {
+                throw deserialize_error(std::format("Cannot deserialize {}: missing field {}", reflect::type_name<T>(), name));
+            }
+        });
+    }
+
+    template<aggregate T, typename Context>
+    struct deserializer<T, Context> {
+        static T read(const json &value, const Context &ctx) {
+            if (!value.IsObject()) {
+                throw deserialize_error(std::format("Cannot deserialize {}: value is not an object", reflect::type_name<T>()));
+            }
+            T result{};
+            read_object_fields(result, value, ctx);
+            return result;
+        }
+    };
+    
+    template<aggregate T, typename Context> requires is_transparent<T>
+    struct deserializer<T, Context> {
+        static T read(const json &value, const Context &ctx) {
+            if constexpr (reflect::size<T>() == 1) {
+                return { deserialize<reflect::member_type<0, T>>(value, ctx) };
+            } else {
+                if (!value.IsArray()) {
+                    throw deserialize_error(std::format("Cannot deserialize {}: value is not an array", reflect::type_name<T>()));
+                }
+                const auto &value_array = value.GetArray();
+                if (value_array.Size() != reflect::size<T>()) {
+                    throw deserialize_error(std::format("Cannot deserialize {}: invalid size", reflect::type_name<T>()));
+                }
+                return [&]<size_t ... Is>(std::index_sequence<Is ...>) -> T {
+                    return { deserialize<reflect::member_type<Is, T>>(value_array[Is], ctx) ... };
+                }(std::make_index_sequence<reflect::size<T>()>());
+            }
+        }
+    };
+
 }
 
 #endif

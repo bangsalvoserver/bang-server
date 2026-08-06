@@ -393,7 +393,7 @@ Reusable components independent of the "Bang!" domain, used across all other mod
 | `enums.h` | Support functions on enums: to/from string conversion (`enums::from_string`), iteration, `is_between`. |
 | `fixed_string.h` | A constant string usable as a **template parameter** (C++20 NTTP), underpinning the `effect_vtable_map<utils::fixed_string Name>` mechanism that binds YAML names to C++ types. |
 | `function_ref.h` | A lightweight, non-owning reference to a function (an allocation-free alternative to `std::function`). |
-| `json_serial.h` / `json_aggregate.h` | A generic JSON (de)serialization framework based on compile-time reflection (`serializer<T>`, `deserializer<T>`), used for all network messages and state updates. |
+| `json_serial.h` | A generic JSON (de)serialization framework based on compile-time reflection (`serializer<T>`, `deserializer<T>`), used for all network messages and state updates. |
 | `parse_string.h` | Generic string→type parsing (`string_parser<T>`), used e.g. for `expansion_set` and `game_options::set_option`. |
 | `combinations.h` | `utils::combinations<T>(elems, n)`, a coroutine generator yielding every n-element combination of a vector — used by *Armed & Dangerous*'s `select_cubes` target type (`targeting_select_cubes::possible_targets`) to enumerate every valid way to pick `ncubes` cubes out of a player's available ones. |
 | `int_set.h` | An efficient set of small integers (bitset). |
@@ -402,7 +402,6 @@ Reusable components independent of the "Bang!" domain, used across all other mod
 | `range_utils.h` / `ranges_concat.h` | Extensions to C++20/23 ranges (e.g. `rotate_range` used in `game_table::range_all_players`, concatenation of heterogeneous ranges). |
 | `stable_queue.h` | A **stable** priority queue (preserves insertion order for equal priority) — used by `request_queue`. |
 | `static_map.h` | A compile-time-built map (`static_map_view`), used for card `tag_map`s. |
-| `tagged_variant.h` | A tag-dispatched variant, for handling heterogeneous type unions with minimal overhead. |
 | `tsqueue.h` | A thread-safe queue — used in `net/wsserver.h` as `utils::tsqueue<message_type> m_message_queue`, the queue of incoming raw messages (`client_handle` + `connected`/`disconnected`/raw string) handed off between the network I/O thread and the main tick loop. |
 | `type_name.h` | Compile-time type-name introspection (debug/log). |
 | `visit_indexed.h` | Support for `std::visit` with the index of the active alternative. |
