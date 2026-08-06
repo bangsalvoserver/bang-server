@@ -13,12 +13,18 @@ namespace banggame {
     template<typename T>
     decltype(auto) unwrap_value(T &&value) {
         if constexpr (std::is_aggregate_v<std::remove_cvref_t<T>>) {
+#if defined(__cpp_structured_bindings) && __cpp_structured_bindings >= 202411L
             auto &&[...fields] = std::forward<T>(value);
             if constexpr (sizeof...(fields) == 1) {
                 return (fields...[0]);
-            } else {
-                return value;
             }
+#else
+            if constexpr (reflect::size<T>() == 1) {
+                auto &&[field] = std::forward<T>(value);
+                return (field);
+            }
+#endif
+            else return value;
         } else {
             return value;
         }
