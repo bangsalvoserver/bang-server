@@ -212,10 +212,12 @@ namespace banggame {
         yield_update(game_updates::player_add{ m_players });
 
         for (player_ptr p : m_players) {
-            yield_update(game_updates::player_flags{ p, p->m_player_flags });
+            if (auto flags = p->m_player_flags.exclude(ignored_player_flags)) {
+                yield_update(game_updates::player_flags{ p, flags });
+            }
         }
 
-        yield_update(game_updates::player_order{ m_players, 0ms });
+        yield_update(game_updates::player_order{ m_players, true });
 
         auto add_cards = [&](pocket_type pocket, player_ptr owner = nullptr) {
             auto &range = get_pocket(pocket, owner);
@@ -224,7 +226,7 @@ namespace banggame {
             }
             for (card_ptr c : range) {
                 if (c->get_visibility() == card_visibility::shown) {
-                    yield_update(game_updates::show_card{ c, *c, 0ms });
+                    yield_update(game_updates::show_card{ c, *c, true });
                 }
                 for (const auto &[token, count] : c->tokens) {
                     if (count > 0) {
@@ -232,7 +234,7 @@ namespace banggame {
                     }
                 }
                 if (c->inactive) {
-                    yield_update(game_updates::tap_card{ c, true, 0ms });
+                    yield_update(game_updates::tap_card{ c, true, true });
                 }
             }
         };
@@ -247,7 +249,7 @@ namespace banggame {
         add_cards(pocket_type::hidden_deck);
 
         if (train_position != 0) {
-            yield_update(game_updates::move_train{ train_position, 0ms });
+            yield_update(game_updates::move_train{ train_position, true });
         }
 
         add_cards(pocket_type::stations);
@@ -271,7 +273,7 @@ namespace banggame {
 
         for (player_ptr p : m_players) {
             if (p->check_player_flags(player_flag::role_revealed)) {
-                yield_update(game_updates::player_show_role{ p, p->m_role, 0ms });
+                yield_update(game_updates::player_show_role{ p, p->m_role, true });
             }
 
             if (!p->check_player_flags(player_flag::removed)) {
@@ -280,7 +282,7 @@ namespace banggame {
                 add_cards(pocket_type::player_table, p);
                 add_cards(pocket_type::player_hand, p);
 
-                yield_update(game_updates::player_hp{ p, p->m_hp, 0ms });
+                yield_update(game_updates::player_hp{ p, p->m_hp, true });
 
                 for (const auto &[token, count] : p->tokens) {
                     if (count > 0) {
@@ -299,7 +301,9 @@ namespace banggame {
             }
         }
 
-        yield_update(game_updates::game_flags{ m_game_flags });
+        if (auto flags = m_game_flags.exclude(ignored_game_flags)) {
+            yield_update(game_updates::game_flags{ flags });
+        }
     }
 
     void game::get_rejoin_updates(int user_id, consumer_callback<update_content> callback) {
@@ -313,12 +317,12 @@ namespace banggame {
             yield_update(game_updates::player_add{ target });
 
             if (!target->check_player_flags(player_flag::role_revealed)) {
-                yield_update(game_updates::player_show_role{ target, target->m_role, 0ms });
+                yield_update(game_updates::player_show_role{ target, target->m_role, true });
             }
 
             for (card_ptr c : target->m_characters) {
                 if (c->get_visibility() == card_visibility::show_owner) {
-                    yield_update(game_updates::show_card{ c, *c, 0ms });
+                    yield_update(game_updates::show_card{ c, *c, true });
                 }
             }
 
@@ -326,7 +330,7 @@ namespace banggame {
                 for (player_ptr p : m_players) {
                     for (card_ptr c : p->m_hand) {
                         if (c->visibility.matches(target)) {
-                            yield_update(game_updates::show_card{ c, *c, 0ms });
+                            yield_update(game_updates::show_card{ c, *c, true });
                         }
                     }
                 }
@@ -334,7 +338,7 @@ namespace banggame {
 
             for (card_ptr c : m_selection) {
                 if (c->visibility.matches(target)) {
-                    yield_update(game_updates::show_card{ c, *c, 0ms });
+                    yield_update(game_updates::show_card{ c, *c, true });
                 }
             }
 

@@ -38,10 +38,6 @@ namespace json {
         }
     };
 
-    template<typename Context> struct serializer<const void *, Context> {
-        struct skip_field{};
-    };
-
     template<typename Context> struct serializer<banggame::effect_holder, Context> {
         static void write(const banggame::effect_holder &effect, string_writer &writer, const Context &ctx) {
             writer.StartObject();
@@ -170,9 +166,6 @@ namespace json {
         }
 
     };
-
-    template<> struct serializer<banggame::game_string, banggame::game_context>
-        : serializer<banggame::game_string_args, banggame::game_context> {};
 
     template<> struct serializer<banggame::animation_duration, banggame::game_context> {
         static void write(const banggame::animation_duration &duration, string_writer &writer, const banggame::game_context &context) {

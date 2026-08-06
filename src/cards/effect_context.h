@@ -44,7 +44,7 @@ namespace banggame {
         static constexpr serialize_fun_t make_serialize_fun() {
             if constexpr (requires { typename T::serialize_context; }) {
                 return [](const context_entry &self, json::string_writer &writer) {
-                    auto key = reflect::type_name<T>();
+                    auto key = std::meta::identifier_of(^^T);
                     writer.Key(key.data(), key.size());
                     if constexpr (std::is_empty_v<T>) {
                         writer.Bool(true);

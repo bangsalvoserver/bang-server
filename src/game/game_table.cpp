@@ -195,8 +195,7 @@ namespace banggame {
             target_tokens += num_tokens;
             origin_tokens -= num_tokens;
 
-            animation_duration duration = instant ? 0ms : num_tokens == 1 ? durations.move_token : durations.move_tokens;
-            add_update(game_updates::move_tokens{ token_type, num_tokens, origin, target, duration });
+            add_update(game_updates::move_tokens{ token_type, num_tokens, origin, target, instant });
         }
     }
 
@@ -274,13 +273,21 @@ namespace banggame {
     }
 
     void game_table::add_game_flags(game_flag flags) {
-        m_game_flags.add(flags);
-        add_update(game_updates::game_flags{ m_game_flags });
+        if (!check_flags(flags)) {
+            m_game_flags.add(flags);
+            if (!ignored_game_flags.check(flags)) {
+                add_update(game_updates::game_flags{ m_game_flags.exclude(ignored_game_flags) });
+            }
+        }
     }
 
     void game_table::remove_game_flags(game_flag flags) {
-        m_game_flags.remove(flags);
-        add_update(game_updates::game_flags{ m_game_flags });
+        if (check_flags(flags)) {
+            m_game_flags.remove(flags);
+            if (!ignored_game_flags.check(flags)) {
+                add_update(game_updates::game_flags{ m_game_flags.exclude(ignored_game_flags) });
+            }
+        }
     }
 
     bool game_table::check_flags(game_flag flags) const {
