@@ -4,8 +4,6 @@ project(bangcardgame VERSION 0.1.0)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-include(FetchContent)
-
 if(WIN32)
     if (MSVC)
         add_compile_options(/bigobj)
@@ -14,69 +12,49 @@ if(WIN32)
     elseif(MINGW)
         add_compile_options(-fno-ms-extensions)
         add_compile_options(-Wa,-mbig-obj)
-        link_libraries(stdc++exp ws2_32 iphlpapi userenv psapi)
+        link_libraries(stdc++exp)
     endif()
     add_compile_definitions(_WIN32_WINNT=0x0601)
 endif()
 
-# libuv
-FetchContent_Declare(
-    libuv
-    GIT_REPOSITORY https://github.com/libuv/libuv.git
-    GIT_TAG v1.48.0
-)
-set(LIBUV_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-set(BUILD_TESTING OFF CACHE BOOL "" FORCE)
-FetchContent_MakeAvailable(libuv)
-include_directories(${libuv_SOURCE_DIR}/include)
+# external dependencies
 
 add_library(banglibs INTERFACE)
 
 # uwebsockets
+
 add_subdirectory(external/uwebsockets)
-target_link_libraries(banglibs INTERFACE uwebsockets uv_a)
+target_link_libraries(banglibs INTERFACE uwebsockets)
 
 # reflect
+
 add_subdirectory(external/reflect)
 target_link_libraries(banglibs INTERFACE reflect)
 
 # sqlite
-find_package(SQLite3 QUIET)
-if(NOT SQLite3_FOUND)
-    FetchContent_Declare(
-        sqlite3
-        URL https://www.sqlite.org/2024/sqlite-amalgamation-3450300.zip
-        DOWNLOAD_EXTRACT_TIMESTAMP TRUE
-    )
-    FetchContent_MakeAvailable(sqlite3)
-    add_library(sqlite3_lib STATIC ${sqlite3_SOURCE_DIR}/sqlite3.c)
-    target_include_directories(sqlite3_lib PUBLIC ${sqlite3_SOURCE_DIR})
-    add_library(SQLite::SQLite3 ALIAS sqlite3_lib)
-endif()
+
+find_package(SQLite3 REQUIRED)
 target_link_libraries(banglibs INTERFACE SQLite::SQLite3)
 
 # cxxopts
-find_package(cxxopts QUIET)
-if(NOT cxxopts_FOUND)
-    FetchContent_Declare(
-        cxxopts
-        GIT_REPOSITORY https://github.com/jarro2783/cxxopts.git
-        GIT_TAG v3.2.0
-    )
-    FetchContent_MakeAvailable(cxxopts)
-endif()
+
+find_package(cxxopts REQUIRED)
 target_link_libraries(banglibs INTERFACE cxxopts::cxxopts)
 
 # rapidjson
+
 add_subdirectory(external/rapidjson)
 target_link_libraries(banglibs INTERFACE RapidJSON)
 
-# libpng & zlib (použije ty, co jsi nakopíroval do w64devkit)
+# libpng
+
 find_package(PNG REQUIRED)
 target_link_libraries(banglibs INTERFACE PNG::PNG)
 
 # bang server executable
+
 add_executable(bangserver "")
+
 target_include_directories(bangserver PRIVATE src)
 target_link_libraries(bangserver PRIVATE banglibs)
 

@@ -1,7 +1,7 @@
 rulesets:
   - name: vlcata
 
-characters:
+character:
   - name: BEJCEK
     image: 29_bejcek
     effects:
