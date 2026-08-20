@@ -1,5 +1,10 @@
-#include "helena.h"
+#ifndef __VLCATA_HELENA_H__
+#define __VLCATA_HELENA_H__
+
+#include "cards/card_effect.h"
 
 namespace banggame {
-    // Stub pro stabilni testovaci fazi
+   
 }
+
+#endif

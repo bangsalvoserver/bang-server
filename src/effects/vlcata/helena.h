@@ -4,9 +4,7 @@
 #include "cards/card_effect.h"
 
 namespace banggame {
-    struct effect_helena_ability {
-        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target);
-    };
+    struct effect_helena_ability {};
     DEFINE_EFFECT(helena_ability, effect_helena_ability)
 }
 
