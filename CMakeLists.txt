@@ -90,8 +90,8 @@ if(NOT PNG_FOUND)
     FetchContent_MakeAvailable(zlib)
     
     set(ZLIB_INCLUDE_DIR "${zlib_SOURCE_DIR};${zlib_BINARY_DIR}" CACHE PATH "" FORCE)
-    set(ZLIB_LIBRARY zlibstatic CACHE STRING "" FORCE)
-    set(ZLIB_LIBRARIES zlibstatic CACHE STRING "" FORCE)
+    set(ZLIB_LIBRARY "${CMAKE_BINARY_DIR}/_deps/zlib-build/libzlibstatic.a" CACHE FILEPATH "" FORCE)
+    set(ZLIB_LIBRARIES "${CMAKE_BINARY_DIR}/_deps/zlib-build/libzlibstatic.a" CACHE FILEPATH "" FORCE)
     set(ZLIB_FOUND TRUE CACHE BOOL "" FORCE)
 
     FetchContent_Declare(
@@ -115,7 +115,7 @@ target_link_libraries(banglibs INTERFACE PNG::PNG)
 add_executable(bangserver "")
 
 target_include_directories(bangserver PRIVATE src)
-target_link_libraries(bangserver PRIVATE banglibs)
+target_link_libraries(bangserver PRIVATE banglibs "${CMAKE_BINARY_DIR}/_deps/zlib-build/libzlibstatic.a")
 
 target_precompile_headers(bangserver PRIVATE
     <ranges>

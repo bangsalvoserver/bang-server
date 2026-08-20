@@ -1,92 +1,20 @@
-# ==========================================
-# Expansion: Vlčata (vlcata.yml)
-# Where: bang-server/src/config/sets/vlcata.yml
-# ==========================================
+rulesets:
+  - name: vlcata
 
-character:
-  - name: HOROUS
-    image: 29_horous
-    equip:
-      - horous
-
-  - name: MIKI
-    image: 29_miki
-    equip:
-      - miki
-
-  - name: MARTIN
-    image: 29_martin
-    equip:
-      - martin
-
-  - name: TUCTUC
-    image: 29_tuctuc
-    equip:
-      - tuctuc
-
-  - name: ELIS
-    image: 29_elis
-    responses:
-      - elis card self | hand
-      - missed
-
-  - name: VUDCE
-    image: 29_vudce
-    effects:
-      - max_usages(1)
-      - vudce_ability player notself
-
-  - name: JEDNORUCKA_RIZEK
-    image: 29_jednorucka_rizek
-    tags:
-      - max_hp(3)
-    equip:
-      - jednorucka_rizek
-
-  - name: PETUNA
-    image: 29_petuna
-    equip:
-      - petuna
-
-  - name: SMIG
-    image: 29_smig
-    effects:
-      - max_usages(1)
-      - discard card self | hand
-      - smig_destroy card notself | table
-
-  - name: CYRIL
-    image: 29_cyril
-    equip:
-      - cyril
-
-  - name: VENA
-    image: 29_vena
-    equip:
-      - vena
-
+characters:
   - name: BEJCEK
     image: 29_bejcek
     effects:
       - max_usages(3)
       - discard card self | hand
       - draw(1)
-    equip:
-      - bejcek_passive
 
-  - name: VERCA
-    image: 29_verca
-    effects:
-      - discard card self | hand
-      - draw(2)
-    equip:
-      - verca_instant_green
-
-  - name: HELENA
-    image: 29_helena
+  - name: PATKA
+    image: 29_patka
     effects:
       - max_usages(1)
-      - helena_ability player notself
+      - discard card self | hand
+      - draw(2)
 
   - name: ANEZKA
     image: 29_anezka
@@ -101,48 +29,11 @@ character:
       - deathsave
       - discard cards(3) self | hand
       - heal
-    equip:
-      - terka_p_bang
 
   - name: JULKA
     image: 29_julka
-    tags:
-      - max_hp(9)
     equip:
       - initial_cards(5)
-      - julka
-
-  - name: SIMI
-    image: 29_simi
-    tags:
-      - max_hp(5)
-    effects:
-      - discard cards(2) self | hand
-      - simi_take_dynamite
-    equip:
-      - simi_dynamite_master
-
-  - name: LIBOR
-    image: 29_libor
-    tags:
-      - max_hp(5)
-    equip:
-      - libor
-
-  - name: EL_BAGITO
-    image: 29_el_bagito
-    equip:
-      - el_bagito
-
-  - name: KRECEK
-    image: 29_krecek
-    equip:
-      - krecek
-
-  - name: EDIE
-    image: 29_edie
-    equip:
-      - edie
 
   - name: HARRY
     image: 29_harry
@@ -150,34 +41,69 @@ character:
       - max_usages(2)
       - discard card self | hand
       - steal random_if_hand_card
-    tags:
-      - skip_logs
 
-  - name: PATKA
-    image: 29_patka
+  - name: VERCA
+    image: 29_verca
     effects:
-      - max_usages(1)
       - discard card self | hand
       - draw(2)
 
-  - name: KOTEL
-    image: 29_kotel
+  - name: MARTIN
+    image: 29_martin
     equip:
-      - kotel
+      - martin
 
-  - name: TERMIT
-    image: 29_termit
-    tags:
-      - max_hp(5)
+  - name: TUCTUC
+    image: 29_tuctuc
     equip:
-      - termit
+      - tuctuc
 
-  - name: SITEJ
-    image: 29_sitej
+  - name: MIKI
+    image: 29_miki
     equip:
-      - sitej
+      - miki
 
-  - name: BUDHA
-    image: 29_budha
+  - name: LIBOR
+    image: 29_libor
     equip:
-      - budha
+      - libor
+
+  - name: ELIS
+    image: 29_elis
+    responses:
+      - elis card self | hand
+      - missed
+
+  # SKUPINA 3: DOCASNE ZAKOMENTOVANE PRO TEST
+  # - name: HOROUS
+  #   image: 29_horous
+  # - name: VUDCE
+  #   image: 29_vudce
+  # - name: JEDNORUCKA_RIZEK
+  #   image: 29_jednorucka_rizek
+  # - name: PETUNA
+  #   image: 29_petuna
+  # - name: SMIG
+  #   image: 29_smig
+  # - name: CYRIL
+  #   image: 29_cyril
+  # - name: VENA
+  #   image: 29_vena
+  # - name: HELENA
+  #   image: 29_helena
+  # - name: SIMI
+  #   image: 29_simi
+  # - name: EL_BAGITO
+  #   image: 29_el_bagito
+  # - name: KRECEK
+  #   image: 29_krecek
+  # - name: EDIE
+  #   image: 29_edie
+  # - name: KOTEL
+  #   image: 29_kotel
+  # - name: TERMIT
+  #   image: 29_termit
+  # - name: SITEJ
+  #   image: 29_sitej
+  # - name: BUDHA
+  #   image: 29_budha
