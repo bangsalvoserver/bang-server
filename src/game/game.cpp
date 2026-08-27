@@ -499,23 +499,35 @@ namespace banggame {
         add_update(make_preload_assets_update(this));
 
         if (!call_event(event_type::on_assign_characters{ m_first_player })) {
-            auto character_it = m_characters.begin();
-            int max_character_choice = m_characters.size() / num_alive();
-            for (player_ptr p : range_alive_players(m_first_player)) {
-                if (m_options.character_choice > 1) {
+            if (m_options.all_characters) {
+                for (player_ptr p : range_alive_players(m_first_player)) {
                     card_list characters;
-                    characters.reserve(std::min(max_character_choice, m_options.character_choice));
-                    for (int i=0; i<characters.capacity(); ++i) {
-                        characters.push_back(*character_it++);
+                    for (card_ptr c : m_characters) {
+                        card_ptr cloned_card = add_card(*c);
+                        characters.push_back(cloned_card);
                     }
-
                     add_cards_to(std::move(characters), pocket_type::player_hand, p, card_visibility::show_owner);
                     queue_request<request_characterchoice>(p);
-                } else {
-                    card_ptr target_card = *character_it++;
-                    add_log("LOG_CHARACTER_CHOICE", p, target_card);
-                    p->set_character(target_card);
-                    p->set_hp(p->get_character_max_hp(), true);
+                }
+            } else {
+                auto character_it = m_characters.begin();
+                int max_character_choice = m_characters.size() / num_alive();
+                for (player_ptr p : range_alive_players(m_first_player)) {
+                    if (m_options.character_choice > 1) {
+                        card_list characters;
+                        characters.reserve(std::min(max_character_choice, m_options.character_choice));
+                        for (int i=0; i<characters.capacity(); ++i) {
+                            characters.push_back(*character_it++);
+                        }
+
+                        add_cards_to(std::move(characters), pocket_type::player_hand, p, card_visibility::show_owner);
+                        queue_request<request_characterchoice>(p);
+                    } else {
+                        card_ptr target_card = *character_it++;
+                        add_log("LOG_CHARACTER_CHOICE", p, target_card);
+                        p->set_character(target_card);
+                        p->set_hp(p->get_character_max_hp(), true);
+                    }
                 }
             }
         }

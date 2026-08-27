@@ -16,6 +16,7 @@ namespace banggame {
     struct game_options {
         expansion_set expansions;
         int character_choice = 1;
+ 	bool all_characters = false;
         int max_players = 5;
         bool add_bots = false;
         bool quick_discard_all = true;
