@@ -2,79 +2,112 @@ rulesets:
   - name: vlcata
 
 character:
+  # 1. BEJCEK - Up to 3 times per turn, discard a card to draw 1 card
   - name: BEJCEK
     image: 29_bejcek
+    rulesets: [vlcata]
     effects:
       - max_usages(3)
       - discard card self | hand
       - draw(1)
 
+  # 2. PATKA - Once per turn, discard a card to draw 2 cards
   - name: PATKA
     image: 29_patka
+    rulesets: [vlcata]
     effects:
       - max_usages(1)
       - discard card self | hand
       - draw(2)
 
+  # 3. ANEZKA - Once per turn, discard 2 cards to heal any alive player
   - name: ANEZKA
     image: 29_anezka
+    rulesets: [vlcata]
     effects:
       - max_usages(1)
       - discard cards(2) self
       - heal player alive
 
+  # 4. TERKA_P - Discard 3 cards to heal 1 life
   - name: TERKA_P
     image: 29_terka_p
+    rulesets: [vlcata]
     responses:
-      - deathsave
       - discard cards(3) self | hand
       - heal
 
+
+  # 5. JULKA - 9 HP, starts with 5 cards, loses 1 HP at the end of turn if HP > 3
   - name: JULKA
     image: 29_julka
+    rulesets: [vlcata]
+    border: character9
     equip:
       - initial_cards(5)
+      - julka
 
+
+  # 6. HARRY - Up to 2 times per turn, discard 1 card and steal random card from another player
   - name: HARRY
     image: 29_harry
+    rulesets: [vlcata]
     effects:
       - max_usages(2)
       - discard card self | hand
       - steal random_if_hand_card
 
+  # 7. VERCA - Discard a card to draw 2 cards
   - name: VERCA
     image: 29_verca
+    rulesets: [vlcata]
     effects:
       - discard card self | hand
       - draw(2)
 
+  # 8. MARTIN - Once per turn, draw 1 extra card
   - name: MARTIN
     image: 29_martin
-    equip:
-      - martin
+    rulesets: [vlcata]
+    effects:
+      - max_usages(1)
+      - draw(1)
 
+  # 9. TUCTUC - Discard a card to heal 1 life point
   - name: TUCTUC
     image: 29_tuctuc
-    equip:
-      - tuctuc
+    rulesets: [vlcata]
+    effects:
+      - max_usages(1)
+      - discard card self | hand
+      - heal
 
+  # 10. MIKI - Once per turn, draw 2 cards
   - name: MIKI
     image: 29_miki
-    equip:
-      - miki
+    rulesets: [vlcata]
+    effects:
+      - max_usages(1)
+      - draw(2)
 
+  # 11. LIBOR - Discard a card to play Bang against a player
   - name: LIBOR
     image: 29_libor
-    equip:
-      - libor
+    rulesets: [vlcata]
+    effects:
+      - max_usages(1)
+      - discard card self | hand
+      - bang player
 
+# 12. ELIS - Discard a non-spades hand card to play Missed! works!
   - name: ELIS
     image: 29_elis
+    rulesets: [vlcata]
     responses:
-      - elis card self | hand
+      - discard card self | hand not_spades
       - missed
 
-  # SKUPINA 3: DOCASNE ZAKOMENTOVANE PRO TEST
+  # GROUP 3: NOT TESTING
   # - name: HOROUS
   #   image: 29_horous
   # - name: VUDCE

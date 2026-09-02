@@ -11,14 +11,22 @@
 namespace banggame {
 
     bool request_characterchoice::can_pick(card_ptr target_card) const {
-        return target_card->pocket == pocket_type::player_hand && target_card->owner == target;
+        if (target->m_hand.empty()) {
+            return target_card->pocket == pocket_type::selection;
+        } else {
+            return target_card->pocket == pocket_type::player_hand && target_card->owner == target;
+        }
     }
 
     void request_characterchoice::on_pick(card_ptr target_card) {
         pop_request();
 
-        target_card->move_to(pocket_type::player_character, target);
-        target->m_game->remove_cards(target->m_hand);
+        if (target_card->pocket == pocket_type::selection) {
+            target_card->move_to(pocket_type::player_character, target, card_visibility::shown);
+        } else {
+            target_card->move_to(pocket_type::player_character, target);
+            target->m_game->remove_cards(target->m_hand);
+        }
 
         target->m_game->queue_action([target=target]{
             card_ptr character = target->get_character();

@@ -500,15 +500,14 @@ namespace banggame {
 
         if (!call_event(event_type::on_assign_characters{ m_first_player })) {
             if (m_options.all_characters) {
+                add_cards_to(m_characters, pocket_type::selection, nullptr, card_visibility::shown);
                 for (player_ptr p : range_alive_players(m_first_player)) {
-                    card_list characters;
-                    for (card_ptr c : m_characters) {
-                        card_ptr cloned_card = add_card(*c);
-                        characters.push_back(cloned_card);
-                    }
-                    add_cards_to(std::move(characters), pocket_type::player_hand, p, card_visibility::show_owner);
                     queue_request<request_characterchoice>(p);
                 }
+                queue_action([this]{
+                    remove_cards(m_selection);
+                }, 190);
+            } else {
             } else {
                 auto character_it = m_characters.begin();
                 int max_character_choice = m_characters.size() / num_alive();
