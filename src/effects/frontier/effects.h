@@ -14,6 +14,7 @@
 #include "coyotes.h"
 #include "falcon.h"
 #include "fishing.h"
+#include "grizzly.h"
 #include "hawken.h"
 #include "josey_strong.h"
 #include "josiah_tung.h"

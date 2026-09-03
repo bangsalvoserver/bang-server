@@ -4,8 +4,6 @@
 
 #include "game/game_table.h"
 #include "game/game_options.h"
-#include "game/bot_suggestion.h"
-#include "game/prompts.h"
 
 #include "death.h"
 
@@ -25,13 +23,7 @@ namespace banggame {
         return {};
     }
 
-    game_string effect_damage::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {
-        return prompts::bot_check_target_enemy(origin, target, bot_suggestion::action_type::damage);
-    }
-
     void effect_damage::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
-        bot_suggestion::signal_hostile_action(origin, target, flags);
-        
         target->damage(origin_card, origin, damage, flags);
     }
 

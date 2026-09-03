@@ -12,6 +12,7 @@ target_sources(bangserver PRIVATE
     coyotes.cpp
     falcon.cpp
     fishing.cpp
+    grizzly.cpp
     hawken.cpp
     josey_strong.cpp
     josiah_tung.cpp
