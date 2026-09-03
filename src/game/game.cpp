@@ -508,7 +508,6 @@ namespace banggame {
                     remove_cards(m_selection);
                 }, 190);
             } else {
-            } else {
                 auto character_it = m_characters.begin();
                 int max_character_choice = m_characters.size() / num_alive();
                 for (player_ptr p : range_alive_players(m_first_player)) {
