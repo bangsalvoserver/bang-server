@@ -38,6 +38,7 @@ namespace banggame {
         diamonds,
         clubs,
         spades,
+        not_spades,
         origin_card_suit,
         two_to_nine,
         ten_to_ace,
