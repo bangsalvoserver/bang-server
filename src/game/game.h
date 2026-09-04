@@ -1,7 +1,10 @@
 #ifndef __GAME_H__
 #define __GAME_H__
 
+#include <map>
+
 #include "game_table.h"
+#include "game_stats.h"
 
 #include "net/game_interface.h"
 
@@ -9,7 +12,14 @@ namespace banggame {
 
     struct game : game_interface, game_table {
         using game_table::game_table;
-    
+
+        std::map<player_ptr, player_tracking> m_stats;
+        int m_rounds = 0;
+        int64_t m_started_at = 0;
+
+        void init_stats_tracking();
+        game_report get_game_report() const override;
+
         void tick() override {
             game_table::tick();
         }

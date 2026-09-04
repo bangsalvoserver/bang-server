@@ -10,6 +10,9 @@
 
 #include "effects/base/requests.h"
 #include "effects/base/death.h"
+#include "effects/base/dynamite.h"
+#include "effects/base/duel.h"
+#include "effects/base/jail.h"
 
 #include "play_verify.h"
 #include "possible_to_play.h"
@@ -19,6 +22,7 @@
 #include "net/manager.h"
 
 #include <array>
+#include <chrono>
 #include <unordered_set>
 
 namespace banggame {
@@ -376,6 +380,7 @@ namespace banggame {
 
     void game::start_game(std::span<int> user_ids) {
         add_players(user_ids);
+        init_stats_tracking();
 
         for (ruleset_ptr ruleset : m_options.expansions) {
             ruleset->on_apply(this);
@@ -558,6 +563,75 @@ namespace banggame {
         });
 
         commit_updates();
+    }
+
+    static int64_t unix_now() {
+        return std::chrono::duration_cast<std::chrono::seconds>(
+            std::chrono::system_clock::now().time_since_epoch()).count();
+    }
+
+    void game::init_stats_tracking() {
+        m_started_at = unix_now();
+
+        add_listener<event_type::on_play_card>(nullptr, [this](player_ptr origin, card_ptr origin_card, const effect_context &ctx) {
+            if (origin_card->is_bang_card(origin)) {
+                ++m_stats[origin].bangs_played;
+            } else if (origin_card->pocket == pocket_type::player_character) {
+                ++m_stats[origin].ability_uses;
+            }
+        });
+
+        add_listener<event_type::on_turn_switch>(nullptr, [this](player_ptr origin) {
+            if (origin == m_first_player) {
+                ++m_rounds;
+            }
+        });
+
+        add_listener<event_type::on_player_eliminated>(nullptr, [this](player_ptr killer, player_ptr target, death_type type) {
+            if (type == death_type::death && killer && killer != target) {
+                ++m_stats[killer].kills;
+            }
+        });
+
+        add_listener<event_type::on_dynamite_explode>(nullptr, [this](player_ptr target) {
+            ++m_stats[target].dynamite_explosions;
+        });
+
+        add_listener<event_type::on_duel_lost>(nullptr, [this](player_ptr target) {
+            ++m_stats[target].duels_lost;
+        });
+
+        add_listener<event_type::on_jail_turn_skipped>(nullptr, [this](player_ptr target) {
+            ++m_stats[target].prison_turns_skipped;
+        });
+    }
+
+    game_report game::get_game_report() const {
+        game_report report;
+        report.started_at = m_started_at;
+        report.ended_at = unix_now();
+        report.num_rounds = m_rounds;
+        report.num_players = static_cast<int>(m_players.size());
+
+        for (ruleset_ptr ruleset : m_options.expansions) {
+            report.expansions.emplace_back(get_expansion_name(ruleset));
+        }
+
+        for (player_ptr p : m_players) {
+            player_game_report &entry = report.players.emplace_back();
+            entry.user_id = p->user_id;
+            entry.is_bot = p->is_bot();
+            entry.role = p->get_base_role();
+            entry.survived = p->in_game() && p->alive();
+            if (card_ptr character = p->get_character()) {
+                entry.character = std::string(character->name);
+            }
+            if (auto it = m_stats.find(p); it != m_stats.end()) {
+                entry.stats = it->second;
+            }
+        }
+
+        return report;
     }
 
     request_state game::send_request_status_ready() {

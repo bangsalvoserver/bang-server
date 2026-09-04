@@ -10,6 +10,12 @@ namespace banggame {
     };
 
     DEFINE_EQUIP(dynamite, equip_dynamite)
+
+    namespace event_type {
+        struct on_dynamite_explode {
+            player_ptr target;
+        };
+    }
 }
 
 #endif

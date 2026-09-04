@@ -96,6 +96,12 @@ namespace sql {
         uint64_t column_uint64(int index) {
             return sqlite3_column_int64(stmt, index);
         }
+
+        std::string column_text(int index) {
+            const unsigned char *text = sqlite3_column_text(stmt, index);
+            int size = sqlite3_column_bytes(stmt, index);
+            return text ? std::string(reinterpret_cast<const char *>(text), size) : std::string();
+        }
     };
 
     struct sqlite3_connection {
