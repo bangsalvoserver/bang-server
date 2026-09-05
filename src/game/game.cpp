@@ -623,6 +623,7 @@ namespace banggame {
             entry.is_bot = p->is_bot();
             entry.role = p->get_base_role();
             entry.survived = p->in_game() && p->alive();
+            entry.won = p->check_player_flags(player_flag::winner);
             if (card_ptr character = p->get_character()) {
                 entry.character = std::string(character->name);
             }

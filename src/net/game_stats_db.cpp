@@ -34,6 +34,7 @@ namespace game_stats {
                     character TEXT NOT NULL,
                     role TEXT NOT NULL,
                     survived INTEGER NOT NULL,
+                    won INTEGER NOT NULL,
                     bangs_played INTEGER NOT NULL,
                     ability_uses INTEGER NOT NULL,
                     dynamite_explosions INTEGER NOT NULL,
@@ -90,9 +91,9 @@ namespace game_stats {
 
             for (const player_game_report &p : report.players) {
                 auto stmt = s_connection.prepare(
-                    "INSERT INTO game_players (game_id, user_id, username, is_bot, character, role, survived, "
+                    "INSERT INTO game_players (game_id, user_id, username, is_bot, character, role, survived, won, "
                     "bangs_played, ability_uses, dynamite_explosions, prison_turns_skipped, duels_lost, kills) "
-                    "VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13)"
+                    "VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14)"
                 );
                 stmt.bind(1, report.game_id);
                 stmt.bind(2, p.user_id);
@@ -101,12 +102,13 @@ namespace game_stats {
                 stmt.bind(5, p.character);
                 stmt.bind(6, std::string(enums::to_string(p.role)));
                 stmt.bind(7, p.survived ? 1 : 0);
-                stmt.bind(8, p.stats.bangs_played);
-                stmt.bind(9, p.stats.ability_uses);
-                stmt.bind(10, p.stats.dynamite_explosions);
-                stmt.bind(11, p.stats.prison_turns_skipped);
-                stmt.bind(12, p.stats.duels_lost);
-                stmt.bind(13, p.stats.kills);
+                stmt.bind(8, p.won ? 1 : 0);
+                stmt.bind(9, p.stats.bangs_played);
+                stmt.bind(10, p.stats.ability_uses);
+                stmt.bind(11, p.stats.dynamite_explosions);
+                stmt.bind(12, p.stats.prison_turns_skipped);
+                stmt.bind(13, p.stats.duels_lost);
+                stmt.bind(14, p.stats.kills);
                 stmt.step();
             }
         } catch (const sql::sql_error &error) {
@@ -137,7 +139,7 @@ namespace game_stats {
             }
 
             auto stmt = s_connection.prepare(
-                "SELECT user_id, username, is_bot, character, role, survived, "
+                "SELECT user_id, username, is_bot, character, role, survived, won, "
                 "bangs_played, ability_uses, dynamite_explosions, prison_turns_skipped, duels_lost, kills "
                 "FROM game_players WHERE game_id = ?1"
             );
@@ -150,12 +152,13 @@ namespace game_stats {
                 p.character = stmt.column_text(3);
                 p.role = enums::from_string<player_role>(stmt.column_text(4)).value_or(player_role::unknown);
                 p.survived = stmt.column_int(5) != 0;
-                p.stats.bangs_played = stmt.column_int(6);
-                p.stats.ability_uses = stmt.column_int(7);
-                p.stats.dynamite_explosions = stmt.column_int(8);
-                p.stats.prison_turns_skipped = stmt.column_int(9);
-                p.stats.duels_lost = stmt.column_int(10);
-                p.stats.kills = stmt.column_int(11);
+                p.won = stmt.column_int(6) != 0;
+                p.stats.bangs_played = stmt.column_int(7);
+                p.stats.ability_uses = stmt.column_int(8);
+                p.stats.dynamite_explosions = stmt.column_int(9);
+                p.stats.prison_turns_skipped = stmt.column_int(10);
+                p.stats.duels_lost = stmt.column_int(11);
+                p.stats.kills = stmt.column_int(12);
             }
 
             return report;

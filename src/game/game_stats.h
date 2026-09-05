@@ -25,6 +25,7 @@ namespace banggame {
         std::string character;
         player_role role = player_role::unknown;
         bool survived = false;
+        bool won = false;
         player_tracking stats;
     };
 
