@@ -116,9 +116,10 @@ namespace net {
                 size_t limit = utils::parse_string<size_t>(req->getQuery("limit")).value_or(50);
                 size_t offset = utils::parse_string<size_t>(req->getQuery("offset")).value_or(0);
                 std::string username{req->getQuery("user")};
+                auto lobby_id = utils::parse_string<int>(req->getQuery("lobby"));
                 res->writeHeader("Access-Control-Allow-Origin","*");
                 res->writeHeader("Content-Type", "application/json");
-                res->end(json::to_string(game_stats::search_games(username, limit, offset)));
+                res->end(json::to_string(game_stats::search_games(username, lobby_id, limit, offset)));
             })
             .get("/games/:id", [this](auto *res, auto *req) {
                 if (auto report = game_stats::get_game(req->getParameter("id"))) {

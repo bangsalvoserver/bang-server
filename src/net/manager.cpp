@@ -112,6 +112,7 @@ void game_manager::tick() {
                 if (lobby.m_game->is_game_over()) {
                     game_report report = lobby.m_game->get_game_report();
                     report.game_id = std::format("{}-{}", lobby.lobby_id, report.started_at);
+                    report.lobby_id = lobby.lobby_id;
                     for (player_game_report &p : report.players) {
                         if (auto bot_it = rn::find(lobby.bots, p.user_id, &lobby_bot::user_id); bot_it != lobby.bots.end()) {
                             p.username = bot_it->username;

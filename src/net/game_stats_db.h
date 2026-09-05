@@ -16,7 +16,7 @@ namespace game_stats {
 
     std::optional<banggame::game_report> get_game(std::string_view game_id);
 
-    std::vector<banggame::game_report> search_games(std::string_view username, size_t limit, size_t offset);
+    std::vector<banggame::game_report> search_games(std::string_view username, std::optional<int> lobby_id, size_t limit, size_t offset);
 
 }
 

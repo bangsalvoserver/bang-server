@@ -18,6 +18,7 @@ namespace game_stats {
             s_connection.exec_sql(R"SQL(
                 CREATE TABLE IF NOT EXISTS games(
                     game_id TEXT PRIMARY KEY,
+                    lobby_id INTEGER NOT NULL,
                     started_at INTEGER NOT NULL,
                     ended_at INTEGER NOT NULL,
                     num_players INTEGER NOT NULL,
@@ -41,6 +42,7 @@ namespace game_stats {
                     kills INTEGER NOT NULL
                 );
 
+                CREATE INDEX IF NOT EXISTS idx_games_lobby_id ON games(lobby_id);
                 CREATE INDEX IF NOT EXISTS idx_game_players_game_id ON game_players(game_id);
                 CREATE INDEX IF NOT EXISTS idx_game_players_username ON game_players(username);
             )SQL");
@@ -73,15 +75,16 @@ namespace game_stats {
         try {
             {
                 auto stmt = s_connection.prepare(
-                    "INSERT INTO games (game_id, started_at, ended_at, num_players, num_rounds, expansions) "
-                    "VALUES (?1, ?2, ?3, ?4, ?5, ?6)"
+                    "INSERT INTO games (game_id, lobby_id, started_at, ended_at, num_players, num_rounds, expansions) "
+                    "VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)"
                 );
                 stmt.bind(1, report.game_id);
-                stmt.bind(2, report.started_at);
-                stmt.bind(3, report.ended_at);
-                stmt.bind(4, report.num_players);
-                stmt.bind(5, report.num_rounds);
-                stmt.bind(6, join_expansions(report.expansions));
+                stmt.bind(2, report.lobby_id);
+                stmt.bind(3, report.started_at);
+                stmt.bind(4, report.ended_at);
+                stmt.bind(5, report.num_players);
+                stmt.bind(6, report.num_rounds);
+                stmt.bind(7, join_expansions(report.expansions));
                 stmt.step();
             }
 
@@ -117,7 +120,7 @@ namespace game_stats {
             game_report report;
             {
                 auto stmt = s_connection.prepare(
-                    "SELECT game_id, started_at, ended_at, num_players, num_rounds, expansions "
+                    "SELECT game_id, lobby_id, started_at, ended_at, num_players, num_rounds, expansions "
                     "FROM games WHERE game_id = ?1"
                 );
                 stmt.bind(1, game_id);
@@ -125,11 +128,12 @@ namespace game_stats {
                     return std::nullopt;
                 }
                 report.game_id = stmt.column_text(0);
-                report.started_at = stmt.column_int64(1);
-                report.ended_at = stmt.column_int64(2);
-                report.num_players = stmt.column_int(3);
-                report.num_rounds = stmt.column_int(4);
-                report.expansions = split_expansions(stmt.column_text(5));
+                report.lobby_id = stmt.column_int(1);
+                report.started_at = stmt.column_int64(2);
+                report.ended_at = stmt.column_int64(3);
+                report.num_players = stmt.column_int(4);
+                report.num_rounds = stmt.column_int(5);
+                report.expansions = split_expansions(stmt.column_text(6));
             }
 
             auto stmt = s_connection.prepare(
@@ -161,7 +165,7 @@ namespace game_stats {
         }
     }
 
-    std::vector<game_report> search_games(std::string_view username, size_t limit, size_t offset) {
+    std::vector<game_report> search_games(std::string_view username, std::optional<int> lobby_id, size_t limit, size_t offset) {
         std::vector<game_report> result;
         if (!s_connection) return result;
         try {
@@ -170,11 +174,13 @@ namespace game_stats {
                 auto stmt = s_connection.prepare(
                     "SELECT game_id FROM games "
                     "WHERE (?1 = '' OR game_id IN (SELECT game_id FROM game_players WHERE username = ?1)) "
-                    "ORDER BY started_at DESC LIMIT ?2 OFFSET ?3"
+                    "AND (?2 = -1 OR lobby_id = ?2) "
+                    "ORDER BY started_at DESC LIMIT ?3 OFFSET ?4"
                 );
                 stmt.bind(1, username);
-                stmt.bind(2, static_cast<int64_t>(limit));
-                stmt.bind(3, static_cast<int64_t>(offset));
+                stmt.bind(2, static_cast<int64_t>(lobby_id.value_or(-1)));
+                stmt.bind(3, static_cast<int64_t>(limit));
+                stmt.bind(4, static_cast<int64_t>(offset));
                 while (stmt.step()) {
                     game_ids.push_back(stmt.column_text(0));
                 }
