@@ -12,9 +12,11 @@ namespace game_stats {
 
     void init(const std::string &db_file);
 
+    int get_next_game_id();
+
     void save_game(const banggame::game_report &report);
 
-    std::optional<banggame::game_report> get_game(std::string_view game_id);
+    std::optional<banggame::game_report> get_game(int game_id);
 
     std::vector<banggame::game_report> search_games(std::string_view username, std::optional<int> lobby_id, size_t limit, size_t offset);
 

@@ -122,12 +122,18 @@ namespace net {
                 res->end(json::to_string(game_stats::search_games(username, lobby_id, limit, offset)));
             })
             .get("/games/:id", [this](auto *res, auto *req) {
-                if (auto report = game_stats::get_game(req->getParameter("id"))) {
-                    res->writeHeader("Access-Control-Allow-Origin","*");
-                    res->writeHeader("Content-Type", "application/json");
-                    res->end(json::to_string(*report));
+                if (auto id = utils::parse_string<int>(req->getParameter("id"))) {
+                    if (auto report = game_stats::get_game(*id)) {
+                        res->writeHeader("Access-Control-Allow-Origin","*");
+                        res->writeHeader("Content-Type", "application/json");
+                        res->end(json::to_string(*report));
+                    } else {
+                        res->writeStatus("404 Not Found");
+                        res->writeHeader("Access-Control-Allow-Origin","*");
+                        res->end();
+                    }
                 } else {
-                    res->writeStatus("404 Not Found");
+                    res->writeStatus("400 Bad Request");
                     res->writeHeader("Access-Control-Allow-Origin","*");
                     res->end();
                 }

@@ -30,7 +30,7 @@ namespace banggame {
     };
 
     struct game_report {
-        std::string game_id;
+        int game_id = 0;
         int lobby_id = 0;
         int64_t started_at = 0;
         int64_t ended_at = 0;

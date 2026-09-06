@@ -4,8 +4,6 @@
 #include "utils/enums.h"
 #include "logging.h"
 
-#include <sstream>
-
 namespace game_stats {
 
     using namespace banggame;
@@ -17,7 +15,7 @@ namespace game_stats {
             s_connection.init(db_file);
             s_connection.exec_sql(R"SQL(
                 CREATE TABLE IF NOT EXISTS games(
-                    game_id TEXT PRIMARY KEY,
+                    game_id INTEGER PRIMARY KEY,
                     lobby_id INTEGER NOT NULL,
                     started_at INTEGER NOT NULL,
                     ended_at INTEGER NOT NULL,
@@ -27,7 +25,7 @@ namespace game_stats {
                 );
 
                 CREATE TABLE IF NOT EXISTS game_players(
-                    game_id TEXT NOT NULL,
+                    game_id INTEGER NOT NULL,
                     user_id INTEGER NOT NULL,
                     username TEXT NOT NULL,
                     is_bot INTEGER NOT NULL,
@@ -43,6 +41,12 @@ namespace game_stats {
                     kills INTEGER NOT NULL
                 );
 
+                CREATE TABLE IF NOT EXISTS next_game_id(
+                    id INTEGER PRIMARY KEY CHECK (id = 0),
+                    value INTEGER NOT NULL
+                );
+                INSERT OR IGNORE INTO next_game_id (id, value) VALUES (0, 0);
+
                 CREATE INDEX IF NOT EXISTS idx_games_lobby_id ON games(lobby_id);
                 CREATE INDEX IF NOT EXISTS idx_game_players_game_id ON game_players(game_id);
                 CREATE INDEX IF NOT EXISTS idx_game_players_username ON game_players(username);
@@ -50,6 +54,21 @@ namespace game_stats {
         } catch (const sql::sql_error &error) {
             logging::error("SQL error: {}", error.what());
         }
+    }
+
+    int get_next_game_id() {
+        if (!s_connection) return 0;
+        try {
+            auto stmt = s_connection.prepare(
+                "UPDATE next_game_id SET value = value + 1 WHERE id = 0 RETURNING value"
+            );
+            if (stmt.step()) {
+                return stmt.column_int(0);
+            }
+        } catch (const sql::sql_error &error) {
+            logging::error("SQL error: {}", error.what());
+        }
+        return 0;
     }
 
     static std::string join_expansions(const std::vector<std::string> &expansions) {
@@ -62,13 +81,9 @@ namespace game_stats {
     }
 
     static std::vector<std::string> split_expansions(const std::string &value) {
-        std::vector<std::string> result;
-        std::istringstream stream(value);
-        std::string item;
-        while (std::getline(stream, item, ',')) {
-            if (!item.empty()) result.push_back(item);
-        }
-        return result;
+        return rv::split(value, ",")
+            | rv::transform([](auto name) { return std::string_view{name}; })
+            | rn::to<std::vector<std::string>>();
     }
 
     void save_game(const game_report &report) {
@@ -116,7 +131,7 @@ namespace game_stats {
         }
     }
 
-    std::optional<game_report> get_game(std::string_view game_id) {
+    std::optional<game_report> get_game(int game_id) {
         if (!s_connection) return std::nullopt;
         try {
             game_report report;
@@ -129,7 +144,7 @@ namespace game_stats {
                 if (!stmt.step()) {
                     return std::nullopt;
                 }
-                report.game_id = stmt.column_text(0);
+                report.game_id = stmt.column_int(0);
                 report.lobby_id = stmt.column_int(1);
                 report.started_at = stmt.column_int64(2);
                 report.ended_at = stmt.column_int64(3);
@@ -172,7 +187,7 @@ namespace game_stats {
         std::vector<game_report> result;
         if (!s_connection) return result;
         try {
-            std::vector<std::string> game_ids;
+            std::vector<int> game_ids;
             {
                 auto stmt = s_connection.prepare(
                     "SELECT game_id FROM games "
@@ -185,11 +200,11 @@ namespace game_stats {
                 stmt.bind(3, static_cast<int64_t>(limit));
                 stmt.bind(4, static_cast<int64_t>(offset));
                 while (stmt.step()) {
-                    game_ids.push_back(stmt.column_text(0));
+                    game_ids.push_back(stmt.column_int(0));
                 }
             }
 
-            for (const std::string &id : game_ids) {
+            for (int id : game_ids) {
                 if (auto report = get_game(id)) {
                     result.push_back(std::move(*report));
                 }
