@@ -81,7 +81,7 @@ Options:
   -t, --tracking-db <file>  Path to the tracking database (SQLite file).  
                             This database tracks player count and lobby count over time.
                             The database will be created automatically if missing.
-  --games-db <file>         Path to the games database (SQLite file, default: games.db).
+  --games-db <file>         Path to the games database (SQLite file).
                             This database records the players, characters and per-player
                             stats (bangs played, kills, etc.) of every finished game, and
                             powers the GET /games and GET /games/:id endpoints.

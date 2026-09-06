@@ -46,7 +46,7 @@ int main(int argc, char **argv) {
         ("l,logging",   "Logging Level",    cxxopts::value(logging_level))
         ("r,reuse-addr","Reuse Address",    cxxopts::value(reuse_addr))
         ("t,tracking-db","Tracking Database File", cxxopts::value(tracking_file))
-        ("games-db",    "Games Database File", cxxopts::value(games_db_file)->default_value("games.db"))
+        ("games-db",    "Games Database File", cxxopts::value(games_db_file))
 #ifndef LIBUS_NO_SSL
         ("s,secure",    "Enable TLS",       cxxopts::value(enable_tls))
         ("cert",        "Certificate File", cxxopts::value(certificate_file))
