@@ -16,6 +16,13 @@ namespace banggame {
         int prison_turns_skipped = 0;
         int duels_lost = 0;
         int kills = 0;
+        int cards_drawn = 0;
+        int damage_dealt = 0;
+        int hp_recovered = 0;
+        int draw_checks_total = 0;
+        int draw_checks_lucky = 0;
+        int bonus_draws_used = 0;
+        int volcanic_bangs_played = 0;
     };
 
     struct player_game_report {
@@ -26,6 +33,8 @@ namespace banggame {
         player_role role = player_role::unknown;
         bool survived = false;
         bool won = false;
+        int elimination_order = 0;
+        int died_on_round = 0;
         player_tracking stats;
     };
 

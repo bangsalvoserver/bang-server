@@ -14,6 +14,10 @@ namespace banggame {
         using game_table::game_table;
 
         std::map<player_ptr, player_tracking> m_stats;
+        std::map<player_ptr, int> m_turn_bang_count;
+        std::map<player_ptr, int> m_elimination_order;
+        std::map<player_ptr, int> m_died_on_round;
+        int m_next_elimination_order = 1;
         int m_rounds = 0;
         int64_t m_started_at = 0;
 

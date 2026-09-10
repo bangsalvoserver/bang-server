@@ -43,12 +43,21 @@ namespace game_stats {
                     role TEXT NOT NULL,
                     survived INTEGER NOT NULL,
                     won INTEGER NOT NULL,
+                    elimination_order INTEGER NOT NULL,
+                    died_on_round INTEGER NOT NULL,
                     bangs_played INTEGER NOT NULL,
                     ability_uses INTEGER NOT NULL,
                     dynamite_explosions INTEGER NOT NULL,
                     prison_turns_skipped INTEGER NOT NULL,
                     duels_lost INTEGER NOT NULL,
-                    kills INTEGER NOT NULL
+                    kills INTEGER NOT NULL,
+                    cards_drawn INTEGER NOT NULL,
+                    damage_dealt INTEGER NOT NULL,
+                    hp_recovered INTEGER NOT NULL,
+                    draw_checks_total INTEGER NOT NULL,
+                    draw_checks_lucky INTEGER NOT NULL,
+                    bonus_draws_used INTEGER NOT NULL,
+                    volcanic_bangs_played INTEGER NOT NULL
                 );
 
                 CREATE TABLE IF NOT EXISTS next_game_id(
@@ -142,8 +151,12 @@ namespace game_stats {
             for (const player_game_report &p : report.players) {
                 auto stmt = s_connection.prepare(
                     "INSERT INTO game_players (game_id, user_id, username, is_bot, character, role, survived, won, "
-                    "bangs_played, ability_uses, dynamite_explosions, prison_turns_skipped, duels_lost, kills) "
-                    "VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14)"
+                    "elimination_order, died_on_round, "
+                    "bangs_played, ability_uses, dynamite_explosions, prison_turns_skipped, duels_lost, kills, "
+                    "cards_drawn, damage_dealt, hp_recovered, draw_checks_total, draw_checks_lucky, "
+                    "bonus_draws_used, volcanic_bangs_played) "
+                    "VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15, ?16, "
+                    "?17, ?18, ?19, ?20, ?21, ?22, ?23)"
                 );
                 stmt.bind(1, report.game_id);
                 stmt.bind(2, p.user_id);
@@ -153,12 +166,21 @@ namespace game_stats {
                 stmt.bind(6, std::string(enums::to_string(p.role)));
                 stmt.bind(7, p.survived ? 1 : 0);
                 stmt.bind(8, p.won ? 1 : 0);
-                stmt.bind(9, p.stats.bangs_played);
-                stmt.bind(10, p.stats.ability_uses);
-                stmt.bind(11, p.stats.dynamite_explosions);
-                stmt.bind(12, p.stats.prison_turns_skipped);
-                stmt.bind(13, p.stats.duels_lost);
-                stmt.bind(14, p.stats.kills);
+                stmt.bind(9, p.elimination_order);
+                stmt.bind(10, p.died_on_round);
+                stmt.bind(11, p.stats.bangs_played);
+                stmt.bind(12, p.stats.ability_uses);
+                stmt.bind(13, p.stats.dynamite_explosions);
+                stmt.bind(14, p.stats.prison_turns_skipped);
+                stmt.bind(15, p.stats.duels_lost);
+                stmt.bind(16, p.stats.kills);
+                stmt.bind(17, p.stats.cards_drawn);
+                stmt.bind(18, p.stats.damage_dealt);
+                stmt.bind(19, p.stats.hp_recovered);
+                stmt.bind(20, p.stats.draw_checks_total);
+                stmt.bind(21, p.stats.draw_checks_lucky);
+                stmt.bind(22, p.stats.bonus_draws_used);
+                stmt.bind(23, p.stats.volcanic_bangs_played);
                 stmt.step();
             }
         } catch (const sql::sql_error &error) {
@@ -190,7 +212,10 @@ namespace game_stats {
 
             auto stmt = s_connection.prepare(
                 "SELECT user_id, username, is_bot, character, role, survived, won, "
-                "bangs_played, ability_uses, dynamite_explosions, prison_turns_skipped, duels_lost, kills "
+                "elimination_order, died_on_round, "
+                "bangs_played, ability_uses, dynamite_explosions, prison_turns_skipped, duels_lost, kills, "
+                "cards_drawn, damage_dealt, hp_recovered, draw_checks_total, draw_checks_lucky, "
+                "bonus_draws_used, volcanic_bangs_played "
                 "FROM game_players WHERE game_id = ?1"
             );
             stmt.bind(1, game_id);
@@ -203,12 +228,21 @@ namespace game_stats {
                 p.role = enums::from_string<player_role>(stmt.column_text(4)).value_or(player_role::unknown);
                 p.survived = stmt.column_int(5) != 0;
                 p.won = stmt.column_int(6) != 0;
-                p.stats.bangs_played = stmt.column_int(7);
-                p.stats.ability_uses = stmt.column_int(8);
-                p.stats.dynamite_explosions = stmt.column_int(9);
-                p.stats.prison_turns_skipped = stmt.column_int(10);
-                p.stats.duels_lost = stmt.column_int(11);
-                p.stats.kills = stmt.column_int(12);
+                p.elimination_order = stmt.column_int(7);
+                p.died_on_round = stmt.column_int(8);
+                p.stats.bangs_played = stmt.column_int(9);
+                p.stats.ability_uses = stmt.column_int(10);
+                p.stats.dynamite_explosions = stmt.column_int(11);
+                p.stats.prison_turns_skipped = stmt.column_int(12);
+                p.stats.duels_lost = stmt.column_int(13);
+                p.stats.kills = stmt.column_int(14);
+                p.stats.cards_drawn = stmt.column_int(15);
+                p.stats.damage_dealt = stmt.column_int(16);
+                p.stats.hp_recovered = stmt.column_int(17);
+                p.stats.draw_checks_total = stmt.column_int(18);
+                p.stats.draw_checks_lucky = stmt.column_int(19);
+                p.stats.bonus_draws_used = stmt.column_int(20);
+                p.stats.volcanic_bangs_played = stmt.column_int(21);
             }
 
             return report;
