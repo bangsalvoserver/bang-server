@@ -4,15 +4,25 @@
 #include "utils/enums.h"
 #include "logging.h"
 
+#include <format>
+
 namespace game_stats {
 
     using namespace banggame;
 
     static sql::sqlite3_connection s_connection;
 
-    void init(const std::string &db_file) {
-        try {
-            s_connection.init(db_file);
+    // Schema versioning, tracked via SQLite's built-in `PRAGMA user_version`.
+    // Bump current_schema_version and add a new `if (from_version < N)` branch
+    // to migrate_schema() whenever the schema changes (e.g. a new stat column),
+    // instead of editing the existing CREATE TABLE statements. This lets an
+    // already-existing database file be upgraded in place via ALTER TABLE
+    // instead of silently failing (or losing data) when the code expects
+    // columns the on-disk schema doesn't have yet.
+    static constexpr int current_schema_version = 1;
+
+    static void migrate_schema(int from_version) {
+        if (from_version < 1) {
             s_connection.exec_sql(R"SQL(
                 CREATE TABLE IF NOT EXISTS games(
                     game_id INTEGER PRIMARY KEY,
@@ -51,6 +61,31 @@ namespace game_stats {
                 CREATE INDEX IF NOT EXISTS idx_game_players_game_id ON game_players(game_id);
                 CREATE INDEX IF NOT EXISTS idx_game_players_username ON game_players(username);
             )SQL");
+        }
+
+        // Example of a future migration, adding a new stat column without
+        // touching existing rows (they get backfilled with the DEFAULT value):
+        //
+        // if (from_version < 2) {
+        //     s_connection.exec_sql(
+        //         "ALTER TABLE game_players ADD COLUMN new_stat INTEGER NOT NULL DEFAULT 0"
+        //     );
+        // }
+    }
+
+    void init(const std::string &db_file) {
+        try {
+            s_connection.init(db_file);
+
+            int stored_version = 0;
+            if (auto stmt = s_connection.prepare("PRAGMA user_version"); stmt.step()) {
+                stored_version = stmt.column_int(0);
+            }
+
+            if (stored_version < current_schema_version) {
+                migrate_schema(stored_version);
+                s_connection.exec_sql(std::format("PRAGMA user_version = {}", current_schema_version));
+            }
         } catch (const sql::sql_error &error) {
             logging::error("SQL error: {}", error.what());
         }
