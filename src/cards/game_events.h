@@ -37,6 +37,13 @@ namespace banggame::event_type {
         int ncards;
     };
 
+    // Generic "a character's special/passive ability had an effect" signal, for
+    // abilities whose activation isn't otherwise visible through a more specific
+    // event (e.g. Vulture Sam, Kit Carlson, Black Jack's extra card).
+    struct on_special_ability_used {
+        player_ptr origin;
+    };
+
     struct on_play_card {
         player_ptr origin;
         card_ptr origin_card;

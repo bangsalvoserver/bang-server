@@ -329,7 +329,13 @@ namespace banggame {
     }
 
     void player::pass_turn() {
-        if (m_hand.size() > max_cards_end_of_turn()) {
+        int actual_max_cards = max_cards_end_of_turn();
+        if (int(m_hand.size()) > m_hp && int(m_hand.size()) <= actual_max_cards) {
+            // a max-hand-size modifier (e.g. Sean Mallory's/Gunbelt) is the only reason
+            // this player doesn't have to discard down right now
+            m_game->call_event(event_type::on_special_ability_used{ this });
+        }
+        if (m_hand.size() > actual_max_cards) {
             m_game->queue_request<request_discard_pass>(this);
         } else {
             m_game->call_event(event_type::on_turn_end{ this, false });
