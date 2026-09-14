@@ -2,6 +2,8 @@
 
 #include "game/game_table.h"
 
+#include "cards/game_events.h"
+
 #include "effects/base/vulture_sam.h"
 #include "effects/base/requests.h"
 
@@ -28,6 +30,7 @@ namespace banggame {
                     player_end->m_game->add_log("LOG_DRAWN_CARD", player_end, discarded_card);
                     discarded_card->add_short_pause();
                     player_end->add_to_hand(discarded_card);
+                    player_end->m_game->call_event(event_type::on_special_ability_used{ player_end });
                 }
             }
         });

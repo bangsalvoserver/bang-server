@@ -277,9 +277,13 @@ namespace banggame {
                 ? card_visibility::shown : card_visibility::show_owner);
         }
         m_game->call_event(event_type::on_drawn_any_card{ target });
+        m_game->call_event(event_type::on_card_added_to_hand{ this, target });
     }
 
     void player::draw_card(int ncards, card_ptr origin_card) {
+        if (origin_card) {
+            m_game->call_event(event_type::on_extra_cards_drawn{ this, origin_card, ncards });
+        }
         if (!m_game->check_flags(game_flag::hands_shown)) {
             if (origin_card) {
                 m_game->add_log(update_target::excludes(this), "LOG_DRAWN_CARDS_FOR", this, ncards, origin_card);
@@ -325,7 +329,16 @@ namespace banggame {
     }
 
     void player::pass_turn() {
-        if (m_hand.size() > max_cards_end_of_turn()) {
+        int actual_max_cards = max_cards_end_of_turn();
+        if (int(m_hand.size()) > m_hp && int(m_hand.size()) <= actual_max_cards) {
+            // several unrelated things can raise the end-of-turn hand limit above hp
+            // (Gunbelt, Pack Mule, Coffee, being at 1 hp in Legends, ...); only Sean
+            // Mallory's own passive should be counted as a "special ability" use here
+            if (card_ptr character = get_character(); character && character->name == "SEAN_MALLORY") {
+                m_game->call_event(event_type::on_special_ability_used{ this });
+            }
+        }
+        if (m_hand.size() > actual_max_cards) {
             m_game->queue_request<request_discard_pass>(this);
         } else {
             m_game->call_event(event_type::on_turn_end{ this, false });

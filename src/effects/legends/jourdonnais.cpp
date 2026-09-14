@@ -4,6 +4,7 @@
 #include "effects/base/draw_check.h"
 
 #include "cards/game_enums.h"
+#include "cards/game_events.h"
 
 #include "game/game_table.h"
 
@@ -20,6 +21,7 @@ namespace banggame {
                     && effect_jourdonnais_legend::can_escape(e_origin, e_origin_card, e_flags)
                     && req.can_escape(origin_card)
                 ) {
+                    origin->m_game->call_event(event_type::on_special_ability_used{ origin });
                     return escape_type::escape_no_timer;
                 }
                 return {};

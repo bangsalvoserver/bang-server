@@ -46,6 +46,11 @@ namespace banggame {
             player_ptr origin;
             shared_draw_check_handler req;
         };
+
+        struct on_draw_check_luck {
+            player_ptr target;
+            bool lucky;
+        };
         
         struct get_suit_modifier {
             using result_type = card_suit;

@@ -1,5 +1,7 @@
 #include "tuco_franziskaner.h"
 
+#include "cards/game_events.h"
+
 #include "game/game_table.h"
 
 #include "effects/base/draw.h"
@@ -11,6 +13,7 @@ namespace banggame {
         p->m_game->add_listener<event_type::init_request_draw>({target_card, 1}, [p](player_ptr origin, shared_request_draw req) {
             if (p == origin && rn::none_of(p->m_table, &card::is_blue)) {
                 req->num_cards_to_draw += 2;
+                p->m_game->call_event(event_type::on_special_ability_used{ p });
             }
         });
 

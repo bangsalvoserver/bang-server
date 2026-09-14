@@ -2,6 +2,8 @@
 
 #include "escape.h"
 
+#include "cards/game_events.h"
+
 #include "effects/base/escapable.h"
 
 #include "game/game_table.h"
@@ -14,6 +16,7 @@ namespace banggame {
                 if (e_target == origin && !origin->empty_hand()
                     && effect_escape::can_escape(e_origin, e_origin_card, flags)
                 ) {
+                    origin->m_game->call_event(event_type::on_special_ability_used{ origin });
                     return escape_type::escape_no_timer;
                 }
                 return {};
@@ -26,6 +29,7 @@ namespace banggame {
                 if (e_target == origin && !origin->empty_hand()
                     && effect_escape2::can_escape(e_origin, e_origin_card, flags)
                 ) {
+                    origin->m_game->call_event(event_type::on_special_ability_used{ origin });
                     return escape_type::escape_no_timer;
                 }
                 return {};

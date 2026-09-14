@@ -2,6 +2,7 @@
 
 #include "bot_info.h"
 #include "tracking.h"
+#include "game_stats_db.h"
 #include "server_options.h"
 
 #include "utils/random_element.h"
@@ -109,6 +110,18 @@ void game_manager::tick() {
                 });
 
                 if (lobby.m_game->is_game_over()) {
+                    game_report report = lobby.m_game->get_game_report();
+                    report.game_id = lobby.game_id;
+                    report.lobby_id = lobby.lobby_id;
+                    for (player_game_report &p : report.players) {
+                        if (auto bot_it = rn::find(lobby.bots, p.user_id, &lobby_bot::user_id); bot_it != lobby.bots.end()) {
+                            p.username = bot_it->username;
+                        } else {
+                            p.username = lobby.find_user(p.user_id).session->username;
+                        }
+                    }
+                    game_stats::save_game(report);
+
                     lobby.state = lobby_state::finished;
                     broadcast_lobby_update(lobby);
                 }
@@ -300,7 +313,7 @@ void game_manager::handle_join_lobby(session_ptr session, game_lobby &lobby) {
     }
     
     if (lobby.m_game) {
-        send_message(session->client, server_messages::game_started{});
+        send_message(session->client, server_messages::game_started{ lobby.game_id });
 
         lobby.m_game->get_spectator_join_updates([&](update_content update) {
             send_message(session->client, server_messages::game_update{ std::move(update) });
@@ -549,8 +562,9 @@ void game_manager::handle_message(client_messages::game_start &&args, session_pt
     }
 
     lobby.state = lobby_state::playing;
+    lobby.game_id = game_stats::get_next_game_id();
 
-    lobby.broadcast_message(server_messages::game_started{});
+    lobby.broadcast_message(server_messages::game_started{ lobby.game_id });
 
     auto guard = logging::push_context(std::format("game {}", lobby.name));
     lobby.m_game = std::make_unique<banggame::game>(lobby.options);

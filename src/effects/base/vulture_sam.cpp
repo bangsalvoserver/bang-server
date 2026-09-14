@@ -3,6 +3,8 @@
 #include "death.h"
 #include "pick.h"
 
+#include "cards/game_events.h"
+
 #include "game/game_table.h"
 
 #include "utils/range_utils.h"
@@ -17,6 +19,7 @@ namespace banggame {
             target->m_game->add_log("LOG_STOLEN_CARD", origin, target, target_card);
         }
         origin->steal_card(target_card);
+        origin->m_game->call_event(event_type::on_special_ability_used{ origin });
     }
 
     static card_ptr get_vulture_sam(player_ptr target) {

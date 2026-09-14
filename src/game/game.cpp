@@ -10,6 +10,14 @@
 
 #include "effects/base/requests.h"
 #include "effects/base/death.h"
+#include "effects/base/dynamite.h"
+#include "effects/base/duel.h"
+#include "effects/base/jail.h"
+#include "effects/base/damage.h"
+#include "effects/base/heal.h"
+#include "effects/base/draw_check.h"
+#include "effects/goldrush/discount.h"
+#include "effects/greattrainrobbery/traincost.h"
 
 #include "play_verify.h"
 #include "possible_to_play.h"
@@ -19,6 +27,7 @@
 #include "net/manager.h"
 
 #include <array>
+#include <chrono>
 #include <unordered_set>
 
 namespace banggame {
@@ -376,6 +385,7 @@ namespace banggame {
 
     void game::start_game(std::span<int> user_ids) {
         add_players(user_ids);
+        init_stats_tracking();
 
         for (ruleset_ptr ruleset : m_options.expansions) {
             ruleset->on_apply(this);
@@ -558,6 +568,169 @@ namespace banggame {
         });
 
         commit_updates();
+    }
+
+    static int64_t unix_now() {
+        return std::chrono::duration_cast<std::chrono::seconds>(
+            std::chrono::system_clock::now().time_since_epoch()).count();
+    }
+
+    static bool player_has_character(player_ptr p, std::string_view name) {
+        card_ptr c = p->get_character();
+        return c && c->name == name;
+    }
+
+    void game::init_stats_tracking() {
+        m_started_at = unix_now();
+
+        add_listener<event_type::on_play_card>(nullptr, [this](player_ptr origin, card_ptr origin_card, const effect_context &ctx) {
+            if (origin_card->is_bang_card(origin)) {
+                ++m_stats[origin].bangs_played;
+                if (int &turn_count = m_turn_bang_count[origin]; ++turn_count > 1) {
+                    ++m_stats[origin].volcanic_bangs_played;
+                    ++m_stats[origin].ability_uses;
+                }
+                if (player_has_character(origin, "SLAB_THE_KILLER")) {
+                    ++m_stats[origin].ability_uses;
+                }
+            } else if (origin_card->pocket == pocket_type::player_character) {
+                ++m_stats[origin].ability_uses;
+            }
+            if (ctx.contains<contexts::repeat_card>() && player_has_character(origin, "LEE_VAN_KLIFF")) {
+                ++m_stats[origin].ability_uses;
+            }
+            if (ctx.contains<contexts::discount>()) {
+                // only Pretty Luzena's character card can use the discount modifier
+                ++m_stats[origin].ability_uses;
+            }
+            if (ctx.contains<contexts::train_cost>()) {
+                if (card_ptr cost_card = ctx.get<contexts::train_cost>(); cost_card && cost_card->pocket == pocket_type::player_character) {
+                    // Sancho attached his character card as a traincost modifier
+                    ++m_stats[origin].ability_uses;
+                }
+            }
+        });
+
+        add_listener<event_type::on_special_ability_used>(nullptr, [this](player_ptr origin) {
+            ++m_stats[origin].ability_uses;
+        });
+
+        add_listener<event_type::on_turn_start>(nullptr, [this](player_ptr origin) {
+            m_turn_bang_count[origin] = 0;
+        });
+
+        add_listener<event_type::on_turn_switch>(nullptr, [this](player_ptr origin) {
+            if (origin == m_first_player) {
+                ++m_rounds;
+            }
+        });
+
+        add_listener<event_type::on_player_eliminated>(nullptr, [this](player_ptr killer, player_ptr target, death_type type) {
+            if (type == death_type::death && killer && killer != target) {
+                ++m_stats[killer].kills;
+            }
+            m_elimination_order[target] = m_next_elimination_order++;
+            m_died_on_round[target] = m_rounds;
+        });
+
+        add_listener<event_type::on_dynamite_explode>(nullptr, [this](player_ptr target) {
+            ++m_stats[target].dynamite_explosions;
+        });
+
+        add_listener<event_type::on_duel_lost>(nullptr, [this](player_ptr target) {
+            ++m_stats[target].duels_lost;
+        });
+
+        add_listener<event_type::on_jail_turn_skipped>(nullptr, [this](player_ptr target) {
+            ++m_stats[target].prison_turns_skipped;
+        });
+
+        add_listener<event_type::on_card_added_to_hand>(nullptr, [this](player_ptr origin, card_ptr target_card) {
+            ++m_stats[origin].cards_drawn;
+        });
+
+        add_listener<event_type::on_extra_cards_drawn>(nullptr, [this](player_ptr origin, card_ptr origin_card, int ncards) {
+            if (origin_card->pocket == pocket_type::player_character) {
+                // a passive character ability (Suzy Lafayette, Bart Cassidy, Molly Stark, ...)
+                // triggered the draw, rather than a played card like Stagecoach/Wells Fargo
+                ++m_stats[origin].ability_uses;
+            } else {
+                ++m_stats[origin].bonus_draws_used;
+            }
+        });
+
+        add_listener<event_type::on_hit>(nullptr, [this](card_ptr origin_card, player_ptr origin, player_ptr target, int damage, effect_flags flags) {
+            if (origin && origin != target) {
+                m_stats[origin].damage_dealt += damage;
+                if (player_has_character(origin, "ROSE_DOOLAN") && calc_distance(origin, target) == origin->get_weapon_range() + 1) {
+                    // the shot only reached because of her extra range
+                    ++m_stats[origin].ability_uses;
+                }
+                if (player_has_character(target, "EL_GRINGO")) {
+                    ++m_stats[target].ability_uses;
+                }
+                if (player_has_character(target, "BIG_SPENCER") && rn::any_of(target->m_hand, [](card_ptr c) { return c->has_tag(tag_type::missedcard); })) {
+                    // hit despite holding a Missed!, since he can't play it
+                    ++m_stats[target].ability_uses;
+                }
+            }
+        });
+
+        add_listener<event_type::on_heal>(nullptr, [this](card_ptr origin_card, player_ptr origin, player_ptr target, int amount) {
+            m_stats[target].hp_recovered += amount;
+            if (player_has_character(target, "GREG_DIGGER") && origin_card->name == "GREG_DIGGER") {
+                ++m_stats[target].ability_uses;
+            }
+            if (origin_card->name == "BEER" && amount == 2 && player_has_character(target, "TEQUILA_JOE")) {
+                ++m_stats[target].ability_uses;
+            }
+        });
+
+        add_listener<event_type::on_draw_check_luck>(nullptr, [this](player_ptr target, bool lucky) {
+            ++m_stats[target].draw_checks_total;
+            if (lucky) {
+                ++m_stats[target].draw_checks_lucky;
+            }
+            if (player_has_character(target, "LUCKY_DUKE")) {
+                ++m_stats[target].ability_uses;
+            }
+        });
+    }
+
+    game_report game::get_game_report() const {
+        game_report report;
+        report.started_at = m_started_at;
+        report.ended_at = unix_now();
+        report.num_rounds = m_rounds;
+        report.num_players = static_cast<int>(m_players.size());
+
+        for (ruleset_ptr ruleset : m_options.expansions) {
+            report.expansions.emplace_back(get_expansion_name(ruleset));
+        }
+        report.options = json::to_string(m_options);
+
+        for (player_ptr p : m_players) {
+            player_game_report &entry = report.players.emplace_back();
+            entry.user_id = p->user_id;
+            entry.is_bot = p->is_bot();
+            entry.role = p->get_base_role();
+            entry.survived = p->in_game() && p->alive();
+            entry.won = p->check_player_flags(player_flag::winner);
+            if (card_ptr character = p->get_character()) {
+                entry.character = std::string(character->name);
+            }
+            if (auto it = m_stats.find(p); it != m_stats.end()) {
+                entry.stats = it->second;
+            }
+            if (auto it = m_elimination_order.find(p); it != m_elimination_order.end()) {
+                entry.elimination_order = it->second;
+            }
+            if (auto it = m_died_on_round.find(p); it != m_died_on_round.end()) {
+                entry.died_on_round = it->second;
+            }
+        }
+
+        return report;
     }
 
     request_state game::send_request_status_ready() {

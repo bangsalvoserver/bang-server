@@ -1,6 +1,7 @@
 #include "emiliano.h"
 
 #include "cards/game_enums.h"
+#include "cards/game_events.h"
 #include "effects/base/bang.h"
 
 #include "game/game_table.h"
@@ -16,6 +17,7 @@ namespace banggame {
                             origin->m_game->add_log("LOG_STOLEN_SELF_CARD", origin, c);
                             c->add_short_pause();
                             origin->add_to_hand(c);
+                            origin->m_game->call_event(event_type::on_special_ability_used{ origin });
                         }
                     });
                 };

@@ -7,6 +7,7 @@
 
 #include "manager.h"
 #include "tracking.h"
+#include "game_stats_db.h"
 #include "server_options.h"
 
 std::stop_source g_stop;
@@ -26,6 +27,7 @@ int main(int argc, char **argv) {
     std::string logging_level;
 
     std::string tracking_file;
+    std::string games_db_file;
 
     bool display_help = false;
 
@@ -44,6 +46,7 @@ int main(int argc, char **argv) {
         ("l,logging",   "Logging Level",    cxxopts::value(logging_level))
         ("r,reuse-addr","Reuse Address",    cxxopts::value(reuse_addr))
         ("t,tracking-db","Tracking Database File", cxxopts::value(tracking_file))
+        ("games-db",    "Games Database File", cxxopts::value(games_db_file))
 #ifndef LIBUS_NO_SSL
         ("s,secure",    "Enable TLS",       cxxopts::value(enable_tls))
         ("cert",        "Certificate File", cxxopts::value(certificate_file))
@@ -78,7 +81,11 @@ int main(int argc, char **argv) {
     if (!tracking_file.empty()) {
         tracking::init_tracking(tracking_file);
     }
-    
+
+    if (!games_db_file.empty()) {
+        game_stats::init(games_db_file);
+    }
+
     banggame::game_manager server{serv_options};
 
 #ifndef LIBUS_NO_SSL

@@ -58,6 +58,7 @@ namespace banggame {
 
         void on_resolve() override {
             pop_request();
+            target->m_game->call_event(event_type::on_duel_lost{ target });
             target->damage(origin_card, origin, 1);
         }
 

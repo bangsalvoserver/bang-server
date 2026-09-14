@@ -21,6 +21,7 @@ namespace banggame {
         origin->m_game->add_listener<event_type::apply_escapable_modifier>(origin_card,
             [=](card_ptr e_origin_card, player_ptr e_origin, const_player_ptr e_target, effect_flags e_flags, const interface_escapable &req) -> escape_type {
                 if (e_target == origin && effect_ms_abigail::can_escape(e_origin, e_origin_card, e_flags)) {
+                    origin->m_game->call_event(event_type::on_special_ability_used{ origin });
                     return escape_type::escape_no_timer;
                 }
                 return {};

@@ -1,5 +1,7 @@
 #include "luckycharm.h"
 
+#include "cards/game_events.h"
+
 #include "game/game_table.h"
 #include "effects/base/damage.h"
 
@@ -12,6 +14,7 @@ namespace banggame {
                     if (target->alive()) {
                         target->m_game->add_log("LOG_CARD_HAS_EFFECT", target_card);
                         target_card->flash_card();
+                        target->m_game->call_event(event_type::on_special_ability_used{ target });
                         target->add_gold(damage);
                     }
                 });

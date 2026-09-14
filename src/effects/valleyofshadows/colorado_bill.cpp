@@ -1,6 +1,7 @@
 #include "colorado_bill.h"
 
 #include "cards/game_enums.h"
+#include "cards/game_events.h"
 
 #include "effects/base/bang.h"
 #include "effects/base/missed.h"
@@ -9,7 +10,7 @@
 #include "game/game_table.h"
 
 namespace banggame {
-    
+
     void equip_colorado_bill::on_enable(card_ptr origin_card, player_ptr origin) {
         origin->m_game->add_listener<event_type::apply_bang_modifier>(origin_card, [=](player_ptr e_origin, shared_request_bang req) {
             if (e_origin == origin) {
@@ -22,19 +23,21 @@ namespace banggame {
                 }, [=](bool result) {
                     if (result) {
                         origin->m_game->add_log("LOG_CARD_HAS_EFFECT", origin_card);
+                        origin->m_game->call_event(event_type::on_special_ability_used{ origin });
                         req->unavoidable = true;
                     }
                 });
             }
         });
     }
-    
+
     void equip_colorado_bill2::on_enable(card_ptr target_card, player_ptr origin) {
         origin->m_game->add_listener<event_type::on_missed>(target_card, [=](card_ptr missed_card, effect_flags flags, shared_request_bang req) {
             if (req->origin == origin && flags.check_all({effect_flag::is_bang, effect_flag::is_missed})) {
                 origin->m_game->queue_request<request_check>(origin, target_card, &card_sign::is_spades, [=](bool result) {
                     if (result) {
                         origin->m_game->add_log("LOG_CARD_HAS_EFFECT", target_card);
+                        origin->m_game->call_event(event_type::on_special_ability_used{ origin });
                         req->unavoidable = true;
                     }
                 });
