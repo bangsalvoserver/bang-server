@@ -27,6 +27,9 @@ namespace banggame {
                 }
                 return nullptr;
             });
+            target_card->m_game->add_listener<event_type::check_card_copied>(nullptr, [=](const_card_ptr e_target_card) {
+                return e_target_card == result;
+            });
         }
         return result;
     }
