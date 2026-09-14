@@ -16,6 +16,8 @@
 #include "effects/base/damage.h"
 #include "effects/base/heal.h"
 #include "effects/base/draw_check.h"
+#include "effects/goldrush/discount.h"
+#include "effects/greattrainrobbery/traincost.h"
 
 #include "play_verify.h"
 #include "possible_to_play.h"
@@ -596,6 +598,16 @@ namespace banggame {
             }
             if (ctx.contains<contexts::repeat_card>() && player_has_character(origin, "LEE_VAN_KLIFF")) {
                 ++m_stats[origin].ability_uses;
+            }
+            if (ctx.contains<contexts::discount>()) {
+                // only Pretty Luzena's character card can use the discount modifier
+                ++m_stats[origin].ability_uses;
+            }
+            if (ctx.contains<contexts::train_cost>()) {
+                if (card_ptr cost_card = ctx.get<contexts::train_cost>(); cost_card && cost_card->pocket == pocket_type::player_character) {
+                    // Sancho attached his character card as a traincost modifier
+                    ++m_stats[origin].ability_uses;
+                }
             }
         });
 

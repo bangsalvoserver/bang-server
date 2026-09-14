@@ -2,6 +2,7 @@
 
 #include "game/filters.h"
 #include "cards/filter_enums.h"
+#include "cards/game_events.h"
 
 #include "game/game_table.h"
 
@@ -30,6 +31,7 @@ namespace banggame {
 
     void effect_skip_player::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) {
         origin->m_game->add_log("LOG_SKIP_PLAYER", origin_card, origin, target, ctx.get<contexts::playing_card>());
+        origin->m_game->call_event(event_type::on_special_ability_used{ origin });
     }
 
     struct request_sgt_blaze : request_dismissable, interface_picking_player {
@@ -56,6 +58,7 @@ namespace banggame {
         void on_pick(player_ptr target_player) override {
             ctx->skipped_player = target_player;
             target->m_game->add_log("LOG_SKIP_PLAYER", origin_card, target, target_player, target->m_game->m_train.front());
+            target->m_game->call_event(event_type::on_special_ability_used{ target });
             pop_request();
         }
 
