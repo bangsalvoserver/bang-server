@@ -653,6 +653,7 @@ namespace banggame {
         for (ruleset_ptr ruleset : m_options.expansions) {
             report.expansions.emplace_back(get_expansion_name(ruleset));
         }
+        report.options = json::to_string(m_options);
 
         for (player_ptr p : m_players) {
             player_game_report &entry = report.players.emplace_back();

@@ -62,7 +62,9 @@ namespace sql {
         }
 
         void bind(int index, std::string_view value) {
-            throw_if_sqlite3_error(sqlite3_bind_text(stmt, index, value.data(), value.size(), nullptr));
+            // SQLITE_TRANSIENT: let SQLite copy the bytes now, since callers often pass a
+            // temporary (e.g. the result of a helper function) that won't outlive this call.
+            throw_if_sqlite3_error(sqlite3_bind_text(stmt, index, value.data(), value.size(), SQLITE_TRANSIENT));
         }
 
         void bind(int index, int value) {

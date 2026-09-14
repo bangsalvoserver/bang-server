@@ -6,6 +6,7 @@
 #include <cstdint>
 
 #include "cards/card_defs.h"
+#include "utils/json_serial.h"
 
 namespace banggame {
 
@@ -46,6 +47,7 @@ namespace banggame {
         int num_players = 0;
         int num_rounds = 0;
         std::vector<std::string> expansions;
+        json::raw_string options{std::string("{}")};
         std::vector<player_game_report> players;
     };
 

@@ -31,7 +31,8 @@ namespace game_stats {
                     ended_at INTEGER NOT NULL,
                     num_players INTEGER NOT NULL,
                     num_rounds INTEGER NOT NULL,
-                    expansions TEXT NOT NULL
+                    expansions TEXT NOT NULL,
+                    options TEXT NOT NULL
                 );
 
                 CREATE TABLE IF NOT EXISTS game_players(
@@ -125,9 +126,18 @@ namespace game_stats {
     }
 
     static std::vector<std::string> split_expansions(const std::string &value) {
-        return rv::split(value, ",")
-            | rv::transform([](auto name) { return std::string_view{name}; })
-            | rn::to<std::vector<std::string>>();
+        std::vector<std::string> result;
+        size_t start = 0;
+        while (start <= value.size()) {
+            size_t comma = value.find(',', start);
+            size_t end = comma == std::string::npos ? value.size() : comma;
+            if (end > start) {
+                result.emplace_back(value.substr(start, end - start));
+            }
+            if (comma == std::string::npos) break;
+            start = comma + 1;
+        }
+        return result;
     }
 
     void save_game(const game_report &report) {
@@ -135,8 +145,8 @@ namespace game_stats {
         try {
             {
                 auto stmt = s_connection.prepare(
-                    "INSERT INTO games (game_id, lobby_id, started_at, ended_at, num_players, num_rounds, expansions) "
-                    "VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)"
+                    "INSERT INTO games (game_id, lobby_id, started_at, ended_at, num_players, num_rounds, expansions, options) "
+                    "VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)"
                 );
                 stmt.bind(1, report.game_id);
                 stmt.bind(2, report.lobby_id);
@@ -145,6 +155,7 @@ namespace game_stats {
                 stmt.bind(5, report.num_players);
                 stmt.bind(6, report.num_rounds);
                 stmt.bind(7, join_expansions(report.expansions));
+                stmt.bind(8, std::string_view(report.options));
                 stmt.step();
             }
 
@@ -194,7 +205,7 @@ namespace game_stats {
             game_report report;
             {
                 auto stmt = s_connection.prepare(
-                    "SELECT game_id, lobby_id, started_at, ended_at, num_players, num_rounds, expansions "
+                    "SELECT game_id, lobby_id, started_at, ended_at, num_players, num_rounds, expansions, options "
                     "FROM games WHERE game_id = ?1"
                 );
                 stmt.bind(1, game_id);
@@ -208,6 +219,7 @@ namespace game_stats {
                 report.num_players = stmt.column_int(4);
                 report.num_rounds = stmt.column_int(5);
                 report.expansions = split_expansions(stmt.column_text(6));
+                report.options = stmt.column_text(7);
             }
 
             auto stmt = s_connection.prepare(
