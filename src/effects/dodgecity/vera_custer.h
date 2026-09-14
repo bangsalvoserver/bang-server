@@ -11,6 +11,13 @@ namespace banggame {
     };
 
     DEFINE_EQUIP(vera_custer, equip_vera_custer)
+
+    namespace event_type {
+        struct check_card_copied {
+            using result_type = bool;
+            const_card_ptr target_card;
+        };
+    }
 }
 
 #endif

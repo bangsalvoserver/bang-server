@@ -2,18 +2,40 @@
 
 #include "game_table.h"
 
+#include "effects/dodgecity/vera_custer.h"
+
 #include "cards/card_effect.h"
 
 #include "net/logging.h"
+
 #include "utils/type_name.h"
 
 namespace banggame {
+
+    static bool is_card_copied(const_card_ptr target_card) {
+        return target_card->m_game->call_event(event_type::check_card_copied{ target_card });
+    }
+
+    static bool is_disableable_card(const_card_ptr target_card) {
+        if (target_card->pocket == pocket_type::player_character) {
+            // vera custer's copied character are not disableable
+            // if vera custer copies greygory deck -> copied greygory deck and his own secondary characters are all not disableable
+            bool found_copied = false;
+            for (card_ptr c : target_card->owner->m_characters) {
+                if (!found_copied) found_copied = is_card_copied(c);
+                if (found_copied && c == target_card) return false;
+            }
+            return true;
+        } else {
+            return target_card->pocket == pocket_type::player_table;
+        }
+    }
     
     static auto disableable_cards(const player_list &players) {
         return players | rv::for_each([](player_ptr p) {
             return rv::concat(
                 p->m_table,
-                p->m_characters | rv::take(1)
+                p->m_characters | rv::take_while(std::not_fn(is_card_copied))
             );
         });
     }
@@ -56,9 +78,11 @@ namespace banggame {
     }
 
     card_ptr disabler_map::get_disabler(const_card_ptr target_card, bool check_disable_use) const {
-        for (auto &[card_key, fun] : m_disablers) {
-            if ((!check_disable_use || fun.is_disable_use()) && fun(target_card)) {
-                return card_key.target_card;
+        if (is_disableable_card(target_card)) {
+            for (auto &[card_key, fun] : m_disablers) {
+                if ((!check_disable_use || fun.is_disable_use()) && fun(target_card)) {
+                    return card_key.target_card;
+                }
             }
         }
         return nullptr;
