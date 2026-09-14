@@ -35,6 +35,7 @@ namespace banggame {
             if (target == origin) {
                 for (player_ptr p : target->m_game->range_other_players(target)) {
                     if (p->m_hand.size() > target->m_hand.size()) {
+                        target->m_game->call_event(event_type::on_special_ability_used{ target });
                         target->m_game->queue_request<request_youl_grinner>(target_card, target, p);
                     }
                 }

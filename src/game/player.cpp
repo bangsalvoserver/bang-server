@@ -331,9 +331,12 @@ namespace banggame {
     void player::pass_turn() {
         int actual_max_cards = max_cards_end_of_turn();
         if (int(m_hand.size()) > m_hp && int(m_hand.size()) <= actual_max_cards) {
-            // a max-hand-size modifier (e.g. Sean Mallory's/Gunbelt) is the only reason
-            // this player doesn't have to discard down right now
-            m_game->call_event(event_type::on_special_ability_used{ this });
+            // several unrelated things can raise the end-of-turn hand limit above hp
+            // (Gunbelt, Pack Mule, Coffee, being at 1 hp in Legends, ...); only Sean
+            // Mallory's own passive should be counted as a "special ability" use here
+            if (card_ptr character = get_character(); character && character->name == "SEAN_MALLORY") {
+                m_game->call_event(event_type::on_special_ability_used{ this });
+            }
         }
         if (m_hand.size() > actual_max_cards) {
             m_game->queue_request<request_discard_pass>(this);

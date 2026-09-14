@@ -586,6 +586,7 @@ namespace banggame {
                 ++m_stats[origin].bangs_played;
                 if (int &turn_count = m_turn_bang_count[origin]; ++turn_count > 1) {
                     ++m_stats[origin].volcanic_bangs_played;
+                    ++m_stats[origin].ability_uses;
                 }
                 if (player_has_character(origin, "SLAB_THE_KILLER")) {
                     ++m_stats[origin].ability_uses;
@@ -653,11 +654,21 @@ namespace banggame {
                     // the shot only reached because of her extra range
                     ++m_stats[origin].ability_uses;
                 }
+                if (player_has_character(target, "EL_GRINGO")) {
+                    ++m_stats[target].ability_uses;
+                }
+                if (player_has_character(target, "BIG_SPENCER") && rn::any_of(target->m_hand, [](card_ptr c) { return c->has_tag(tag_type::missedcard); })) {
+                    // hit despite holding a Missed!, since he can't play it
+                    ++m_stats[target].ability_uses;
+                }
             }
         });
 
         add_listener<event_type::on_heal>(nullptr, [this](card_ptr origin_card, player_ptr origin, player_ptr target, int amount) {
             m_stats[target].hp_recovered += amount;
+            if (player_has_character(target, "GREG_DIGGER") && origin_card->name == "GREG_DIGGER") {
+                ++m_stats[target].ability_uses;
+            }
             if (origin_card->name == "BEER" && amount == 2 && player_has_character(target, "TEQUILA_JOE")) {
                 ++m_stats[target].ability_uses;
             }

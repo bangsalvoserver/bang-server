@@ -19,6 +19,7 @@ namespace banggame {
             target->m_game->add_log("LOG_STOLEN_CARD", origin, target, target_card);
         }
         origin->steal_card(target_card);
+        origin->m_game->call_event(event_type::on_special_ability_used{ origin });
     }
 
     static card_ptr get_vulture_sam(player_ptr target) {
@@ -41,7 +42,6 @@ namespace banggame {
                 target_card = origin->random_hand_card();
             }
             steal_card(target, origin, target_card);
-            target->m_game->call_event(event_type::on_special_ability_used{ target });
 
             if (!origin->empty_hand() || !origin->empty_table()) {
                 for (player_ptr next_target : target->m_game->range_other_players(target)) {
@@ -99,7 +99,6 @@ namespace banggame {
                 while (!target->empty_hand()) {
                     steal_card(origin, target, target->m_hand.front());
                 }
-                origin->m_game->call_event(event_type::on_special_ability_used{ origin });
             } else if (!range_targets.empty() && range_targets.front() == origin) {
                 origin->m_game->queue_request<request_multi_vulture_sam>(target_card, target, origin);
             }

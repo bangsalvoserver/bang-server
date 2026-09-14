@@ -13,6 +13,7 @@ namespace banggame {
                     if (card_ptr card = other->find_equipped_card(equipped_card)) {
                         target->m_game->add_log("LOG_DISCARDED_CARD_FOR", target_card, other, card);
                         other->discard_card(card);
+                        target->m_game->call_event(event_type::on_special_ability_used{ p });
                     }
                 }
             }

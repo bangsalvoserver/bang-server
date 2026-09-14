@@ -2,6 +2,8 @@
 
 #include "game/game_table.h"
 
+#include "cards/game_events.h"
+
 #include "effects/base/death.h"
 #include "effects/base/draw_check.h"
 
@@ -14,6 +16,7 @@ namespace banggame {
                     if (result) {
                         origin->set_hp(1);
                         origin->draw_card(1, origin_card);
+                        origin->m_game->call_event(event_type::on_special_ability_used{ origin });
                     }
                 });
             }
