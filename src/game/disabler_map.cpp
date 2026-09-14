@@ -3,19 +3,34 @@
 #include "game_table.h"
 
 #include "cards/card_effect.h"
+#include "cards/game_enums.h"
 
 #include "net/logging.h"
+
 #include "utils/type_name.h"
 
 namespace banggame {
+
+    static auto disableable_characters(player_ptr origin) {
+        // vera custer's copied character are not disableable
+        // if vera custer copies greygory deck -> copied greygory deck and his own secondary characters are all not disableable
+        return origin->m_characters | rv::take_while([](card_ptr c) {
+            return !c->flags.check(card_flag::copied);
+        });
+    }
     
     static auto disableable_cards(const player_list &players) {
         return players | rv::for_each([](player_ptr p) {
-            return rv::concat(
-                p->m_table,
-                p->m_characters | rv::take(1)
-            );
+            return rv::concat(p->m_table, disableable_characters(p));
         });
+    }
+
+    static bool is_disableable_card(const_card_ptr target_card) {
+        if (target_card->pocket == pocket_type::player_character) {
+            return rn::contains(disableable_characters(target_card->owner), target_card);
+        } else {
+            return target_card->pocket == pocket_type::player_table;
+        }
     }
 
     void disabler_map::add_disabler(event_card_key key, card_disabler_fun &&fun) {
@@ -56,9 +71,11 @@ namespace banggame {
     }
 
     card_ptr disabler_map::get_disabler(const_card_ptr target_card, bool check_disable_use) const {
-        for (auto &[card_key, fun] : m_disablers) {
-            if ((!check_disable_use || fun.is_disable_use()) && fun(target_card)) {
-                return card_key.target_card;
+        if (is_disableable_card(target_card)) {
+            for (auto &[card_key, fun] : m_disablers) {
+                if ((!check_disable_use || fun.is_disable_use()) && fun(target_card)) {
+                    return card_key.target_card;
+                }
             }
         }
         return nullptr;

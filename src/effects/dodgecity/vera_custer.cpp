@@ -21,6 +21,7 @@ namespace banggame {
         card_ptr result = target_card->m_game->call_event(event_type::get_card_copy{ target_card });
         if (!result) {
             result = target_card->m_game->add_card(*target_card);
+            result->flags.add(card_flag::copied);
             target_card->m_game->add_listener<event_type::get_card_copy>(nullptr, [=](card_ptr e_target_card) -> card_ptr {
                 if (e_target_card == target_card) {
                     return result;

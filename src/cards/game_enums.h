@@ -68,7 +68,8 @@ namespace banggame {
     };
 
     enum class card_flag {
-        inactive
+        inactive,
+        copied
     };
 }
 
