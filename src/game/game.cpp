@@ -231,7 +231,7 @@ namespace banggame {
                         yield_update(game_updates::add_tokens{ token, count, token_positions::card{c} });
                     }
                 }
-                if (c->inactive) {
+                if (c->flags.check(card_flag::inactive)) {
                     yield_update(game_updates::tap_card{ c, true, 0ms });
                 }
             }

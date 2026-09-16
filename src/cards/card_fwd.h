@@ -63,10 +63,12 @@ namespace banggame {
     enum class effect_flag;
     enum class game_flag;
     enum class player_flag;
+    enum class card_flag;
 
     using effect_flags = enums::bitset<effect_flag>;
     using game_flags = enums::bitset<game_flag>;
     using player_flags = enums::bitset<player_flag>;
+    using card_flags = enums::bitset<card_flag>;
 
     struct game_error : std::runtime_error {
         using std::runtime_error::runtime_error;

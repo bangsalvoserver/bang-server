@@ -68,7 +68,7 @@ void ruleset_dodgecity::on_apply(game_ptr game) {
 
     // A player cannot play a green card already used this turn
     game->add_listener<event_type::check_play_card>(nullptr, [](player_ptr origin, card_ptr target_card, const effect_context &ctx) -> game_string {
-        if (target_card->is_green() && target_card->inactive) {
+        if (target_card->is_green() && target_card->flags.check(card_flag::inactive)) {
             return {"ERROR_CARD_INACTIVE", target_card};
         }
         return {};

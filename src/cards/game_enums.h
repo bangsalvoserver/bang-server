@@ -66,6 +66,10 @@ namespace banggame {
         positive_karma,
         negative_karma
     };
+
+    enum class card_flag {
+        inactive
+    };
 }
 
 #endif
