@@ -594,7 +594,12 @@ namespace banggame {
                     ++m_stats[origin].ability_uses;
                 }
             } else if (origin_card->pocket == pocket_type::player_character) {
-                ++m_stats[origin].ability_uses;
+                // Evelyn SheBang's add_draw_card response is free and repeatable, so it's not
+                // a meaningful "ability use" on its own; her real ability is instrumented
+                // directly in effect_evelyn_shebang::on_play instead.
+                if (!player_has_character(origin, "EVELYN_SHEBANG")) {
+                    ++m_stats[origin].ability_uses;
+                }
             }
             if (ctx.contains<contexts::repeat_card>() && player_has_character(origin, "LEE_VAN_KLIFF")) {
                 ++m_stats[origin].ability_uses;
@@ -617,6 +622,18 @@ namespace banggame {
 
         add_listener<event_type::on_turn_start>(nullptr, [this](player_ptr origin) {
             m_turn_bang_count[origin] = 0;
+            m_turn_train_equips[origin] = 0;
+        });
+
+        add_listener<event_type::on_equip_card>(nullptr, [this](player_ptr origin, player_ptr target, card_ptr origin_card, const effect_context &ctx) {
+            if (origin_card->is_train()) {
+                if (card_ptr cost_card = ctx.get<contexts::train_cost>(); cost_card && cost_card->deck != card_deck_type::main_deck) {
+                    if (int &count = m_turn_train_equips[origin]; ++count > 1 && player_has_character(origin, "BENNY_BRAWLER")) {
+                        // the "one train equip per turn" limit would have blocked this, if not for his ability
+                        ++m_stats[origin].ability_uses;
+                    }
+                }
+            }
         });
 
         add_listener<event_type::on_turn_switch>(nullptr, [this](player_ptr origin) {

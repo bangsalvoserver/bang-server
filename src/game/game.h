@@ -15,6 +15,7 @@ namespace banggame {
 
         std::map<player_ptr, player_tracking> m_stats;
         std::map<player_ptr, int> m_turn_bang_count;
+        std::map<player_ptr, int> m_turn_train_equips;
         std::map<player_ptr, int> m_elimination_order;
         std::map<player_ptr, int> m_died_on_round;
         int m_next_elimination_order = 1;

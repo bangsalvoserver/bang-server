@@ -4,6 +4,7 @@
 #include "effects/base/requests.h"
 
 #include "cards/game_enums.h"
+#include "cards/game_events.h"
 
 #include "game/game_table.h"
 
@@ -19,6 +20,7 @@ namespace banggame {
 
         origin->m_game->add_listener<event_type::apply_bang_modifier>(origin_card, [=](player_ptr target, shared_request_bang req) {
             if (origin != target && req->target == origin) {
+                origin->m_game->call_event(event_type::on_special_ability_used{ origin });
                 origin->m_game->queue_request<request_discard>(origin_card, origin, target, effect_flags{}, 210);
             }
         });
