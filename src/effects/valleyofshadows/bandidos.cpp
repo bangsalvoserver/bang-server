@@ -3,6 +3,7 @@
 #include "game/game_table.h"
 #include "game/prompts.h"
 #include "game/possible_to_play.h"
+#include "game/play_verify.h"
 
 #include "cards/game_enums.h"
 
@@ -34,7 +35,7 @@ namespace banggame {
 
         prompt_string resolve_prompt() const override {
             if (target->is_bot() && target->m_hp <= 2 && rn::any_of(target->m_hand, [&](card_ptr target_card) {
-                return !target->m_game->is_usage_disabled(target_card);
+                return !get_use_card_error(target, target_card);
             })) {
                 return "BOT_MUST_RESPOND_BANDIDOS";
             }
@@ -88,8 +89,8 @@ namespace banggame {
                     target->m_game->play_sound(update_target::includes(origin, target), sound_id::bandidos);
                 }
                 auto not_disabled = target->m_hand
-                    | rv::remove_if([&](const_card_ptr c) {
-                        return target->m_game->is_usage_disabled(c);
+                    | rv::remove_if([&](card_ptr c) {
+                        return get_use_card_error(target, c);
                     })
                     | rn::to<std::vector>();
                 if (not_disabled.size() <= 1) {

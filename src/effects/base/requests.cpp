@@ -7,6 +7,7 @@
 #include "game/game_table.h"
 #include "game/game_options.h"
 #include "game/prompts.h"
+#include "game/play_verify.h"
 
 namespace banggame {
 
@@ -77,7 +78,7 @@ namespace banggame {
 
     bool request_discard::can_pick(card_ptr target_card) const {
         return target_card->pocket == pocket_type::player_hand && target_card->owner == target
-            && !target->m_game->is_usage_disabled(target_card);
+            && !get_use_card_error(target, target_card);
     }
     
     void request_discard::on_pick(card_ptr target_card) {

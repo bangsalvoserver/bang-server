@@ -207,6 +207,10 @@ namespace banggame {
         return origin->m_game->call_event(event_type::check_play_card{ origin, origin_card, ctx });
     }
 
+    game_string get_use_card_error(player_ptr origin, card_ptr origin_card) {
+        return origin->m_game->call_event(event_type::check_use_card{ origin, origin_card });
+    }
+
     static game_string verify_card_targets(player_ptr origin, card_ptr origin_card, effect_list_type type, const target_list &targets, const target_selection_list &modifiers, effect_context &ctx) {
         MAYBE_RETURN(verify_modifiers(origin, origin_card, type, modifiers, ctx));
 

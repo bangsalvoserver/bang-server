@@ -70,10 +70,10 @@ namespace banggame {
         m_disablers.erase(iterator);
     }
 
-    card_ptr disabler_map::get_disabler(const_card_ptr target_card, bool check_disable_use) const {
+    card_ptr disabler_map::get_disabler(const_card_ptr target_card) const {
         if (is_disableable_card(target_card)) {
             for (auto &[card_key, fun] : m_disablers) {
-                if ((!check_disable_use || fun.is_disable_use()) && fun(target_card)) {
+                if (fun(target_card)) {
                     return card_key.target_card;
                 }
             }

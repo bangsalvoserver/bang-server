@@ -11,6 +11,7 @@
 #include "game/game_table.h"
 #include "game/possible_to_play.h"
 #include "game/prompts.h"
+#include "game/play_verify.h"
 
 #include "poker.h"
 
@@ -33,7 +34,7 @@ namespace banggame {
         
         bool can_pick(card_ptr target_card) const override {
             return target_card->pocket == pocket_type::player_hand && target_card->owner == target
-                && !target->m_game->is_usage_disabled(target_card);
+                && !get_use_card_error(target, target_card);
         }
 
         void on_update() override {

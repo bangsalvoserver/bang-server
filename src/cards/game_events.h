@@ -80,6 +80,12 @@ namespace banggame::event_type {
         const effect_context &ctx;
     };
 
+    struct check_use_card {
+        using result_type = game_string;
+        player_ptr origin;
+        card_ptr origin_card;
+    };
+
     struct check_character_modifier {
         using result_type = bool;
         player_ptr origin;

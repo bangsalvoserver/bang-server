@@ -141,10 +141,7 @@ namespace banggame {
     }
 
     game_string effect_discard::get_error(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
-        if (card_ptr disabler = origin->m_game->get_usage_disabler(target_card)) {
-            return {"ERROR_CARD_DISABLED_BY", target_card, disabler};
-        }
-        return {};
+        return get_use_card_error(origin, target_card);
     }
 
     game_string effect_discard::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card) {

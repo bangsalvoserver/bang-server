@@ -7,25 +7,24 @@
 
 namespace banggame {
 
+    static game_string get_sermon_error(card_ptr target_card, player_ptr origin, card_ptr origin_card) {
+        if (origin == origin->m_game->m_playing
+            && (!origin_card->owner || origin_card->owner == origin)
+            && origin_card->has_tag(origin_card->pocket == pocket_type::player_hand ? tag_type::bangcard : tag_type::play_as_bang)
+        ) {
+            return {"ERROR_CARD_DISABLED_BY", origin_card, target_card};
+        }
+        return {};
+    }
+
     void equip_sermon::on_enable(card_ptr target_card, player_ptr target) {
-        target->m_game->add_listener<event_type::pre_turn_start>(target_card, [=](player_ptr p) {
-            target->m_game->add_disabler(target_card, {[=](const_card_ptr c) {
-                if (c->owner && c->owner != p) {
-                    return false;
-                } else if (c->pocket == pocket_type::player_hand) {
-                    return c->has_tag(tag_type::bangcard);
-                } else {
-                    return c->has_tag(tag_type::play_as_bang);
-                }
-            }, true});
+        target->m_game->add_listener<event_type::check_play_card>(target_card, [=](player_ptr origin, card_ptr origin_card, const effect_context &ctx)  {
+            return get_sermon_error(target_card, origin, origin_card);
         });
-        target->m_game->add_listener<event_type::on_turn_end>(target_card, [=](player_ptr p, bool skipped) {
-            target->m_game->remove_disabler(target_card);
+
+        target->m_game->add_listener<event_type::check_use_card>(target_card, [=](player_ptr origin, card_ptr origin_card) {
+            return get_sermon_error(target_card, origin, origin_card);
         });
     }
 
-    void equip_sermon::on_disable(card_ptr target_card, player_ptr target) {
-        target->m_game->remove_disabler(target_card);
-        target->m_game->remove_listeners(target_card);
-    }
 }
