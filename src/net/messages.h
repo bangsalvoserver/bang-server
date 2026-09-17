@@ -203,7 +203,9 @@ namespace banggame {
             json::raw_string update;
         };
 
-        struct game_started {};
+        struct game_started {
+            int game_id;
+        };
     }
 
     using server_message = std::variant<

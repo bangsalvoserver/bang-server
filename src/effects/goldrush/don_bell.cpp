@@ -15,6 +15,7 @@ namespace banggame {
                 target->m_game->queue_request<request_check>(target, target_card, &card_sign::is_red, [=](bool result) {
                     if (result) {
                         target->m_game->add_log("LOG_CARD_HAS_EFFECT", target_card);
+                        target->m_game->call_event(event_type::on_special_ability_used{ target });
                         ++target->m_extra_turns;
                     }
                 });

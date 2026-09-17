@@ -62,7 +62,9 @@ namespace sql {
         }
 
         void bind(int index, std::string_view value) {
-            throw_if_sqlite3_error(sqlite3_bind_text(stmt, index, value.data(), value.size(), nullptr));
+            // SQLITE_TRANSIENT: let SQLite copy the bytes now, since callers often pass a
+            // temporary (e.g. the result of a helper function) that won't outlive this call.
+            throw_if_sqlite3_error(sqlite3_bind_text(stmt, index, value.data(), value.size(), SQLITE_TRANSIENT));
         }
 
         void bind(int index, int value) {
@@ -95,6 +97,12 @@ namespace sql {
 
         uint64_t column_uint64(int index) {
             return sqlite3_column_int64(stmt, index);
+        }
+
+        std::string column_text(int index) {
+            const unsigned char *text = sqlite3_column_text(stmt, index);
+            int size = sqlite3_column_bytes(stmt, index);
+            return text ? std::string(reinterpret_cast<const char *>(text), size) : std::string();
         }
     };
 

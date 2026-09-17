@@ -2,6 +2,8 @@
 
 #include "game/game_table.h"
 
+#include "cards/game_events.h"
+
 #include "effects/base/draw.h"
 
 namespace banggame {
@@ -10,6 +12,7 @@ namespace banggame {
         target->m_game->add_listener<event_type::init_request_draw>({target_card, 2}, [=](player_ptr origin, shared_request_draw req) {
             if (origin == target && req->num_cards_to_draw == 2) {
                 req->num_cards_to_draw = 3;
+                target->m_game->call_event(event_type::on_special_ability_used{ target });
             }
         });
     }

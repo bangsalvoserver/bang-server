@@ -3,6 +3,8 @@
 #include "effects/base/vulture_sam.h"
 #include "effects/base/draw_check.h"
 
+#include "cards/game_events.h"
+
 #include "game/game_table.h"
 
 namespace banggame {
@@ -31,6 +33,7 @@ namespace banggame {
                         player_end->m_game->add_log("LOG_DRAWN_CARD", player_end, target_card);
                         target_card->add_short_pause();
                         player_end->add_to_hand(target_card);
+                        player_end->m_game->call_event(event_type::on_special_ability_used{ player_end });
                     }
                 });
             }, priority);

@@ -14,6 +14,12 @@ namespace banggame {
 
     DEFINE_EQUIP(jail, equip_jail)
 
+    namespace event_type {
+        struct on_jail_turn_skipped {
+            player_ptr target;
+        };
+    }
+
     struct effect_escape_jail : effect_discard {
         bool can_play(card_ptr origin_card, player_ptr origin);
         void on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card);
