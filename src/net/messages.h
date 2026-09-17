@@ -66,6 +66,10 @@ namespace banggame {
             int user_id;
         };
 
+        struct game_replace_bot {
+            int user_id;
+        };
+
         struct game_action {
             struct transparent{};
             json::json_document action;
@@ -86,6 +90,7 @@ namespace banggame {
         client_messages::user_spectate,
         client_messages::game_start,
         client_messages::game_rejoin,
+        client_messages::game_replace_bot,
         client_messages::game_action
     >;
 

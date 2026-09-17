@@ -48,6 +48,7 @@ private:
     void handle_message(client_messages::user_spectate &&msg, session_ptr session);
     void handle_message(client_messages::game_start &&msg, session_ptr session);
     void handle_message(client_messages::game_rejoin &&msg, session_ptr session);
+    void handle_message(client_messages::game_replace_bot &&msg, session_ptr session);
     void handle_message(client_messages::game_action &&msg, session_ptr session);
     
     void register_chat_commands(game_lobby &lobby);

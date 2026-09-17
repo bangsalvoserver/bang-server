@@ -621,6 +621,45 @@ void game_manager::handle_message(client_messages::game_rejoin &&args, session_p
     broadcast_lobby_update(lobby);
 }
 
+void game_manager::handle_message(client_messages::game_replace_bot &&args, session_ptr session) {
+    if (!session->lobby) {
+        throw lobby_error("ERROR_PLAYER_NOT_IN_LOBBY");
+    }
+    game_lobby &lobby = *session->lobby;
+    game_user &user = lobby.find_user(session);
+
+    if (!user.is_lobby_owner()) {
+        throw lobby_error("ERROR_PLAYER_NOT_LOBBY_OWNER");
+    }
+
+    if (lobby.state != lobby_state::playing) {
+        throw lobby_error("ERROR_LOBBY_NOT_PLAYING");
+    }
+
+    if (args.user_id < 0) {
+        throw lobby_error("ERROR_CANNOT_REPLACE_BOT");
+    }
+
+    if (rn::contains(lobby.connected_user_ids, args.user_id)) {
+        throw lobby_error("ERROR_PLAYER_NOT_DISCONNECTED");
+    }
+
+    int bot_id = -1;
+    while (rn::contains(lobby.bots, bot_id, &lobby_bot::user_id)) {
+        --bot_id;
+    }
+
+    auto name = sample_elements_r<std::string_view>(bot_info.names, 1, session_rng).front();
+    auto propic = sample_elements_r<image_pixels_hash>(bot_info.propics, 1, session_rng).front();
+
+    auto &bot = lobby.bots.emplace_back(bot_id, std::format("BOT {}", name), propic);
+    lobby.broadcast_message(bot.make_user_update());
+
+    lobby.m_game->rejoin_user(args.user_id, bot_id);
+
+    broadcast_lobby_update(lobby);
+}
+
 void game_manager::handle_message(client_messages::game_action &&args, session_ptr session) {
     if (!session->lobby) {
         throw lobby_error("ERROR_PLAYER_NOT_IN_LOBBY");
