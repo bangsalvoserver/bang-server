@@ -108,9 +108,7 @@ namespace banggame {
             }), m_mgr->session_rng);
 
         image_pixels_hash bot_propic = random_element(bot_info.propics
-            | rv::transform([&](const image_registry::registered_image &image) {
-                return image_pixels_hash{image};
-            })
+            | rv::transform([](image_pixels_hash image) { return image; })
             | rv::filter([&](image_pixels_hash image) {
                 return !rn::contains(bots, image, &lobby_bot::propic);
             }), m_mgr->session_rng);
