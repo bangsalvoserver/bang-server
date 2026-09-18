@@ -107,7 +107,7 @@ struct game_user {
 
 struct lobby_bot {
     int user_id;
-    std::string username;
+    std::string_view username;
     image_pixels_hash propic;
 
     server_messages::lobby_user_update make_user_update() const;
@@ -153,6 +153,7 @@ struct game_lobby {
     game_user &find_user(std::string_view name_or_id);
 
     std::pair<game_user &, bool> add_user(session_ptr session);
+    int add_bot();
 
     static std::string crop_lobby_name(const std::string &name);
 

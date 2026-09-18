@@ -566,16 +566,8 @@ void game_manager::handle_message(client_messages::game_start &&args, session_pt
         }
     }
 
-    auto names = sample_elements_r<std::string_view>(bot_info.names, num_bots, session_rng);
-
-    auto propics = sample_elements_r<image_pixels_hash>(bot_info.propics, num_bots, session_rng);
-
     for (int i=0; i < num_bots; ++i) {
-        int bot_id = -1-i;
-        auto &bot = lobby.bots.emplace_back(bot_id, std::format("BOT {}", names[i % names.size()]), propics[i % propics.size()]);
-        user_ids.push_back(bot_id);
-
-        lobby.broadcast_message(bot.make_user_update());
+        user_ids.push_back(lobby.add_bot());
     }
     
     broadcast_lobby_update(lobby);
@@ -644,18 +636,7 @@ void game_manager::handle_message(client_messages::game_replace_bot &&args, sess
         throw lobby_error("ERROR_PLAYER_NOT_DISCONNECTED");
     }
 
-    int bot_id = -1;
-    while (rn::contains(lobby.bots, bot_id, &lobby_bot::user_id)) {
-        --bot_id;
-    }
-
-    auto name = sample_elements_r<std::string_view>(bot_info.names, 1, session_rng).front();
-    auto propic = sample_elements_r<image_pixels_hash>(bot_info.propics, 1, session_rng).front();
-
-    auto &bot = lobby.bots.emplace_back(bot_id, std::format("BOT {}", name), propic);
-    lobby.broadcast_message(bot.make_user_update());
-
-    lobby.m_game->rejoin_user(args.user_id, bot_id);
+    lobby.m_game->rejoin_user(args.user_id, lobby.add_bot());
 
     broadcast_lobby_update(lobby);
 }

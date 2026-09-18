@@ -4,6 +4,7 @@
 #include "messages.h"
 
 #include "utils/range_utils.h"
+#include "utils/random_element.h"
 
 namespace banggame {
 
@@ -36,7 +37,7 @@ namespace banggame {
     server_messages::lobby_user_update lobby_bot::make_user_update() const {
         return {
             .user_id = user_id,
-            .username = username,
+            .username = std::format("BOT {}", username),
             .propic = propic
         };
     }
@@ -95,6 +96,28 @@ namespace banggame {
             connected_user_ids.push_back(user_id);
             return {user, true};
         }
+    }
+
+    int game_lobby::add_bot() {
+        int bot_id = (bots.empty() ? 0 : bots.back().user_id) - 1;
+
+        // we assume there cannot be more bots than names/propics
+        std::string_view bot_name = random_element(bot_info.names
+            | rv::filter([&](std::string_view name) {
+                return !rn::contains(bots, name, &lobby_bot::username);
+            }), m_mgr->session_rng);
+
+        image_pixels_hash bot_propic = random_element(bot_info.propics
+            | rv::transform([&](const image_registry::registered_image &image) {
+                return image_pixels_hash{image};
+            })
+            | rv::filter([&](image_pixels_hash image) {
+                return !rn::contains(bots, image, &lobby_bot::propic);
+            }), m_mgr->session_rng);
+
+        auto &bot = bots.emplace_back(bot_id, bot_name, bot_propic);
+        broadcast_message(bot.make_user_update());
+        return bot_id;
     }
 
     std::string game_lobby::crop_lobby_name(const std::string &name) {
