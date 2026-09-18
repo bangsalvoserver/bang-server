@@ -90,4 +90,14 @@ namespace banggame {
             }
         } while (std::holds_alternative<request_states::next>(m_state));
     }
+
+    void request_queue::commit_bot_rejoin() {
+        if (std::holds_alternative<request_states::done>(m_state)) {
+            m_state = request_bot_play(false);
+
+            if (std::holds_alternative<request_states::next>(m_state)) {
+                commit_updates();
+            }
+        }
+    }
 }

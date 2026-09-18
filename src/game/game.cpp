@@ -372,6 +372,10 @@ namespace banggame {
         }
         update_player_userid(target, new_user_id);
         add_update(game_updates::player_add{ target });
+
+        if (target->is_bot()) {
+            commit_bot_rejoin();
+        }
     }
 
     void game::start_game(std::span<int> user_ids) {

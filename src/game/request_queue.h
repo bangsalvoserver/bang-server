@@ -88,6 +88,7 @@ namespace banggame {
     public:
         void tick();
         void commit_updates();
+        void commit_bot_rejoin();
 
     public:
         bool pending_requests() const {
