@@ -98,20 +98,26 @@ namespace banggame {
         }
     }
 
+    template<rn::forward_range R, typename Proj, typename Rng>
+    decltype(auto) random_least_used(R &&values, const std::vector<lobby_bot> &bots, Proj proj, Rng &rng) {
+        auto use_count = [&](const auto &value) {
+            return rn::count(bots, value, proj);
+        };
+        auto min_count = rn::min(values | rv::transform(use_count));
+
+        return random_element(values | rv::filter([&](const auto &value) {
+            return use_count(value) == min_count;
+        }), rng);
+    }
+
     int game_lobby::add_bot() {
         int bot_id = (bots.empty() ? 0 : bots.back().user_id) - 1;
 
-        // we assume there cannot be more bots than names/propics
-        std::string_view bot_name = random_element(bot_info.names
-            | rv::filter([&](std::string_view name) {
-                return !rn::contains(bots, name, &lobby_bot::username);
-            }), m_mgr->session_rng);
+        std::string_view bot_name = random_least_used(bot_info.names, bots, &lobby_bot::username, m_mgr->session_rng);
 
-        image_pixels_hash bot_propic = random_element(bot_info.propics
-            | rv::transform([](image_pixels_hash image) { return image; })
-            | rv::filter([&](image_pixels_hash image) {
-                return !rn::contains(bots, image, &lobby_bot::propic);
-            }), m_mgr->session_rng);
+        image_pixels_hash bot_propic = random_least_used(bot_info.propics
+            | rv::transform([](image_pixels_hash image) { return image; }),
+            bots, &lobby_bot::propic, m_mgr->session_rng);
 
         auto &bot = bots.emplace_back(bot_id, bot_name, bot_propic);
         broadcast_message(bot.make_user_update());
