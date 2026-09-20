@@ -121,24 +121,49 @@ namespace banggame {
         return request_states::done{};
     }
 
-    request_state game::request_bot_play(bool instant) {
-        if (rn::none_of(m_players, &player::is_bot)) {
-            return request_states::done{};
-        } else if (!instant && m_options.bot_play_timer > game_duration{0}) {
-            return request_states::bot_play{ get_total_update_time() + std::chrono::duration_cast<ticks>(m_options.bot_play_timer) };
-        }
+    request_state game::request_bot_play(player_ptr origin, bool instant) {
+        if (origin) {
+            if (pending_requests()) {
+                if (!instant && m_options.bot_play_timer > game_duration{0}) {
+                    if (!get_all_playable_cards(origin, effect_list_type::responses).empty()) {
+                        return request_states::bot_play{ origin, get_total_update_time() + std::chrono::duration_cast<ticks>(m_options.bot_play_timer) };
+                    }
+                } else {       
+                    playable_cards_list play_cards = generate_playable_cards_list(origin, effect_list_type::responses);
+                    if (!play_cards.empty() && std::holds_alternative<request_states::next>(execute_random_play(origin, bot_info.settings.response_rules, play_cards))) {
+                        return request_states::next{};
+                    }
+                }
+            } else if (origin == origin->m_game->m_playing) {
+                if (!instant && m_options.bot_play_timer > game_duration{0}) {
+                    if (!get_all_playable_cards(origin, effect_list_type::effects).empty()) {
+                        return request_states::bot_play{ origin, get_total_update_time() + std::chrono::duration_cast<ticks>(m_options.bot_play_timer) };
+                    }
+                } else {       
+                    playable_cards_list play_cards = generate_playable_cards_list(origin, effect_list_type::effects);
+                    if (!play_cards.empty() && std::holds_alternative<request_states::next>(execute_random_play(origin, bot_info.settings.in_play_rules, play_cards))) {
+                        return request_states::next{};
+                    }
+                }
+            }
+        } else if (auto all_bots = m_players | rv::filter(&player::is_bot)) {
+            if (!instant && m_options.bot_play_timer > game_duration{0}) {
+                return request_states::bot_play{ nullptr, get_total_update_time() + std::chrono::duration_cast<ticks>(m_options.bot_play_timer) };
+            }
 
-        if (pending_requests()) {
-            for (player_ptr origin : m_players | rv::filter(&player::is_bot)) {
-                playable_cards_list play_cards = generate_playable_cards_list(origin, effect_list_type::responses);
-                
-                if (!play_cards.empty() && std::holds_alternative<request_states::next>(execute_random_play(origin, bot_info.settings.response_rules, play_cards))) {
+            if (pending_requests()) {
+                for (player_ptr p : all_bots) {
+                    playable_cards_list play_cards = generate_playable_cards_list(p, effect_list_type::responses);
+                    if (!play_cards.empty() && std::holds_alternative<request_states::next>(execute_random_play(p, bot_info.settings.response_rules, play_cards))) {
+                        return request_states::next{};
+                    }
+                }
+            } else if (m_playing && m_playing->is_bot()) {
+                playable_cards_list play_cards = generate_playable_cards_list(m_playing, effect_list_type::effects);
+                if (!play_cards.empty() && std::holds_alternative<request_states::next>(execute_random_play(m_playing, bot_info.settings.in_play_rules, play_cards))) {
                     return request_states::next{};
                 }
             }
-        } else if (m_playing && m_playing->is_bot()) {
-            playable_cards_list play_cards = generate_playable_cards_list(m_playing);
-            return execute_random_play(m_playing, bot_info.settings.in_play_rules, play_cards);
         }
         return request_states::done{};
     }

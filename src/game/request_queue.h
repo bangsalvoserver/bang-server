@@ -43,6 +43,7 @@ namespace banggame {
         };
 
         struct bot_play {
+            player_ptr origin;
             ticks timer;
         };
     }
@@ -83,12 +84,12 @@ namespace banggame {
         virtual void send_request_update() = 0;
         virtual void send_request_status_clear() = 0;
         virtual request_state send_request_status_ready() = 0;
-        virtual request_state request_bot_play(bool instant) = 0;
+        virtual request_state request_bot_play(player_ptr origin, bool instant) = 0;
 
     public:
         void tick();
         void commit_updates();
-        void commit_bot_rejoin();
+        void commit_bot_rejoin(player_ptr origin);
 
     public:
         bool pending_requests() const {

@@ -33,7 +33,7 @@ namespace banggame {
         } else if (std::holds_alternative<request_states::next>(send_request_status_ready())) {
             return request_states::next{};
         }
-        return request_bot_play(false);
+        return request_bot_play(nullptr, false);
     }
 
     request_state request_queue::invoke_tick_update() {
@@ -59,9 +59,9 @@ namespace banggame {
             },
             [&](request_states::bot_play state) -> request_state {
                 if (state.timer > ticks{}) {
-                    return request_states::bot_play{ state.timer - ticks{1} };
+                    return request_states::bot_play{ state.origin, state.timer - ticks{1} };
                 } else {
-                    return request_bot_play(true);
+                    return request_bot_play(state.origin, true);
                 }
             }
         }, m_state);
@@ -91,9 +91,9 @@ namespace banggame {
         } while (std::holds_alternative<request_states::next>(m_state));
     }
 
-    void request_queue::commit_bot_rejoin() {
+    void request_queue::commit_bot_rejoin(player_ptr origin) {
         if (std::holds_alternative<request_states::done>(m_state)) {
-            m_state = request_bot_play(false);
+            m_state = request_bot_play(origin, false);
 
             if (std::holds_alternative<request_states::next>(m_state)) {
                 commit_updates();

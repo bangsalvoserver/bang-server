@@ -37,7 +37,7 @@ namespace banggame {
             clear_request_status();
         }
         request_state send_request_status_ready() override;
-        request_state request_bot_play(bool instant) override;
+        request_state request_bot_play(player_ptr origin, bool instant) override;
     };
 
 }

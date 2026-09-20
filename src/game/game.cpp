@@ -374,7 +374,7 @@ namespace banggame {
         add_update(game_updates::player_add{ target });
 
         if (target->is_bot()) {
-            commit_bot_rejoin();
+            commit_bot_rejoin(target);
         }
     }
 
