@@ -94,6 +94,7 @@ namespace banggame {
                 && !target->check_player_flags(player_flag::extra_turn)
             ) {
                 handlers.add(origin_card);
+                target->m_game->call_event(event_type::on_special_ability_used{ target });
                 target->m_game->queue_request<request_vera_custer>(origin_card, nullptr, target);
                 return true;
             }

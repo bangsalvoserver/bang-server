@@ -2,6 +2,8 @@
 
 #include "game/game_table.h"
 
+#include "cards/game_events.h"
+
 #include "effects/base/draw.h"
 #include "effects/base/resolve.h"
 
@@ -45,6 +47,7 @@ namespace banggame {
         
         target->m_game->add_listener<event_type::on_draw_from_deck>(target_card, [=](player_ptr origin, card_ptr origin_card, shared_request_draw req_draw) {
             if (origin == target && origin_card == target_card) {
+                target->m_game->call_event(event_type::on_special_ability_used{ target });
                 target->m_game->queue_request<request_annie_oakey>(target_card, target, std::move(req_draw));
             }
         });

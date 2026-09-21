@@ -31,6 +31,7 @@ namespace banggame {
             }
         });
 
+        origin->m_game->call_event(event_type::on_special_ability_used{ origin });
         effect_bang{}.on_play(origin_card, origin, target);
     }
 }

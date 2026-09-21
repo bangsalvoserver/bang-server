@@ -122,7 +122,8 @@ struct game_lobby {
 
     game_manager *m_mgr;
 
-    id_type lobby_id;
+    id_type lobby_id = 0;
+    int game_id = 0;
 
     std::string name;
     game_options options;

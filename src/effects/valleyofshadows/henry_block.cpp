@@ -1,5 +1,7 @@
 #include "henry_block.h"
 
+#include "cards/game_events.h"
+
 #include "game/game_table.h"
 
 #include "effects/base/bang.h"
@@ -14,6 +16,7 @@ namespace banggame {
                 flags.add(destroy_flag::ignore_if_dead);
                 p->m_game->add_log("LOG_CARD_HAS_EFFECT", target_card);
                 target_card->flash_card();
+                p->m_game->call_event(event_type::on_special_ability_used{ p });
                 p->m_game->queue_request<request_bang>(target_card, target, origin);
             }
         });

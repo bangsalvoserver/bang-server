@@ -21,6 +21,7 @@ namespace banggame {
                     if (!result) {
                         target->m_game->add_log("LOG_CARD_EXPLODES", target_card);
                         target->m_game->play_sound(sound_id::dynamite);
+                        target->m_game->call_event(event_type::on_dynamite_explode{ target });
                         target->discard_card(target_card);
                         target->damage(target_card, nullptr, 3);
                     } else {
