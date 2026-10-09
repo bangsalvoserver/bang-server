@@ -17,15 +17,21 @@ namespace tracking {
                     count INT NOT NULL
                 );
 
+                CREATE INDEX IF NOT EXISTS client_count_ts ON client_count(timestamp);
+
                 CREATE TABLE IF NOT EXISTS user_count(
                     timestamp INT NOT NULL,
                     count INT NOT NULL
                 );
 
+                CREATE INDEX IF NOT EXISTS user_count_ts   ON user_count(timestamp);
+
                 CREATE TABLE IF NOT EXISTS lobby_count(
                     timestamp INT NOT NULL,
                     count INT NOT NULL
                 );
+
+                CREATE INDEX IF NOT EXISTS lobby_count_ts  ON lobby_count(timestamp);
             )SQL");
         } catch (const sql::sql_error &error) {
             logging::error("SQL error: {}", error.what());
@@ -67,18 +73,55 @@ namespace tracking {
         timestamp_counts result;
         if (s_connection) {
             try {
-                auto stmt = s_connection.prepare(std::format(
-                    "SELECT timestamp, count FROM {} WHERE timestamp >= {}",
-                    table_name, start_date.time_since_epoch().count()
-                ));
-                while (stmt.step()) {
-                    timestamp time{std::chrono::seconds{stmt.column_int64(0)}};
-                    size_t count = stmt.column_uint64(1);
-                    if (time >= start_date) {
-                        result.emplace_back(time, count);
-                        start_date += max_diff;
+                const int64_t start = start_date.time_since_epoch().count();
+                const int64_t step = std::max<int64_t>(1, max_diff.count());
+
+                {
+                    auto stmt = s_connection.prepare(std::format(
+                        "SELECT count FROM {} WHERE timestamp < {} ORDER BY timestamp DESC, rowid DESC LIMIT 1",
+                        table_name, start
+                    ));
+                    if (stmt.step()) {
+                        result.emplace_back(start_date, stmt.column_uint64(0));
                     }
                 }
+
+                auto stmt = s_connection.prepare(std::format(
+                    "SELECT timestamp, count FROM {} WHERE timestamp >= {} ORDER BY timestamp, rowid",
+                    table_name, start
+                ));
+
+                int64_t current_bucket = -1;
+                timestamp_count_entry lo, hi;
+
+                auto flush = [&] {
+                    if (current_bucket < 0) return;
+                    if (lo.second == hi.second) {
+                        result.push_back(lo);
+                    } else if (hi.first < lo.first) {
+                        result.push_back(hi);
+                        result.push_back(lo);
+                    } else {
+                        result.push_back(lo);
+                        result.push_back(hi);
+                    }
+                };
+
+                while (stmt.step()) {
+                    int64_t seconds = stmt.column_int64(0);
+                    timestamp_count_entry e{timestamp{std::chrono::seconds{seconds}}, static_cast<size_t>(stmt.column_uint64(1))};
+                    int64_t bucket = (seconds - start) / step;
+
+                    if (bucket != current_bucket) {
+                        flush();
+                        current_bucket = bucket;
+                        lo = hi = e;
+                    } else {
+                        if (e.second < lo.second) lo = e;
+                        if (e.second > hi.second) hi = e;
+                    }
+                }
+                flush();
             } catch (const sql::sql_error &error) {
                 logging::error("SQL error: {}", error.what());
             }
@@ -98,7 +141,7 @@ namespace tracking {
 
     tracking_response get_tracking_for(duration length, size_t max_count) {
         timestamp start_date = std::chrono::time_point_cast<duration>(clock::now() - length);
-        auto max_diff = length / std::clamp(max_count, 1000uz, 3000uz);
+        auto max_diff = length / std::clamp(max_count, 500uz, 2000uz);
         
         return {
             read_tracking_simple("client_count", start_date, max_diff),

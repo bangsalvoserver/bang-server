@@ -17,7 +17,8 @@ namespace tracking {
     using clock = std::chrono::system_clock;
     using duration = std::chrono::seconds;
     using timestamp = std::chrono::time_point<clock, duration>;
-    using timestamp_counts = std::vector<std::pair<timestamp, size_t>>;
+    using timestamp_count_entry = std::pair<timestamp, size_t>;
+    using timestamp_counts = std::vector<timestamp_count_entry>;
 
     struct tracking_response {
         timestamp_counts client_count;
