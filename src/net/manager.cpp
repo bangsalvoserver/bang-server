@@ -576,6 +576,9 @@ void game_manager::handle_message(client_messages::game_start &&args, session_pt
 }
 
 void game_manager::handle_message(client_messages::game_rejoin &&args, session_ptr session) {
+    if (!session->lobby) {
+        throw lobby_error("ERROR_PLAYER_NOT_IN_LOBBY");
+    }
     game_lobby &lobby = *session->lobby;
     game_user &user = lobby.find_user(session);
 
