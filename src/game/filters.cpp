@@ -191,6 +191,10 @@ namespace banggame {
                 if (target->sign.is_spades()) continue;
                 return {"ERROR_TARGET_NOT_SPADES", origin_card, target};
 
+  	    case target_card_filter::not_spades:
+                if (!target->sign.is_spades()) continue;
+                return {"ERROR_TARGET_SPADES", origin_card, target};
+
             case target_card_filter::two_to_nine:
                 if (target->sign.is_two_to_nine()) continue;
                 return {"ERROR_TARGET_NOT_TWO_TO_NINE", origin_card, target};
