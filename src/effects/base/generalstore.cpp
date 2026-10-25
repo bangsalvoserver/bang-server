@@ -27,6 +27,7 @@ namespace banggame {
         pop_request();
         target->m_game->add_log("LOG_DRAWN_FROM_GENERALSTORE", target, target_card, origin_card);
         target->add_to_hand(target_card);
+        target->m_game->call_event(event_type::on_generalstore_pick{ origin, origin_card, target, target_card });
     }
 
     game_string request_generalstore::status_text(player_ptr owner) const {
@@ -44,6 +45,7 @@ namespace banggame {
 
     void effect_generalstore::on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
         int num_targets = origin->m_game->num_alive() - ctx.contains<contexts::skipped_player>();
+        origin->m_game->call_event(event_type::count_generalstore_cards{ num_targets });
         for (int i=0; i < num_targets; ++i) {
             origin->m_game->top_of_deck()->move_to(pocket_type::selection);
         }

@@ -4,7 +4,14 @@
 #include "cards/card_effect.h"
 
 namespace banggame {
-    
+
+    namespace event_type {
+        struct count_map_reveal {
+            const_player_ptr origin;
+            nullable_ref<int> value;
+        };
+    }
+
     struct equip_map : event_equip {
         void on_enable(card_ptr origin_card, player_ptr origin);
     };

@@ -17,7 +17,9 @@ namespace banggame {
         
         void on_update() override {
             if (update_count == 0) {
-                for (int i=0; i<2; ++i) {
+                int ncards = 2;
+                target->m_game->call_event(event_type::count_map_reveal{ target, ncards });
+                for (int i=0; i<ncards; ++i) {
                     target->m_game->top_of_deck()->move_to(pocket_type::selection, target);
                 }
             }

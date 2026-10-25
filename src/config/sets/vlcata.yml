@@ -1,0 +1,213 @@
+character:
+  # 1. BEJCEK - Up to 3 times per turn, discard a card to draw 1 card; whenever any player plays a Bounty card, he draws a card
+  - name: BEJCEK
+    image: 29_bejcek
+    effects:
+      - max_usages(3)
+      - discard card self | hand
+      - draw(1)
+    equip:
+      - bejcek
+
+  # 2. PATKA - Two independent once-per-turn abilities: discard a card with an effect on all players
+  #    (Saloon etc) to draw 2, and/or discard X cards to draw back X-1
+  - name: PATKA
+    image: 29_patka
+    equip:
+      - patka
+    effects:
+      - patka_discard
+
+  # 3. ANEZKA - Discard 2 cards to heal any alive player, unlimited times on herself, but at most 1 other player per turn
+  - name: ANEZKA
+    image: 29_anezka
+    equip:
+      - anezka
+    effects:
+      - discard cards(2) self
+      - anezka_heal player alive
+ 
+  # 4. TERKA_P - Bang can heal (she may flip any hit she deals into a heal) and, only on her turn or when dying, can discard 3 cards to heal 1 life (Sid Ketchum like)
+  - name: TERKA_P
+    image: 29_terka_p
+    effects:
+      - discard cards(3) self | hand
+      - terka_p_selfheal
+    responses:
+      - deathsave
+      - discard cards(3) self | hand
+      - terka_p_selfheal
+    equip:
+      - terka_p_bang
+
+
+  # 5. JULKA - 9 HP, starts with 5 cards, loses 1 HP at the end of turn if HP > 3
+  - name: JULKA
+    image: 29_julka
+    equip:
+      - initial_cards(5)
+      - julka
+    tags:
+      - max_hp(9)
+
+
+  # 6. HARRY - Up to 2 times per turn, give away 1 card and steal 1 random card from another player (1-for-1 trade)
+  - name: HARRY
+    image: 29_harry
+    effects:
+      - max_usages(2)
+      - none card self | hand
+      - none random_if_hand_card notself | hand
+    mth_effect: flint_westwood(1,2) (1)
+
+  # 7. VERCA - Discard a green-bordered card to draw 2 cards, no limit; green cards she plays are already active
+  - name: VERCA
+    image: 29_verca
+    equip:
+      - verca
+    effects:
+      - discard card self | hand green
+      - draw(2)
+
+  # 8. MARTIN - At the end of turn, draw 1 extra card if not played Bang
+  - name: MARTIN
+    image: 29_martin
+    equip:
+      - martin
+
+  # 9. TUCTUC - When is healed draw 2 cards (do as Bart Casidy if +HP)
+  - name: TUCTUC
+    image: 29_tuctuc
+    equip:
+      - tuctuc
+
+  # 10. MIKI - Take 2 from 4 cards in drawing phase
+  - name: MIKI
+    image: 29_miki
+    equip:
+      - miki
+
+  # 11. LIBOR - Bang card deal 2 HP and if libor doesnt play alcohol card he loses 1 HP after that
+  - name: LIBOR
+    image: 29_libor
+    equip:
+      - libor
+    tags:
+      - max_hp(5)
+
+# 12. ELIS - Discard a non-spades hand card to play Missed! works!
+  - name: ELIS
+    image: 29_elis
+    responses:
+      - discard card self | hand not_spades
+      - missed
+
+  # GROUP 3
+  # 13. HOROUS - At the end of his turn, draw!: if black, treated as eliminated (coffin-style) until his next turn comes up
+  - name: HOROUS
+    image: 29_horous
+    equip:
+      - horous
+
+  # 14. VUDCE - Once per turn, choose a player and name a card from a curated list: if they have it, they discard it, else reveal hand
+  - name: VUDCE
+    image: 29_vudce
+    effects:
+      - max_usages(1)
+      - vudce_ability player not_empty_hand notself
+
+  # 15. JEDNORUCKA_RIZEK - Survives his first death: sits out (coffin-style) and revives at the start of his next turn with 3 HP and 3 cards
+  - name: JEDNORUCKA_RIZEK
+    image: 29_jednorucka_rizek
+    equip:
+      - jednorucka_rizek
+    tags:
+      - max_hp(3)
+
+  # 16. PETUNA - At the end of his turn, a dialog asks if he wants to draw!: spade loses 1 HP, red grants an extra turn (max 1x per round)
+  - name: PETUNA
+    image: 29_petuna
+    equip:
+      - petuna
+
+  # 17. SMIG - Once per turn, discard a Bang! card to destroy a table card, unless the owner plays Missed!
+  - name: SMIG
+    image: 29_smig
+    effects:
+      - max_usages(1)
+      - discard card self | hand bangcard
+      - smig_destroy card | table
+
+  # 18. CYRIL - Draws a card whenever he is targeted by a Bang! card, before it resolves
+  - name: CYRIL
+    image: 29_cyril
+    equip:
+      - cyril
+
+  # 19. VENA - Whenever he takes damage, draw!: hearts or a 2 negates the life loss
+  - name: VENA
+    image: 29_vena
+    equip:
+      - vena
+
+  # 20. HELENA - Once per turn, choose a player and name a card from a curated list: if they have it, it's forced into play, else reveal hand
+  - name: HELENA
+    image: 29_helena
+    effects:
+      - max_usages(1)
+      # - helena_ability player not_empty_hand notself
+
+  # 21. SIMI - Becomes Sheriff (roles reshuffled among everyone else) and is immune to Dynamite's damage
+  - name: SIMI
+    image: 29_simi
+    equip:
+      - simi_dynamite_master
+    effects:
+      - max_usages(1)
+      - discard cards(2) self | hand
+      - simi_take_dynamite
+
+  # 22. EL_BAGITO - Draws as many cards as another player draws from Stagecoach, Wells Fargo or Pony Express
+  - name: EL_BAGITO
+    image: 29_el_bagito
+    equip:
+      - el_bagito
+
+  # 23. KRECEK - Draws a card whenever he equips a weapon; other players cannot keep a longer-range weapon than his
+  - name: KRECEK
+    image: 29_krecek
+    equip:
+      - krecek
+
+  # 24. EDIE - Whenever a card is stolen/destroyed from her, draw!: if not a Spade, the attacker discards a random card
+  - name: EDIE
+    image: 29_edie
+    equip:
+      - edie
+
+  # 25. KOTEL - Weapons +1 range/+1 Bang! per turn, Mustang/Hideout +1 distance, Scope/Binocular +1 range,
+  #     Barrel draws 2 on success, Map reveals 3 instead of 2
+  - name: KOTEL
+    image: 29_kotel
+    equip:
+      - kotel
+
+  # 26. TERMIT - +1 starting card if seated last/next-to-last, +2 cards from General Store, +1 hand limit below 3 HP
+  - name: TERMIT
+    image: 29_termit
+    equip:
+      - termit
+    tags:
+      - max_hp(5)
+
+  # 27. SITEJ - At the end of his turn, discards his whole hand and draws that many cards + 1
+  - name: SITEJ
+    image: 29_sitej
+    equip:
+      - sitej
+
+  # 28. BUDHA - Whenever he plays an alcohol card, reveals 3 (like Kit Carlson); unplayable ones are discarded, the rest he must immediately play in an order he picks; alcohol chains another 3
+  - name: BUDHA
+    image: 29_budha
+    # equip:
+    #   - budha

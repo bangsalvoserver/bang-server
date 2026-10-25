@@ -16,7 +16,7 @@ namespace banggame {
     void handler_flint_westwood::on_play(card_ptr origin_card, player_ptr origin, card_ptr chosen_card, card_ptr target_card) {
         auto target = target_card->owner;
         
-        for (int i=0; i<2; ++i) {
+        for (int i=0; i<ncards; ++i) {
             origin->m_game->queue_action([=]{
                 if (origin->alive() && target->alive() && !target->empty_hand()) {
                     card_ptr stolen_card = target->random_hand_card();

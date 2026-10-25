@@ -6,6 +6,9 @@
 namespace banggame {
 
     struct handler_flint_westwood {
+        int ncards;
+        handler_flint_westwood(int ncards): ncards{ncards} {}
+        
         game_string on_prompt(card_ptr origin_card, player_ptr origin, card_ptr chosen_card, card_ptr target_card);
         void on_play(card_ptr origin_card, player_ptr origin, card_ptr chosen_card, card_ptr target_card);
     };

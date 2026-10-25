@@ -15,6 +15,7 @@ legends: !include sets/legends.yml
 canyondiablo: !include sets/canyondiablo.yml
 crazy_greygory: !include sets/crazy_greygory.yml
 frontier: !include sets/frontier.yml
+vlcata: !include sets/vlcata.yml
 ghost_cards: {}
 stickofdynamite: {}
 shadowgunslingers: {}

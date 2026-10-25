@@ -162,6 +162,10 @@ namespace banggame {
             case target_card_filter::brown:
                 if (target->is_brown()) continue;
                 return {"ERROR_TARGET_NOT_BROWN_CARD", origin_card, target};
+            
+            case target_card_filter::green:
+                if (target->is_green()) continue;
+                return {"ERROR_TARGET_NOT_GREEN_CARD", origin_card, target};
 
             case target_card_filter::blue:
                 if (target->is_blue()) continue;
@@ -190,6 +194,10 @@ namespace banggame {
             case target_card_filter::spades:
                 if (target->sign.is_spades()) continue;
                 return {"ERROR_TARGET_NOT_SPADES", origin_card, target};
+
+            case target_card_filter::not_spades:
+                if (!target->sign.is_spades()) continue;
+                return {"ERROR_TARGET_SPADES", origin_card, target};
 
             case target_card_filter::two_to_nine:
                 if (target->sign.is_two_to_nine()) continue;
