@@ -24,6 +24,7 @@ namespace banggame {
                     if (result) {
                         target->m_game->add_log("LOG_JAIL_BREAK", target);
                     } else {
+                        target->m_game->call_event(event_type::on_jail_turn_skipped{ target });
                         target->skip_turn();
                     }
                 });

@@ -49,8 +49,12 @@ namespace sql {
         sqlite3_statement(const sqlite3_statement &) = delete;
         sqlite3_statement &operator = (const sqlite3_statement &) = delete;
 
-        sqlite3_statement(sqlite3_statement &&other) noexcept : stmt{std::exchange(other.stmt, nullptr)} {}
+        sqlite3_statement(sqlite3_statement &&other) noexcept
+            : db{std::exchange(other.db, nullptr)}
+            , stmt{std::exchange(other.stmt, nullptr)} {}
+
         sqlite3_statement &operator = (sqlite3_statement &&other) noexcept {
+            std::swap(db, other.db);
             std::swap(stmt, other.stmt);
             return *this;
         }
@@ -62,7 +66,7 @@ namespace sql {
         }
 
         void bind(int index, std::string_view value) {
-            throw_if_sqlite3_error(sqlite3_bind_text(stmt, index, value.data(), value.size(), nullptr));
+            throw_if_sqlite3_error(sqlite3_bind_text(stmt, index, value.data(), value.size(), SQLITE_TRANSIENT));
         }
 
         void bind(int index, int value) {
@@ -95,6 +99,12 @@ namespace sql {
 
         uint64_t column_uint64(int index) {
             return sqlite3_column_int64(stmt, index);
+        }
+
+        std::string column_text(int index) {
+            const unsigned char *text = sqlite3_column_text(stmt, index);
+            int size = sqlite3_column_bytes(stmt, index);
+            return text ? std::string(reinterpret_cast<const char *>(text), size) : std::string();
         }
     };
 

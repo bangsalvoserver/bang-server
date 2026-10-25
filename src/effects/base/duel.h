@@ -11,6 +11,12 @@ namespace banggame {
     };
 
     DEFINE_EFFECT(duel, effect_duel)
+
+    namespace event_type {
+        struct on_duel_lost {
+            player_ptr target;
+        };
+    }
 }
 
 #endif

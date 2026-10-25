@@ -277,9 +277,13 @@ namespace banggame {
                 ? card_visibility::shown : card_visibility::show_owner);
         }
         m_game->call_event(event_type::on_drawn_any_card{ target });
+        m_game->call_event(event_type::on_card_added_to_hand{ this, target });
     }
 
     void player::draw_card(int ncards, card_ptr origin_card) {
+        if (origin_card) {
+            m_game->call_event(event_type::on_extra_cards_drawn{ this, origin_card, ncards });
+        }
         if (!m_game->check_flags(game_flag::hands_shown)) {
             if (origin_card) {
                 m_game->add_log(update_target::excludes(this), "LOG_DRAWN_CARDS_FOR", this, ncards, origin_card);

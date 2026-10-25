@@ -66,6 +66,12 @@ namespace banggame {
             lobby.broadcast_message(server_messages::lobby_game_options{ lobby.options });
         }}, { command_permissions::lobby_owner, command_permissions::lobby_waiting });
 
+        lobby.add_command({"game-id", "GAME_ID_DESCRIPTION", [](game_lobby &lobby, int user_id) {
+            lobby.send_chat_message(user_id, { 0, 
+                "GAME_ID", {chat_format_arg::string{std::format("{}", lobby.game_id)}}, lobby_chat_flag::translated
+            });
+        }}, { command_permissions::lobby_in_game });
+
         lobby.add_command({"quit", "QUIT_DESCRIPTION", [](game_lobby &lobby, int user_id) {
             lobby.m_mgr->kick_client(lobby.find_user(user_id).session->client, "QUIT");
         }});

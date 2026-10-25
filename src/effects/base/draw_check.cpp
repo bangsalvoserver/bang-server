@@ -101,6 +101,7 @@ namespace banggame {
         pop_request();
         modified_sign sign = get_modified_sign(drawn_card);
         bool lucky = do_get_result(sign).lucky;
+        target->m_game->call_event(event_type::on_draw_check_luck{ target, lucky });
         if (!target->m_game->m_selection.empty()) {
             while (!target->m_game->m_selection.empty()) {
                 card_ptr c = target->m_game->m_selection.front();

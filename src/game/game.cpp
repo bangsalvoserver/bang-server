@@ -380,6 +380,7 @@ namespace banggame {
 
     void game::start_game(std::span<int> user_ids) {
         add_players(user_ids);
+        m_tracking.init_tracking(this);
 
         for (ruleset_ptr ruleset : m_options.expansions) {
             ruleset->on_apply(this);

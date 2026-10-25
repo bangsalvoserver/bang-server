@@ -1,4 +1,5 @@
 target_sources(bangserver PRIVATE
+    game_stats_db.cpp
     image_pixels.cpp
     image_registry.cpp
     lobby.cpp

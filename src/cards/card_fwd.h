@@ -20,6 +20,7 @@ namespace banggame {
     using card_ptr = card *;
     using player_ptr = player *;
 
+    using const_game_ptr = const game_table *;
     using const_card_ptr = const card *;
     using const_player_ptr = const player *;
 

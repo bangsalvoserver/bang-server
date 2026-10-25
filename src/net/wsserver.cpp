@@ -2,6 +2,7 @@
 
 #include "logging.h"
 #include "tracking.h"
+#include "game_stats_db.h"
 #include "image_registry.h"
 
 #include "utils/json_serial.h"
@@ -109,6 +110,23 @@ namespace net {
                     res->writeStatus("400 Bad Request");
                     res->writeHeader("Access-Control-Allow-Origin","*");
                     res->end(length.error());
+                }
+            })
+            .get("/games/:id", [this](auto *res, auto *req) {
+                if (auto id = utils::parse_string<int>(req->getParameter("id"))) {
+                    if (auto report = game_stats::get_game(*id)) {
+                        res->writeHeader("Access-Control-Allow-Origin","*");
+                        res->writeHeader("Content-Type", "application/json");
+                        res->end(json::to_string(*report));
+                    } else {
+                        res->writeStatus("404 Not Found");
+                        res->writeHeader("Access-Control-Allow-Origin","*");
+                        res->end();
+                    }
+                } else {
+                    res->writeStatus("400 Bad Request");
+                    res->writeHeader("Access-Control-Allow-Origin","*");
+                    res->end();
                 }
             })
             .get("/image/:hash", [this](auto *res, auto *req) {
