@@ -27,7 +27,7 @@ namespace banggame {
         return target_card1->name == target_card2->name;
     }
 
-    void equip_good_company::on_enable(card_ptr origin_card, player_ptr origin) {
+    void equip_good_company::on_enable(card_ptr origin_card, player_ptr origin) const {
         struct card_tracking {
             card_ptr last_played = nullptr;
             card_ptr last_discarded = nullptr;
@@ -65,7 +65,7 @@ namespace banggame {
         });
     }
 
-    game_string effect_good_company::get_error(card_ptr origin_card, player_ptr origin, card_ptr target) {
+    game_string effect_good_company::get_error(card_ptr origin_card, player_ptr origin, card_ptr target) const {
         MAYBE_RETURN(effect_discard::get_error(origin_card, origin, target));
 
         card_ptr last_played = origin->m_game->call_event(event_type::get_last_played_card{ origin });

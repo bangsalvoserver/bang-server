@@ -9,21 +9,21 @@
 
 namespace banggame {
     
-    game_string effect_damage::get_error(card_ptr origin_card, player_ptr origin, effect_flags flags) {
+    game_string effect_damage::get_error(card_ptr origin_card, player_ptr origin, effect_flags flags) const {
         if (origin->m_hp <= damage) {
             return "ERROR_CANT_SELF_DAMAGE";
         }
         return {};
     }
 
-    game_string effect_damage::on_prompt(card_ptr origin_card, player_ptr origin) {
+    game_string effect_damage::on_prompt(card_ptr origin_card, player_ptr origin) const {
         if (origin->is_bot() && origin->m_hp <= origin->m_max_hp - 2) {
             return "BOT_TOO_MUCH_DAMAGE";
         }
         return {};
     }
 
-    void effect_damage::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
+    void effect_damage::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) const {
         target->damage(origin_card, origin, damage, flags);
     }
 

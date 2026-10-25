@@ -13,7 +13,7 @@
 
 namespace banggame {
 
-    bool effect_buffalo_bell::can_play(card_ptr origin_card, player_ptr origin) {
+    bool effect_buffalo_bell::can_play(card_ptr origin_card, player_ptr origin) const {
         return effect_missed{}.can_play(origin_card, origin);
     }
 
@@ -26,7 +26,7 @@ namespace banggame {
         return sum;
     }
 
-    game_string effect_buffalo_bell::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
+    game_string effect_buffalo_bell::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card) const {
         int sum = get_card_suit_sum(origin, target_card);
         if (sum < 13) {
             return {"PROMPT_CARD_NO_EFFECT", origin_card};
@@ -34,7 +34,7 @@ namespace banggame {
         return {};
     }
 
-    void effect_buffalo_bell::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
+    void effect_buffalo_bell::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card) const {
         player_ptr shooter = origin->m_game->top_request()->origin;
         effect_discard{}.on_play(origin_card, origin, target_card);
         

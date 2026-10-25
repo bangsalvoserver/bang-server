@@ -8,27 +8,27 @@
 
 namespace banggame {
     
-    void event_equip::on_disable(card_ptr target_card, player_ptr target) {
+    void event_equip::on_disable(card_ptr target_card, player_ptr target) const {
         target->m_game->remove_listeners(target_card);
     }
 
-    bool effect_human::can_play(card_ptr origin_card, player_ptr origin) {
+    bool effect_human::can_play(card_ptr origin_card, player_ptr origin) const {
         return !origin->is_bot();
     }
 
-    void effect_set_playing::add_context(card_ptr origin_card, player_ptr origin, card_ptr target, effect_context &ctx) {
+    void effect_set_playing::add_context(card_ptr origin_card, player_ptr origin, card_ptr target, effect_context &ctx) const {
         ctx.add(contexts::playing_card{ target });
     }
     
-    game_string effect_set_playing::get_error(card_ptr origin_card, player_ptr origin, card_ptr target, const effect_context &ctx) {
+    game_string effect_set_playing::get_error(card_ptr origin_card, player_ptr origin, card_ptr target, const effect_context &ctx) const {
         return get_play_card_error(origin, target, ctx);
     }
 
-    prompt_string effect_set_playing::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
+    prompt_string effect_set_playing::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card) const {
         return prompts::bot_check_discard_card(origin, target_card);
     }
     
-    void effect_discard_playing::on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
+    void effect_discard_playing::on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const {
         card_ptr target_card = ctx.get<contexts::playing_card>();
         switch (type) {
         case play_as::bang:
@@ -52,7 +52,7 @@ namespace banggame {
         };
     }
 
-    void equip_add_flag::on_enable(card_ptr origin_card, player_ptr target) {
+    void equip_add_flag::on_enable(card_ptr origin_card, player_ptr target) const {
         target->add_player_flags(flag);
 
         target->m_game->add_listener<event_type::check_player_flag>({ origin_card, 80 }, [=, flag=flag](player_ptr e_target, player_flag e_flag) {
@@ -60,7 +60,7 @@ namespace banggame {
         });
     }
 
-    void equip_add_flag::on_disable(card_ptr origin_card, player_ptr target) {
+    void equip_add_flag::on_disable(card_ptr origin_card, player_ptr target) const {
         target->m_game->remove_listeners({ origin_card, 80 });
 
         if (!target->m_game->call_event(event_type::check_player_flag{ target, flag })) {
@@ -68,11 +68,11 @@ namespace banggame {
         }
     }
 
-    void equip_game_flag::on_enable(card_ptr origin_card, player_ptr target) {
+    void equip_game_flag::on_enable(card_ptr origin_card, player_ptr target) const {
         target->m_game->add_game_flags(flag);
     }
 
-    void equip_game_flag::on_disable(card_ptr origin_card, player_ptr target) {
+    void equip_game_flag::on_disable(card_ptr origin_card, player_ptr target) const {
         target->m_game->remove_game_flags(flag);
     }
 
@@ -92,7 +92,7 @@ namespace banggame {
         }
     };
 
-    void effect_test_timer::on_play(card_ptr origin_card, player_ptr origin) {
+    void effect_test_timer::on_play(card_ptr origin_card, player_ptr origin) const {
         origin->m_game->queue_request<request_test_timer>(origin_card, nullptr, origin);
     }
 

@@ -29,7 +29,7 @@ namespace banggame {
         return {};
     }
 
-    bool effect_perform_feat::can_play(card_ptr origin_card, player_ptr origin) {
+    bool effect_perform_feat::can_play(card_ptr origin_card, player_ptr origin) const {
         if (origin_card->deck == card_deck_type::feats && !is_legend(origin)) {
             auto [token, count] = get_player_fame_tokens(origin);
             if (count == 0 || origin_card->num_tokens(token) != 0) {
@@ -75,16 +75,16 @@ namespace banggame {
         }
     };
 
-    bool effect_damage_legend::can_play(card_ptr origin_card, player_ptr origin) {
+    bool effect_damage_legend::can_play(card_ptr origin_card, player_ptr origin) const {
         return origin->m_game->top_request<request_damage_legend>(target_is{origin}) != nullptr;
     }
 
-    game_string effect_damage_legend::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {
+    game_string effect_damage_legend::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) const {
         MAYBE_RETURN(prompts::bot_check_target_enemy(origin, target, bot_suggestion::action_type::damage));
         return {};
     }
 
-    void effect_damage_legend::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) {
+    void effect_damage_legend::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) const {
         auto req = origin->m_game->top_request<request_damage_legend>();
         bot_suggestion::signal_hostile_action(origin, target);
         
@@ -194,7 +194,7 @@ namespace banggame {
         target->m_game->queue_request<request_perform_feat>(target);
     }
 
-    prompt_string effect_perform_feat::on_prompt(card_ptr origin_card, player_ptr origin) {
+    prompt_string effect_perform_feat::on_prompt(card_ptr origin_card, player_ptr origin) const {
         if (origin_card->deck == card_deck_type::feats && is_legend(origin) && rn::none_of(origin->m_game->range_other_players(origin),
             [&, can_kill = can_damage_legend_kill(origin)](player_ptr target) {
                 return is_valid_damage_legend_target(origin, target, can_kill)
@@ -206,7 +206,7 @@ namespace banggame {
         return {};
     }
 
-    void effect_perform_feat::on_play(card_ptr origin_card, player_ptr origin) {
+    void effect_perform_feat::on_play(card_ptr origin_card, player_ptr origin) const {
         event_card_key key{origin_card, 5};
         origin->m_game->add_listener<event_type::count_performed_feats>(key, [=](player_ptr p, int &num_feats) {
             if (origin == p) {
@@ -241,7 +241,7 @@ namespace banggame {
         }
     }
 
-    void feat_equip::on_disable(card_ptr origin_card, player_ptr origin) {
+    void feat_equip::on_disable(card_ptr origin_card, player_ptr origin) const {
         origin->m_game->remove_listeners(event_card_key{origin_card, 0});
     }
 }

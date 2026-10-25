@@ -11,7 +11,7 @@
 
 namespace banggame {
     
-    void equip_old_west_gang::on_enable(card_ptr origin_card, player_ptr target) {
+    void equip_old_west_gang::on_enable(card_ptr origin_card, player_ptr target) const {
         auto first_target = std::make_shared<player_ptr>(nullptr);
 
         target->m_game->add_listener<event_type::on_turn_start>(origin_card, [=](player_ptr origin) {

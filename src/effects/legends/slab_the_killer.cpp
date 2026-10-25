@@ -8,7 +8,7 @@
 
 namespace banggame {
 
-    void equip_slab_the_killer_legend::on_enable(card_ptr origin_card, player_ptr origin) {
+    void equip_slab_the_killer_legend::on_enable(card_ptr origin_card, player_ptr origin) const {
         origin->m_game->add_listener<event_type::apply_bang_modifier>(origin_card, [=](player_ptr target, shared_request_bang req) {
             if (origin == target) {
                 req->unavoidable = true;

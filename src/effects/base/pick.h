@@ -6,17 +6,17 @@
 namespace banggame {
 
     struct effect_pick {
-        bool can_play(card_ptr origin_card, player_ptr origin);
-        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target);
-        void on_play(card_ptr origin_card, player_ptr origin, card_ptr target);
+        bool can_play(card_ptr origin_card, player_ptr origin) const;
+        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target) const;
+        void on_play(card_ptr origin_card, player_ptr origin, card_ptr target) const;
     };
     
     DEFINE_EFFECT(pick, effect_pick)
 
     struct effect_pick_player {
-        bool can_play(card_ptr origin_card, player_ptr origin);
-        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target);
-        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target);
+        bool can_play(card_ptr origin_card, player_ptr origin) const;
+        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) const;
+        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target) const;
     };
     
     DEFINE_EFFECT(pick_player, effect_pick_player)

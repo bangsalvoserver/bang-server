@@ -41,7 +41,7 @@ namespace banggame {
         }
     };
 
-    void equip_kit_carlson::on_enable(card_ptr target_card, player_ptr target) {
+    void equip_kit_carlson::on_enable(card_ptr target_card, player_ptr target) const {
         target->m_game->add_listener<event_type::init_request_draw>({target_card, -1}, [=](player_ptr origin, shared_request_draw req_draw) {
             if (origin == target && req_draw->num_cards_to_draw < 3) {
                 req_draw->handlers.push_back(target_card);

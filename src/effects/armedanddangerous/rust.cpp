@@ -34,12 +34,12 @@ namespace banggame {
         }
     };
 
-    prompt_string effect_rust::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
+    prompt_string effect_rust::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) const {
         MAYBE_RETURN(prompts::prompt_target_immunity(origin_card, origin, target, flags));
         return {};
     }
     
-    void effect_rust::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
+    void effect_rust::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) const {
         origin->m_game->queue_request<request_rust>(origin_card, origin, target, flags);
     }
 

@@ -54,29 +54,29 @@ namespace banggame {
         }
     };
 
-    game_string effect_lounge_car::on_prompt(card_ptr origin_card, player_ptr origin) {
+    game_string effect_lounge_car::on_prompt(card_ptr origin_card, player_ptr origin) const {
         if (origin->m_game->m_train_deck.empty()) {
             return {"PROMPT_CARD_NO_EFFECT", origin_card};
         }
         return {};
     }
 
-    void effect_lounge_car::on_play(card_ptr origin_card, player_ptr origin) {
+    void effect_lounge_car::on_play(card_ptr origin_card, player_ptr origin) const {
         origin->m_game->queue_request<request_lounge_car>(origin_card, origin);
     }
 
-    bool effect_lounge_car_response::can_play(card_ptr origin_card, player_ptr origin) {
+    bool effect_lounge_car_response::can_play(card_ptr origin_card, player_ptr origin) const {
         return origin->m_game->top_request<request_lounge_car>(target_is{origin}) != nullptr;
     }
 
-    game_string handler_lounge_car::get_error(card_ptr origin_card, player_ptr origin, card_ptr target_card, player_ptr target_player) {
+    game_string handler_lounge_car::get_error(card_ptr origin_card, player_ptr origin, card_ptr target_card, player_ptr target_player) const {
         for (card_ptr selection_card : origin->m_game->m_selection) {
             MAYBE_RETURN(get_equip_error(selection_card, selection_card == target_card ? target_player : origin));
         }
         return {};
     }
 
-    game_string handler_lounge_car::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card, player_ptr target_player) {
+    game_string handler_lounge_car::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card, player_ptr target_player) const {
         if (target_card->has_tag(tag_type::penalty)) {
             MAYBE_RETURN(prompts::bot_check_target_enemy(origin, target_player));
         } else {
@@ -85,7 +85,7 @@ namespace banggame {
         return {};
     }
 
-    void handler_lounge_car::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card, player_ptr target_player) {
+    void handler_lounge_car::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card, player_ptr target_player) const {
         if (target_card->has_tag(tag_type::penalty)) {
             bot_suggestion::signal_hostile_action(origin, target_player);
         } else {

@@ -28,7 +28,7 @@ namespace banggame {
         }
     };
 
-    void equip_darling_valentine::on_enable(card_ptr target_card, player_ptr target) {
+    void equip_darling_valentine::on_enable(card_ptr target_card, player_ptr target) const {
         target->m_game->add_listener<event_type::on_turn_start>({target_card, -1}, [=](player_ptr origin) {
             origin->m_game->queue_request<request_darling_valentine>(target_card, nullptr, origin);
         });

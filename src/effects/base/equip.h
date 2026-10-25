@@ -10,10 +10,10 @@ namespace banggame {
     game_string get_equip_error(const_card_ptr origin_card, player_ptr target);
 
     struct effect_equip_on {
-        game_string get_error(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx = {});
-        void add_context(card_ptr origin_card, player_ptr origin, player_ptr target, effect_context &ctx);
-        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx);
-        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx);
+        game_string get_error(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx = {}) const;
+        void add_context(card_ptr origin_card, player_ptr origin, player_ptr target, effect_context &ctx) const;
+        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) const;
+        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) const;
     };
 
     DEFINE_EFFECT(equip_on, effect_equip_on)

@@ -44,7 +44,7 @@ namespace banggame {
         }
     };
 
-    void equip_greygory_deck::on_enable(card_ptr origin_card, player_ptr origin) {
+    void equip_greygory_deck::on_enable(card_ptr origin_card, player_ptr origin) const {
         origin->m_game->add_listener<event_type::check_character_modifier>({origin_card, 1}, [=, allow_expansions=allow_expansions](player_ptr target, card_set &handlers) {
             if (origin == target && !handlers.contains(origin_card)
                 && get_possible_cards(origin_card, origin, allow_expansions)
@@ -61,7 +61,7 @@ namespace banggame {
         });
     }
     
-    void effect_greygory_deck::on_play(card_ptr origin_card, player_ptr origin) {
+    void effect_greygory_deck::on_play(card_ptr origin_card, player_ptr origin) const {
         size_t start_index = rn::find(origin->m_characters, origin_card) - origin->m_characters.begin() + 1;
         origin->remove_characters(start_index);
         add_greygory_deck_characters(origin_card, origin, allow_expansions);

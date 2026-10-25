@@ -20,7 +20,7 @@ namespace banggame {
         return {};
     }
 
-    std::generator<player_list> targeting_adjacent_players::possible_targets(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) {
+    std::generator<player_list> targeting_adjacent_players::possible_targets(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
         for (player_ptr first_target : origin->m_game->range_all_players(origin)) {
             if (!check_player_filter(origin_card, origin, target_player.player_filter, first_target, ctx)
                 && !effect.get_error(origin_card, origin, first_target, ctx)
@@ -41,7 +41,7 @@ namespace banggame {
         }
     }
 
-    game_string targeting_adjacent_players::get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const player_list &targets) {
+    game_string targeting_adjacent_players::get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const player_list &targets) const {
         if (targets.empty() || targets.size() > 2) {
             return "ERROR_INVALID_TARGETS";
         }
@@ -69,7 +69,7 @@ namespace banggame {
         return flags;
     }
 
-    prompt_string targeting_adjacent_players::on_prompt(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const player_list &targets) {
+    prompt_string targeting_adjacent_players::on_prompt(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const player_list &targets) const {
         if (targets.size() == 1 && origin->m_game->num_alive() > 2) {
             return {"PROMPT_SINGLE_TARGET", origin_card};
         }
@@ -79,13 +79,13 @@ namespace banggame {
         }));
     }
 
-    void targeting_adjacent_players::add_context(card_ptr origin_card, player_ptr origin, const effect_holder &effect, effect_context &ctx, const player_list &targets) {
+    void targeting_adjacent_players::add_context(card_ptr origin_card, player_ptr origin, const effect_holder &effect, effect_context &ctx, const player_list &targets) const {
         for (player_ptr target : targets) {
             target_player.add_context(origin_card, origin, effect, ctx, target);
         }
     }
 
-    void targeting_adjacent_players::on_play(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const player_list &targets) {
+    void targeting_adjacent_players::on_play(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const player_list &targets) const {
         effect_flags flags = get_flags(targets);
         for (player_ptr target : targets) {
             effect.on_play(origin_card, origin, target, flags, ctx);

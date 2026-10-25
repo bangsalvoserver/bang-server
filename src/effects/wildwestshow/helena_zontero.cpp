@@ -86,7 +86,7 @@ namespace banggame {
         }
     };
 
-    void equip_helena_zontero::on_enable(card_ptr target_card, player_ptr origin) {
+    void equip_helena_zontero::on_enable(card_ptr target_card, player_ptr origin) const {
         origin->m_game->queue_request<request_helena_zontero_check>(target_card, origin);
     }
 }

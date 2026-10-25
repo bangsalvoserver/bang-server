@@ -6,7 +6,7 @@
 
 namespace banggame {
     
-    void equip_herb_hunter::on_enable(card_ptr target_card, player_ptr p) {
+    void equip_herb_hunter::on_enable(card_ptr target_card, player_ptr p) const {
         p->m_game->add_listener<event_type::on_player_eliminated>({target_card, 2}, [p, target_card](player_ptr origin, player_ptr target, death_type type) {
             if (p != target && type != death_type::shadow_turn_end) {
                 p->m_game->queue_action([=]{

@@ -7,14 +7,14 @@
 namespace banggame {
 
     struct modifier_bandolier : modifier_bangmod {
-        bool valid_with_card(card_ptr origin_card, player_ptr origin, card_ptr playing_card);
-        void add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx);
+        bool valid_with_card(card_ptr origin_card, player_ptr origin, card_ptr playing_card) const;
+        void add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) const;
     };
 
     DEFINE_MODIFIER(bandolier, modifier_bandolier)
 
     struct effect_bandolier {
-        game_string on_prompt(card_ptr origin_card, player_ptr origin);
+        game_string on_prompt(card_ptr origin_card, player_ptr origin) const;
     };
 
     DEFINE_EFFECT(bandolier, effect_bandolier)

@@ -10,15 +10,15 @@ namespace banggame {
     DEFINE_EFFECT(none, effect_none)
 
     struct effect_human {
-        bool can_play(card_ptr origin_card, player_ptr origin);
+        bool can_play(card_ptr origin_card, player_ptr origin) const;
     };
 
     DEFINE_EFFECT(human, effect_human)
 
     struct effect_set_playing {
-        void add_context(card_ptr origin_card, player_ptr origin, card_ptr target, effect_context &ctx);
-        game_string get_error(card_ptr origin_card, player_ptr origin, card_ptr target, const effect_context &ctx);
-        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target);
+        void add_context(card_ptr origin_card, player_ptr origin, card_ptr target, effect_context &ctx) const;
+        game_string get_error(card_ptr origin_card, player_ptr origin, card_ptr target, const effect_context &ctx) const;
+        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target) const;
     };
 
     DEFINE_EFFECT(set_playing, effect_set_playing)
@@ -33,7 +33,7 @@ namespace banggame {
         play_as type;
         effect_discard_playing(play_as type) : type{type} {}
 
-        void on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx);
+        void on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const;
     };
 
     DEFINE_EFFECT(discard_playing, effect_discard_playing)
@@ -42,8 +42,8 @@ namespace banggame {
         player_flag flag;
         equip_add_flag(player_flag flag): flag{flag} {}
         
-        void on_enable(card_ptr target_card, player_ptr target);
-        void on_disable(card_ptr target_card, player_ptr target);
+        void on_enable(card_ptr target_card, player_ptr target) const;
+        void on_disable(card_ptr target_card, player_ptr target) const;
     };
 
     DEFINE_EQUIP(add_flag, equip_add_flag)
@@ -52,14 +52,14 @@ namespace banggame {
         game_flag flag;
         equip_game_flag(game_flag flag): flag{flag} {}
         
-        void on_enable(card_ptr target_card, player_ptr target);
-        void on_disable(card_ptr target_card, player_ptr target);
+        void on_enable(card_ptr target_card, player_ptr target) const;
+        void on_disable(card_ptr target_card, player_ptr target) const;
     };
 
     DEFINE_EQUIP(game_flag, equip_game_flag)
 
     struct effect_test_timer {
-        void on_play(card_ptr origin_card, player_ptr origin);
+        void on_play(card_ptr origin_card, player_ptr origin) const;
     };
 
     DEFINE_EFFECT(test_timer, effect_test_timer)

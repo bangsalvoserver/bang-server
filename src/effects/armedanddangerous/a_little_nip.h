@@ -6,8 +6,8 @@
 namespace banggame {
 
     struct effect_a_little_nip {
-        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, const effect_context &ctx);
-        void on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx);
+        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const;
+        void on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const;
     };
 
     DEFINE_EFFECT(a_little_nip, effect_a_little_nip)

@@ -10,24 +10,24 @@
 
 namespace banggame {
 
-    void equip_disable_character::on_enable(card_ptr target_card, player_ptr target) {
+    void equip_disable_character::on_enable(card_ptr target_card, player_ptr target) const {
         target->m_game->add_disabler(target_card, [=](const_card_ptr c) {
             return c->pocket == pocket_type::player_character && c->owner == target;
         });
     }
 
-    void equip_disable_character::on_disable(card_ptr target_card, player_ptr target) {
+    void equip_disable_character::on_disable(card_ptr target_card, player_ptr target) const {
         target->m_game->queue_action([=]{
             target->m_game->remove_disabler(target_card);
         }, 49);
     }
 
-    game_string equip_ghost::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {
+    game_string equip_ghost::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) const {
         MAYBE_RETURN(prompts::bot_check_target_friend(origin, target));
         return {};
     }
     
-    void equip_ghost::on_enable(card_ptr target_card, player_ptr target) {
+    void equip_ghost::on_enable(card_ptr target_card, player_ptr target) const {
         if (!target->in_game()) {
             revive_character(target);
         }
@@ -35,7 +35,7 @@ namespace banggame {
         equip_add_flag{player_flag::keep_alive}.on_enable(target_card, target);
     }
     
-    void equip_ghost::on_disable(card_ptr target_card, player_ptr target) {
+    void equip_ghost::on_disable(card_ptr target_card, player_ptr target) const {
         equip_add_flag{player_flag::keep_alive}.on_disable(target_card, target);
 
         if (!target->in_game()) {

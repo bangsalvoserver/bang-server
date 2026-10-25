@@ -8,7 +8,7 @@
 
 namespace banggame {
 
-    void equip_mick_defender::on_enable(card_ptr origin_card, player_ptr origin) {
+    void equip_mick_defender::on_enable(card_ptr origin_card, player_ptr origin) const {
         origin->m_game->add_listener<event_type::apply_escapable_modifier>(origin_card,
             [=](card_ptr e_origin_card, player_ptr e_origin, const_player_ptr e_target, effect_flags flags, const interface_escapable &req) -> escape_type {
                 if (e_target == origin && !origin->empty_hand()
@@ -20,7 +20,7 @@ namespace banggame {
             });
     }
 
-    void equip_mick_defender2::on_enable(card_ptr origin_card, player_ptr origin) {
+    void equip_mick_defender2::on_enable(card_ptr origin_card, player_ptr origin) const {
         origin->m_game->add_listener<event_type::apply_escapable_modifier>(origin_card,
             [=](card_ptr e_origin_card, player_ptr e_origin, const_player_ptr e_target, effect_flags flags, const interface_escapable &req) -> escape_type {
                 if (e_target == origin && !origin->empty_hand()

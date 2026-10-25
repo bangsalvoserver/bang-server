@@ -27,14 +27,14 @@ namespace banggame {
         return count;
     }
     
-    bool effect_missed::can_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
+    bool effect_missed::can_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const {
         if (auto req = origin->m_game->top_request<interface_missable>(target_is{origin})) {
             return req->can_miss(origin_card);
         }
         return ctx.contains<contexts::temp_missable>();
     }
 
-    game_string effect_missed::on_prompt(card_ptr origin_card, player_ptr origin) {
+    game_string effect_missed::on_prompt(card_ptr origin_card, player_ptr origin) const {
         if (auto req = origin->m_game->top_request<request_bang>(target_is{origin})) {
             if (req->bang_strength > 1 && count_missed_cards(origin) < req->bang_strength) {
                 return {"PROMPT_BANG_STRENGTH", req->bang_strength};
@@ -43,7 +43,7 @@ namespace banggame {
         return {};
     }
 
-    void effect_missed::on_play(card_ptr origin_card, player_ptr origin) {
+    void effect_missed::on_play(card_ptr origin_card, player_ptr origin) const {
         if (auto req = origin->m_game->top_request<interface_missable>()) {
             req->on_miss(origin_card);
         } else {
@@ -51,20 +51,20 @@ namespace banggame {
         }
     }
 
-    void effect_missedcard::on_play(card_ptr origin_card, player_ptr origin) {
+    void effect_missedcard::on_play(card_ptr origin_card, player_ptr origin) const {
         auto req = origin->m_game->top_request<interface_missable>();
         req->on_miss(origin_card, effect_flag::is_missed);
     }
 
-    bool effect_play_as_missed::can_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
+    bool effect_play_as_missed::can_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const {
         return effect_missedcard{}.can_play(ctx.get<contexts::playing_card>(), origin, ctx);
     }
 
-    game_string effect_play_as_missed::on_prompt(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
+    game_string effect_play_as_missed::on_prompt(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const {
         return effect_missedcard{}.on_prompt(ctx.get<contexts::playing_card>(), origin);
     }
 
-    void effect_play_as_missed::on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
+    void effect_play_as_missed::on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const {
         effect_missedcard{}.on_play(ctx.get<contexts::playing_card>(), origin);
     }
 }

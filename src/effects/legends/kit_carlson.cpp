@@ -44,7 +44,7 @@ namespace banggame {
         }
     };
 
-    void equip_kit_carlson_legend::on_enable(card_ptr target_card, player_ptr target) {
+    void equip_kit_carlson_legend::on_enable(card_ptr target_card, player_ptr target) const {
         target->m_game->add_listener<event_type::init_request_draw>(target_card, [=](player_ptr origin, shared_request_draw req_draw) {
             if (origin == target) {
                 req_draw->handlers.push_back(target_card);
@@ -58,7 +58,7 @@ namespace banggame {
         });
     }
 
-    bool effect_kit_carlson_legend_response::can_play(card_ptr origin_card, player_ptr origin) {
+    bool effect_kit_carlson_legend_response::can_play(card_ptr origin_card, player_ptr origin) const {
         return origin->m_game->top_request<request_kit_carlson_legend>(target_is{origin}) != nullptr;
     }
 }

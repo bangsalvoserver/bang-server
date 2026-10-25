@@ -9,13 +9,13 @@
 
 namespace banggame {
 
-    game_string equip_trap::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {
+    game_string equip_trap::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) const {
         MAYBE_RETURN(prompts::prompt_target_self(origin_card, origin, target));
         MAYBE_RETURN(prompts::bot_check_target_enemy(origin, target));
         return {};
     }
 
-    void equip_trap::on_enable(card_ptr target_card, player_ptr target) {
+    void equip_trap::on_enable(card_ptr target_card, player_ptr target) const {
         target->m_game->add_listener<event_type::check_equip_card>(target_card, [=](player_ptr origin, card_ptr origin_card, player_ptr e_target, const effect_context &ctx) -> game_string {
             if (origin == target && origin_card->is_blue()) {
                 return "ERROR_CANT_EQUIP_BLUE_CARDS";
@@ -60,7 +60,7 @@ namespace banggame {
         }
     };
 
-    void effect_trap::on_play(card_ptr origin_card, player_ptr origin) {
+    void effect_trap::on_play(card_ptr origin_card, player_ptr origin) const {
         origin->m_game->queue_request<request_check>(origin, origin_card, std::not_fn(&card_sign::is_spades),
             [=](card_sign sign) {
                 switch (sign.suit) {

@@ -9,7 +9,7 @@ namespace banggame {
         int ncards;
         equip_bart_cassidy(int ncards = 1): ncards{ncards} {}
         
-        void on_enable(card_ptr target_card, player_ptr target);
+        void on_enable(card_ptr target_card, player_ptr target) const;
     };
 
     DEFINE_EQUIP(bart_cassidy, equip_bart_cassidy)

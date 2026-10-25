@@ -6,7 +6,7 @@
 namespace banggame {
     
     struct equip_kit_carlson : event_equip {
-        void on_enable(card_ptr target_card, player_ptr target);
+        void on_enable(card_ptr target_card, player_ptr target) const;
     };
 
     DEFINE_EQUIP(kit_carlson, equip_kit_carlson)

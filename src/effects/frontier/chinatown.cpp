@@ -42,7 +42,7 @@ namespace banggame {
         }
     };
 
-    prompt_string effect_chinatown::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
+    prompt_string effect_chinatown::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) const {
         MAYBE_RETURN(prompts::bot_check_target_enemy(origin, target));
         MAYBE_RETURN(prompts::prompt_target_immunity(origin_card, origin, target, flags));
         MAYBE_RETURN(prompts::prompt_target_self(origin_card, origin, target));
@@ -53,7 +53,7 @@ namespace banggame {
         return {};
     }
 
-    void effect_chinatown::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) {
+    void effect_chinatown::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) const {
         bot_suggestion::signal_hostile_action(origin, target);
         origin->m_game->queue_request<request_chinatown>(origin_card, origin, target);
     }

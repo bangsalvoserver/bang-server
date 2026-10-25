@@ -8,7 +8,7 @@
 
 namespace banggame {
 
-    void equip_posse::on_enable(card_ptr target_card, player_ptr target) {
+    void equip_posse::on_enable(card_ptr target_card, player_ptr target) const {
         target->m_game->add_listener<event_type::on_turn_start>({ target_card, 6 }, [=](player_ptr origin) {
             if (origin == target) {
                 if (get_tracked_player(target_card) == target) {
@@ -27,7 +27,7 @@ namespace banggame {
         });
     }
 
-    void equip_posse::on_disable(card_ptr target_card, player_ptr target) {
+    void equip_posse::on_disable(card_ptr target_card, player_ptr target) const {
         target->m_game->remove_listeners({ target_card, 6 });
     }
 }

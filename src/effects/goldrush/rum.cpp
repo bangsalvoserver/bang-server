@@ -69,7 +69,7 @@ namespace banggame {
         }
     };
 
-    game_string effect_rum::on_prompt(card_ptr origin_card, player_ptr origin) {
+    game_string effect_rum::on_prompt(card_ptr origin_card, player_ptr origin) const {
         if (origin->is_bot() && origin->m_max_hp - origin->m_hp < 2) {
             return "BOT_WASTEFUL_RUM";
         }
@@ -80,7 +80,7 @@ namespace banggame {
         return {};
     }
 
-    void effect_rum::on_play(card_ptr origin_card, player_ptr origin) {
+    void effect_rum::on_play(card_ptr origin_card, player_ptr origin) const {
         origin->m_game->queue_request<request_rum>(origin_card, origin);
     }
 

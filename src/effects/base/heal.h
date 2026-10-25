@@ -18,15 +18,15 @@ namespace banggame {
         int amount;
         effect_heal(int amount = 1): amount(amount) {}
 
-        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, effect_flags flags = {}) {
+        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, effect_flags flags = {}) const {
             return on_prompt(origin_card, origin, origin, flags);
         }
-        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags = {});
+        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags = {}) const;
 
-        void on_play(card_ptr origin_card, player_ptr origin, effect_flags flags = {}) {
+        void on_play(card_ptr origin_card, player_ptr origin, effect_flags flags = {}) const {
             on_play(origin_card, origin, origin, flags);
         }
-        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags = {});
+        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags = {}) const;
     };
 
     DEFINE_EFFECT(heal, effect_heal)
@@ -34,10 +34,10 @@ namespace banggame {
     struct effect_heal_notfull : effect_heal {
         using effect_heal::effect_heal;
 
-        game_string get_error(card_ptr origin_card, player_ptr origin) {
+        game_string get_error(card_ptr origin_card, player_ptr origin) const {
             return get_error(origin_card, origin, origin);
         }
-        game_string get_error(card_ptr origin_card, player_ptr origin, player_ptr target);
+        game_string get_error(card_ptr origin_card, player_ptr origin, player_ptr target) const;
     };
 
     DEFINE_EFFECT(heal_notfull, effect_heal_notfull)

@@ -14,7 +14,7 @@
 
 namespace banggame {
 
-    prompt_string effect_bang::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx) {
+    prompt_string effect_bang::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx) const {
         MAYBE_RETURN(prompts::bot_check_kill_sheriff(origin, target));
         MAYBE_RETURN(prompts::bot_check_target_enemy(origin, target, bot_suggestion::action_type::damage));
         MAYBE_RETURN(prompts::prompt_target_ghost(origin_card, origin, target));
@@ -24,7 +24,7 @@ namespace banggame {
         return {};
     }
     
-    void effect_bang::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
+    void effect_bang::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) const {
         bot_suggestion::signal_hostile_action(origin, target, flags);
         
         if (!flags.check(effect_flag::target_players)) {
@@ -33,7 +33,7 @@ namespace banggame {
         target->m_game->queue_request<request_bang>(origin_card, origin, target, flags);
     }
 
-    game_string effect_bangcard::get_error(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) {
+    game_string effect_bangcard::get_error(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) const {
         if (origin_card->has_tag(tag_type::bangcard) && origin->m_game->check_flags(game_flag::showdown)) {
             return "ERROR_CARD_INACTIVE";
         } else if (!ctx.contains<contexts::disable_bang_checks>()) {
@@ -43,12 +43,12 @@ namespace banggame {
         }
     }
 
-    prompt_string effect_bangcard::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx) {
+    prompt_string effect_bangcard::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx) const {
         flags.add(effect_flag::is_bang);
         return effect_bang{}.on_prompt(origin_card, origin, target, flags, ctx);
     }
 
-    void effect_bangcard::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
+    void effect_bangcard::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) const {
         bot_suggestion::signal_hostile_action(origin, target, flags);
 
         if (flags.check(effect_flag::play_as_bang)) {
@@ -64,38 +64,38 @@ namespace banggame {
         req->origin->m_game->queue_request(std::move(req));
     }
 
-    prompt_string effect_play_as_bang::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx) {
+    prompt_string effect_play_as_bang::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx) const {
         flags.add(effect_flag::play_as_bang);
         return effect_bang{}.on_prompt(ctx.get<contexts::playing_card>(), origin, target, flags, ctx);
     }
 
-    void effect_play_as_bang::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx) {
+    void effect_play_as_bang::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx) const {
         flags.add(effect_flag::play_as_bang);
         effect_bang{}.on_play(ctx.get<contexts::playing_card>(), origin, target, flags);
     }
 
-    game_string effect_play_as_bangcard::get_error(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) {
+    game_string effect_play_as_bangcard::get_error(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) const {
         return effect_bangcard{}.get_error(ctx.get<contexts::playing_card>(), origin, target, ctx);
     }
 
-    prompt_string effect_play_as_bangcard::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx) {
+    prompt_string effect_play_as_bangcard::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx) const {
         flags.add(effect_flag::play_as_bang);
         return effect_bangcard{}.on_prompt(ctx.get<contexts::playing_card>(), origin, target, flags, ctx);
     }
 
-    void effect_play_as_bangcard::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx) {
+    void effect_play_as_bangcard::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx) const {
         flags.add(effect_flag::play_as_bang);
         effect_bangcard{}.on_play(ctx.get<contexts::playing_card>(), origin, target, flags);
     }
     
-    game_string effect_banglimit::get_error(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
+    game_string effect_banglimit::get_error(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const {
         if (!ctx.contains<contexts::disable_banglimit>() && origin->get_bangs_played() >= 1) {
             return "ERROR_ONE_BANG_PER_TURN";
         }
         return {};
     }
 
-    void effect_banglimit::on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
+    void effect_banglimit::on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const {
         if (ctx.contains<contexts::disable_banglimit>()) {
             return;
         }
@@ -112,11 +112,11 @@ namespace banggame {
         });
     }
 
-    bool modifier_bangmod::valid_with_modifier(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
+    bool modifier_bangmod::valid_with_modifier(card_ptr origin_card, player_ptr origin, card_ptr target_card) const {
         return target_card->has_tag(tag_type::bangmod);
     }
 
-    bool modifier_bangmod::valid_with_card(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
+    bool modifier_bangmod::valid_with_card(card_ptr origin_card, player_ptr origin, card_ptr target_card) const {
         if (target_card->pocket == pocket_type::player_hand) {
             return target_card->has_tag(tag_type::bangcard);
         } else {
@@ -180,11 +180,11 @@ namespace banggame {
         }
     }
 
-    bool effect_bangresponse::can_play(card_ptr origin_card, player_ptr origin) {
+    bool effect_bangresponse::can_play(card_ptr origin_card, player_ptr origin) const {
         return origin->m_game->top_request<respondable_with_bang>(target_is{origin}) != nullptr;
     }
 
-    void effect_bangresponse::on_play(card_ptr origin_card, player_ptr origin) {
+    void effect_bangresponse::on_play(card_ptr origin_card, player_ptr origin) const {
         auto req = origin->m_game->top_request<respondable_with_bang>();
         req->respond_with_bang();
     }

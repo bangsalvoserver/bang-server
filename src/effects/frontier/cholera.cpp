@@ -10,13 +10,13 @@
 
 namespace banggame {
     
-    game_string equip_cholera::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {
+    game_string equip_cholera::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) const {
         MAYBE_RETURN(prompts::bot_check_target_enemy(origin, target));
         MAYBE_RETURN(prompts::prompt_target_self(origin_card, origin, target));
         return {};
     }
 
-    void equip_cholera::on_enable(card_ptr target_card, player_ptr target) {
+    void equip_cholera::on_enable(card_ptr target_card, player_ptr target) const {
         target->m_game->add_listener<event_type::on_turn_end>({ target_card, 25 }, [=](player_ptr origin, bool skipped) {
             if (origin == target) {
                 target->m_game->queue_request<request_check>(target, target_card,

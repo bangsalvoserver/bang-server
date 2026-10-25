@@ -124,16 +124,16 @@ namespace banggame {
         }
     };
 
-    prompt_string effect_poker::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
+    prompt_string effect_poker::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) const {
         MAYBE_RETURN(prompts::prompt_target_immunity(origin_card, origin, target, flags));
         return {};
     }
 
-    void effect_poker::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
+    void effect_poker::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) const {
         origin->m_game->queue_request<request_poker>(origin_card, origin, target, flags);
     }
 
-    void effect_poker::on_play(card_ptr origin_card, player_ptr origin) {
+    void effect_poker::on_play(card_ptr origin_card, player_ptr origin) const {
         origin->m_game->queue_request<request_poker_draw>(origin_card, origin);
     }
 }

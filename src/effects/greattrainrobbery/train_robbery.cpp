@@ -54,7 +54,7 @@ namespace banggame {
         }
     };
 
-    prompt_string effect_train_robbery::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
+    prompt_string effect_train_robbery::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) const {
         MAYBE_RETURN(prompts::prompt_target_immunity(origin_card, origin, target, flags));
         if (origin->is_bot()) {
             if (bot_suggestion::is_target_enemy(origin, target)) {
@@ -76,14 +76,14 @@ namespace banggame {
         return {};
     }
 
-    void effect_train_robbery::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
+    void effect_train_robbery::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) const {
         bot_suggestion::signal_hostile_action(origin, target, flags);
 
         origin->m_game->add_log("LOG_PLAYED_CARD_ON", origin_card, origin, target);
         origin->m_game->queue_request<request_train_robbery>(origin_card, origin, target, flags, 20);
     }
 
-    bool effect_train_robbery_response::can_play(card_ptr origin_card, player_ptr origin) {
+    bool effect_train_robbery_response::can_play(card_ptr origin_card, player_ptr origin) const {
         return origin->m_game->top_request<request_train_robbery>(target_is{origin}) != nullptr;
     }
 
@@ -93,11 +93,11 @@ namespace banggame {
         };
     }
 
-    void effect_train_robbery_response::add_context(card_ptr origin_card, player_ptr origin, card_ptr target_card, effect_context &ctx) {
+    void effect_train_robbery_response::add_context(card_ptr origin_card, player_ptr origin, card_ptr target_card, effect_context &ctx) const {
         ctx.add(contexts::train_robbery_target{ target_card });
     }
 
-    void effect_train_robbery_response::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
+    void effect_train_robbery_response::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card) const {
         auto req = origin->m_game->top_request<request_train_robbery>();
         req->selected_cards.add(target_card);
     }
@@ -106,7 +106,7 @@ namespace banggame {
         return c->has_tag(tag_type::penalty);
     }
 
-    prompt_string effect_train_robbery_discard::on_prompt(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
+    prompt_string effect_train_robbery_discard::on_prompt(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const {
         if (origin->is_bot()) {
             if (origin->is_ghost()) {
                 return {1, "BOT_ONLY_BANG"};
@@ -118,7 +118,7 @@ namespace banggame {
         return {};
     }
 
-    void effect_train_robbery_discard::on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
+    void effect_train_robbery_discard::on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const {
         card_ptr target_card = ctx.get<contexts::train_robbery_target>();
 
         origin->m_game->add_log("LOG_DISCARDED_SELF_CARD", origin, target_card);
@@ -137,7 +137,7 @@ namespace banggame {
         }
     };
 
-    prompt_string effect_train_robbery_bang::on_prompt(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
+    prompt_string effect_train_robbery_bang::on_prompt(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const {
         if (origin->is_bot() && !origin->is_ghost()) {
             if (rn::any_of(origin->m_table, is_penalty_card)) {
                 return "BOT_DISCARD_PENALTY";
@@ -149,7 +149,7 @@ namespace banggame {
         return {};
     }
 
-    void effect_train_robbery_bang::on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
+    void effect_train_robbery_bang::on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const {
         auto req = origin->m_game->top_request<request_train_robbery>();
         card_ptr target_card = ctx.get<contexts::train_robbery_target>();
 

@@ -11,13 +11,13 @@
 
 namespace banggame {
 
-    game_string equip_taxman::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {
+    game_string equip_taxman::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) const {
         MAYBE_RETURN(prompts::bot_check_target_enemy(origin, target));
         MAYBE_RETURN(prompts::prompt_target_self(origin_card, origin, target));
         return {};
     }
 
-    void equip_taxman::on_enable(card_ptr target_card, player_ptr target) {
+    void equip_taxman::on_enable(card_ptr target_card, player_ptr target) const {
         target->m_game->add_listener<event_type::get_predraw_checks>({target_card, 10 + priority},
             [=, priority=priority](player_ptr origin, std::vector<event_card_key> &ret) {
                 if (origin == target && !target->m_game->check_flags(game_flag::phase_one_override)) {

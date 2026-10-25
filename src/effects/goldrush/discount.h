@@ -6,9 +6,9 @@
 namespace banggame {
 
     struct modifier_discount {
-        bool valid_with_card(card_ptr origin_card, player_ptr origin, card_ptr target_card);
+        bool valid_with_card(card_ptr origin_card, player_ptr origin, card_ptr target_card) const;
 
-        void add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx);
+        void add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) const;
     };
 
     DEFINE_MODIFIER(discount, modifier_discount)

@@ -6,7 +6,7 @@
 
 namespace banggame {
 
-    void equip_shootout::on_enable(card_ptr target_card, player_ptr target) {
+    void equip_shootout::on_enable(card_ptr target_card, player_ptr target) const {
         target->m_game->add_listener<event_type::count_bangs_played>({target_card, 1}, [](const_player_ptr p, int &value, bool real_count) {
             if (!real_count) {
                 --value;

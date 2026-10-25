@@ -15,7 +15,7 @@ namespace banggame {
         });
     }
 
-    void equip_suzy_lafayette::on_enable(card_ptr origin_card, player_ptr origin) {
+    void equip_suzy_lafayette::on_enable(card_ptr origin_card, player_ptr origin) const {
         if (origin->m_game->m_playing) {
             check_empty_hand(origin_card, origin, ncards);
         }

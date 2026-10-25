@@ -6,7 +6,7 @@
 
 namespace banggame {
 
-    void effect_aim::on_play(card_ptr origin_card, player_ptr origin) {
+    void effect_aim::on_play(card_ptr origin_card, player_ptr origin) const {
         origin->m_game->add_listener<event_type::apply_bang_modifier>(origin_card, [=](player_ptr p, shared_request_bang req) {
             if (p == origin) {
                 ++req->bang_damage;

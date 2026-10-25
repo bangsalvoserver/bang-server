@@ -46,7 +46,7 @@ namespace banggame {
         }
     };
 
-    void equip_tumbleweed::on_enable(card_ptr target_card, player_ptr target) {
+    void equip_tumbleweed::on_enable(card_ptr target_card, player_ptr target) const {
         target->m_game->add_listener<event_type::on_draw_check_select>(target_card, [=](player_ptr origin, shared_draw_check_handler req) {
             if (target->alive()) {
                 target->m_game->queue_request<request_tumbleweed>(target_card, origin, target, std::move(req));
@@ -56,16 +56,16 @@ namespace banggame {
         });
     }
 
-    prompt_string effect_tumbleweed::on_prompt(card_ptr origin_card, player_ptr origin) {
+    prompt_string effect_tumbleweed::on_prompt(card_ptr origin_card, player_ptr origin) const {
         auto req = origin->m_game->top_request<request_tumbleweed>();
         return req->handler->redraw_prompt(origin_card, origin);
     }
 
-    bool effect_tumbleweed::can_play(card_ptr origin_card, player_ptr origin) {
+    bool effect_tumbleweed::can_play(card_ptr origin_card, player_ptr origin) const {
         return origin->m_game->top_request<request_tumbleweed>(target_is{origin}) != nullptr;
     }
 
-    void effect_tumbleweed::on_play(card_ptr origin_card, player_ptr origin) {
+    void effect_tumbleweed::on_play(card_ptr origin_card, player_ptr origin) const {
         auto req = origin->m_game->top_request<request_tumbleweed>();
         req->pop_request();
         req->handler->restart();

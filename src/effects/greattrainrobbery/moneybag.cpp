@@ -9,7 +9,7 @@
 
 namespace banggame {
 
-    game_string modifier_moneybag::get_error(card_ptr origin_card, player_ptr origin, card_ptr playing_card, const effect_context &ctx) {
+    game_string modifier_moneybag::get_error(card_ptr origin_card, player_ptr origin, card_ptr playing_card, const effect_context &ctx) const {
         card_ptr repeat_card = ctx.get<contexts::repeat_card>();
         if (!repeat_card) {
             return {"ERROR_CANT_PLAY_CARD", origin_card};
@@ -28,7 +28,7 @@ namespace banggame {
         return {};
     }
 
-    void modifier_moneybag::add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) {
+    void modifier_moneybag::add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) const {
         if (!origin->m_game->m_discards.empty()) {
             card_ptr target_card = origin->m_game->m_discards.back();
             ctx.add(contexts::repeat_card{ target_card });

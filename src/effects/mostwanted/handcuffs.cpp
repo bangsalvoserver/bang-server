@@ -22,7 +22,7 @@ namespace banggame {
         }
     };
 
-    void equip_handcuffs::on_enable(card_ptr target_card, player_ptr target) {
+    void equip_handcuffs::on_enable(card_ptr target_card, player_ptr target) const {
         target->m_game->add_listener<event_type::on_turn_start>(target_card, [=](player_ptr origin) {
             origin->m_game->queue_request<request_handcuffs>(target_card, origin);
         });
@@ -31,11 +31,11 @@ namespace banggame {
         });
     }
 
-    bool effect_handcuffs::can_play(card_ptr target_card, player_ptr target) {
+    bool effect_handcuffs::can_play(card_ptr target_card, player_ptr target) const {
         return target->m_game->top_request<request_handcuffs>(target_is{target}) != nullptr;
     }
     
-    void effect_handcuffs::on_play(card_ptr target_card, player_ptr target) {
+    void effect_handcuffs::on_play(card_ptr target_card, player_ptr target) const {
         auto req = target->m_game->top_request<request_handcuffs>();
         card_ptr origin_card = req->origin_card;
         req->pop_request();

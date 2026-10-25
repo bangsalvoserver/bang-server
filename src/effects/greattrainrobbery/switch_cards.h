@@ -6,23 +6,23 @@
 namespace banggame {
     
     struct handler_switch_cards {
-        game_string get_error(card_ptr origin_card, player_ptr origin, card_ptr chosen_card, card_ptr target_card);
-        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, card_ptr chosen_card, card_ptr target_card, const effect_context &ctx);
-        void on_play(card_ptr origin_card, player_ptr origin, card_ptr chosen_card, card_ptr target_card);
+        game_string get_error(card_ptr origin_card, player_ptr origin, card_ptr chosen_card, card_ptr target_card) const;
+        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, card_ptr chosen_card, card_ptr target_card, const effect_context &ctx) const;
+        void on_play(card_ptr origin_card, player_ptr origin, card_ptr chosen_card, card_ptr target_card) const;
     };
 
     DEFINE_MTH(switch_cards, handler_switch_cards)
 
     struct effect_switch_self {
-        game_string get_error(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
+        game_string get_error(card_ptr origin_card, player_ptr origin, card_ptr target_card) const {
             return handler_switch_cards{}.get_error(origin_card, origin, origin_card, target_card);
         }
 
-        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card, const effect_context &ctx) {
+        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card, const effect_context &ctx) const {
             return handler_switch_cards{}.on_prompt(origin_card, origin, origin_card, target_card, ctx);
         }
 
-        void on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
+        void on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card) const {
             return handler_switch_cards{}.on_play(origin_card, origin, origin_card, target_card);
         }
     };

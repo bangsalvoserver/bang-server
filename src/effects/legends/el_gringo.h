@@ -6,7 +6,7 @@
 namespace banggame {
 
     struct equip_el_gringo_legend : event_equip {
-        void on_enable(card_ptr target_card, player_ptr target);
+        void on_enable(card_ptr target_card, player_ptr target) const;
     };
 
     DEFINE_EQUIP(el_gringo_legend, equip_el_gringo_legend)

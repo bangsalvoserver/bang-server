@@ -52,14 +52,14 @@ namespace banggame {
         }
     };
 
-    prompt_string equip_bomb::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {
+    prompt_string equip_bomb::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) const {
         MAYBE_RETURN(prompts::bot_check_target_enemy(origin, target));
         MAYBE_RETURN(prompts::prompt_target_self(origin_card, origin, target));
         MAYBE_RETURN(prompts::prompt_target_immunity(origin_card, origin, target));
         return {};
     }
 
-    void equip_bomb::on_enable(card_ptr target_card, player_ptr target) {
+    void equip_bomb::on_enable(card_ptr target_card, player_ptr target) const {
         target->m_game->add_listener<event_type::get_select_cubes_prompt>(target_card, [=](player_ptr origin, const effect_context &ctx) -> game_string {
             if (origin == target && !target->is_ghost() && contexts::selected_cubes::count_selected_on(ctx, target_card) >= target_card->num_cubes()) {
                 return {"PROMPT_EXPLODE_BOMB", target_card};

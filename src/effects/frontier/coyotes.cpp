@@ -62,7 +62,7 @@ namespace banggame {
         }
     };
 
-    void equip_coyotes::on_enable(card_ptr target_card, player_ptr target) {
+    void equip_coyotes::on_enable(card_ptr target_card, player_ptr target) const {
         target->m_game->add_listener<event_type::on_predraw_check>(target_card, [=](player_ptr e_player, card_ptr e_card) {
             if (e_player == target && e_card == target_card) {
                 target->m_game->queue_request<request_check>(target, target_card,

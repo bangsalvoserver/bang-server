@@ -6,8 +6,8 @@
 namespace banggame {
 
     struct effect_sniper {
-        game_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target);
-        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target);
+        game_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) const;
+        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target) const;
     };
 
     DEFINE_EFFECT(sniper, effect_sniper)

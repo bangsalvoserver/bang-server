@@ -10,7 +10,7 @@ namespace banggame {
 
         using value_type = nullable_card;
 
-        std::generator<card_ptr> possible_targets(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) {
+        std::generator<card_ptr> possible_targets(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
             if (ctx.contains<contexts::repeat_card>()) {
                 co_yield nullptr;
             } else {
@@ -20,7 +20,7 @@ namespace banggame {
             }
         }
 
-        card_ptr random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) {
+        card_ptr random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
             if (ctx.contains<contexts::repeat_card>()) {
                 return nullptr;
             } else {
@@ -28,7 +28,7 @@ namespace banggame {
             }
         }
 
-        game_string get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, card_ptr target) {
+        game_string get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, card_ptr target) const {
             if (!target) {
                 if (ctx.contains<contexts::repeat_card>()) {
                     return {};
@@ -44,7 +44,7 @@ namespace banggame {
             }
         }
 
-        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, card_ptr target) {
+        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, card_ptr target) const {
             if (target) {
                 return targeting_card::on_prompt(origin_card, origin, effect, ctx, target);
             } else {
@@ -52,13 +52,13 @@ namespace banggame {
             }
         }
 
-        void add_context(card_ptr origin_card, player_ptr origin, const effect_holder &effect, effect_context &ctx, card_ptr target) {
+        void add_context(card_ptr origin_card, player_ptr origin, const effect_holder &effect, effect_context &ctx, card_ptr target) const {
             if (target) {
                 targeting_card::add_context(origin_card, origin, effect, ctx, target);
             }
         }
 
-        void on_play(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, card_ptr target) {
+        void on_play(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, card_ptr target) const {
             if (target) {
                 return targeting_card::on_play(origin_card, origin, effect, ctx, target);
             }

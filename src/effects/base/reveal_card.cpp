@@ -6,7 +6,7 @@
 
 namespace banggame {
 
-    void effect_reveal_card::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
+    void effect_reveal_card::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card) const {
         if (!origin->m_game->check_flags(game_flag::hands_shown)) {
             origin->m_game->add_log("LOG_REVEALED_CARD", origin, target_card);
             target_card->set_visibility(card_visibility::shown);

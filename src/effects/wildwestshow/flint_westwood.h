@@ -6,8 +6,8 @@
 namespace banggame {
 
     struct handler_flint_westwood {
-        game_string on_prompt(card_ptr origin_card, player_ptr origin, card_ptr chosen_card, card_ptr target_card);
-        void on_play(card_ptr origin_card, player_ptr origin, card_ptr chosen_card, card_ptr target_card);
+        game_string on_prompt(card_ptr origin_card, player_ptr origin, card_ptr chosen_card, card_ptr target_card) const;
+        void on_play(card_ptr origin_card, player_ptr origin, card_ptr chosen_card, card_ptr target_card) const;
     };
 
     DEFINE_MTH(flint_westwood, handler_flint_westwood)

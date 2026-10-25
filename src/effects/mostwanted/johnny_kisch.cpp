@@ -6,7 +6,7 @@
 
 namespace banggame {
 
-    void equip_johnny_kisch::on_enable(card_ptr target_card, player_ptr p) {
+    void equip_johnny_kisch::on_enable(card_ptr target_card, player_ptr p) const {
         p->m_game->add_listener<event_type::on_equip_card>(target_card, [=](player_ptr origin, player_ptr target, card_ptr equipped_card, const effect_context &ctx) {
             if (p == origin) {
                 for (player_ptr other : target->m_game->range_other_players(target)) {

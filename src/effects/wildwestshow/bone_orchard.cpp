@@ -9,7 +9,7 @@
 
 namespace banggame {
 
-    void equip_bone_orchard::on_enable(card_ptr target_card, player_ptr origin) {
+    void equip_bone_orchard::on_enable(card_ptr target_card, player_ptr origin) const {
         origin->m_game->add_listener<event_type::check_revivers>({target_card, -1}, [=](player_ptr target) {
             if (!target->alive()) {
                 target_card->flash_card();

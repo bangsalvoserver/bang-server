@@ -6,7 +6,7 @@
 namespace banggame {
     
     struct equip_strongbox : event_equip {
-        void on_enable(card_ptr origin_card, player_ptr origin);
+        void on_enable(card_ptr origin_card, player_ptr origin) const;
     };
 
     DEFINE_EQUIP(strongbox, equip_strongbox)

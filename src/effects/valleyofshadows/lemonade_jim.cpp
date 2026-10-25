@@ -7,7 +7,7 @@
 
 namespace banggame {
     
-    void equip_lemonade_jim::on_enable(card_ptr target_card, player_ptr origin) {
+    void equip_lemonade_jim::on_enable(card_ptr target_card, player_ptr origin) const {
         origin->m_game->add_listener<event_type::on_play_beer>(target_card, [=](player_ptr target, bool is_sold) {
             if (origin != target) {
                 target->m_game->queue_request<request_can_play_card>(target_card, target, origin);

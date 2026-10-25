@@ -59,7 +59,7 @@ namespace banggame {
         return target->m_game->call_event(event_type::check_card_taker{ target, card_taker_type::draw_check_start });
     }
     
-    void equip_lucky_duke_legend::on_enable(card_ptr target_card, player_ptr target) {
+    void equip_lucky_duke_legend::on_enable(card_ptr target_card, player_ptr target) const {
         target->m_game->add_listener<event_type::check_card_taker>(target_card, [=](player_ptr e_target, card_taker_type type) -> card_ptr {
             if (type == card_taker_type::draw_check_start && e_target == target) {
                 return target_card;

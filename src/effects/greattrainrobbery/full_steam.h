@@ -9,8 +9,8 @@ namespace banggame {
         int8_t value;
         effect_full_steam(int value) : value(value) {}
         
-        prompt_string on_prompt(card_ptr origin_card, player_ptr origin);
-        void on_play(card_ptr origin_card, player_ptr origin);
+        prompt_string on_prompt(card_ptr origin_card, player_ptr origin) const;
+        void on_play(card_ptr origin_card, player_ptr origin) const;
     };
 
     DEFINE_EFFECT(full_steam, effect_full_steam)

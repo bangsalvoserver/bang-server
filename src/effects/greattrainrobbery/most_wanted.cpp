@@ -58,12 +58,12 @@ namespace banggame {
         }
     };
 
-    prompt_string effect_most_wanted::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
+    prompt_string effect_most_wanted::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) const {
         MAYBE_RETURN(prompts::prompt_target_immunity(origin_card, origin, target, flags));
         return {};
     }
 
-    void effect_most_wanted::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
+    void effect_most_wanted::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) const {
         origin->m_game->queue_request<request_most_wanted>(origin_card, origin, target, flags);
     }
 }

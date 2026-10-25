@@ -9,7 +9,7 @@
 
 namespace banggame {
 
-    void equip_shango_brothers::on_enable(card_ptr target_card, player_ptr target) {
+    void equip_shango_brothers::on_enable(card_ptr target_card, player_ptr target) const {
         struct shango_brothers_state {
             int played_count = 0;
             int cards_drawn = 0;

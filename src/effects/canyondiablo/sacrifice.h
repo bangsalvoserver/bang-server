@@ -6,9 +6,9 @@
 namespace banggame {
 
     struct effect_sacrifice {
-        bool can_play(card_ptr origin_card, player_ptr origin);
-        game_string on_prompt(card_ptr origin_card, player_ptr origin);
-        void on_play(card_ptr origin_card, player_ptr origin);
+        bool can_play(card_ptr origin_card, player_ptr origin) const;
+        game_string on_prompt(card_ptr origin_card, player_ptr origin) const;
+        void on_play(card_ptr origin_card, player_ptr origin) const;
     };
 
     DEFINE_EFFECT(sacrifice, effect_sacrifice)

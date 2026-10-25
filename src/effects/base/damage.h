@@ -26,15 +26,15 @@ namespace banggame {
         int damage;
         effect_damage(int damage = 1) : damage{damage} {}
 
-        game_string get_error(card_ptr origin_card, player_ptr origin, effect_flags flags = {});
+        game_string get_error(card_ptr origin_card, player_ptr origin, effect_flags flags = {}) const;
 
-        game_string on_prompt(card_ptr origin_card, player_ptr origin);
+        game_string on_prompt(card_ptr origin_card, player_ptr origin) const;
         
-        void on_play(card_ptr origin_card, player_ptr origin, effect_flags flags = {}) {
+        void on_play(card_ptr origin_card, player_ptr origin, effect_flags flags = {}) const {
             on_play(origin_card, origin, origin, flags);
         }
 
-        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags = {});
+        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags = {}) const;
     };
 
     DEFINE_EFFECT(damage, effect_damage)

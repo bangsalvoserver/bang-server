@@ -6,30 +6,30 @@
 namespace banggame {
 
     struct effect_bandidos {
-        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags);
-        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags);
+        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) const;
+        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) const;
     };
 
     DEFINE_EFFECT(bandidos, effect_bandidos)
 
     struct effect_bandidos_response {
-        bool can_play(card_ptr origin_card, player_ptr origin);
-        void on_play(card_ptr origin_card, player_ptr origin);
+        bool can_play(card_ptr origin_card, player_ptr origin) const;
+        void on_play(card_ptr origin_card, player_ptr origin) const;
     };
 
 
     DEFINE_EFFECT(bandidos_response, effect_bandidos_response)
 
     struct effect_bandidos2 {
-        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags);
-        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags);
+        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) const;
+        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) const;
     };
 
     DEFINE_EFFECT(bandidos2, effect_bandidos2)
 
     struct effect_bandidos2_response {
-        bool can_play(card_ptr origin_card, player_ptr origin);
-        void on_play(card_ptr origin_card, player_ptr origin);
+        bool can_play(card_ptr origin_card, player_ptr origin) const;
+        void on_play(card_ptr origin_card, player_ptr origin) const;
     };
 
 

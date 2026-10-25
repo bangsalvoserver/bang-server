@@ -9,7 +9,7 @@
 
 namespace banggame {
     
-    game_string handler_gift_card::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card, player_ptr target_player) {
+    game_string handler_gift_card::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card, player_ptr target_player) const {
         if (forced_response) {
             return {};
         } else {
@@ -17,7 +17,7 @@ namespace banggame {
         }
     }
 
-    void handler_gift_card::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card, player_ptr target_player) {
+    void handler_gift_card::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card, player_ptr target_player) const {
         if (!forced_response) {
             bot_suggestion::signal_helpful_action(origin, target_player);
         }

@@ -6,7 +6,7 @@
 namespace banggame {
     
     struct equip_annie_oakey : event_equip {
-        void on_enable(card_ptr origin_card, player_ptr origin);
+        void on_enable(card_ptr origin_card, player_ptr origin) const;
     };
 
     DEFINE_EQUIP(annie_oakey, equip_annie_oakey)
@@ -19,8 +19,8 @@ namespace banggame {
         effect_annie_oakey(card_sign_function fn, int ncards)
             : fn{fn}, ncards{ncards} {}
 
-        bool can_play(card_ptr origin_card, player_ptr origin);
-        void on_play(card_ptr origin_card, player_ptr origin);
+        bool can_play(card_ptr origin_card, player_ptr origin) const;
+        void on_play(card_ptr origin_card, player_ptr origin) const;
     };
 
     DEFINE_EFFECT(annie_oakey, effect_annie_oakey)

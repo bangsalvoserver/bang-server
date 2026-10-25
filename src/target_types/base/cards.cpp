@@ -9,16 +9,16 @@
 
 namespace banggame {
 
-    bool targeting_cards::is_possible(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) {
+    bool targeting_cards::is_possible(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
         return contains_at_least(target_card.possible_targets(origin_card, origin, effect, ctx), ncards);
     }
 
-    card_list targeting_cards::random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) {
+    card_list targeting_cards::random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
         auto targets = target_card.possible_targets(origin_card, origin, effect, ctx);
         return sample_elements(targets, ncards, origin->m_game->bot_rng);
     }
 
-    game_string targeting_cards::get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &targets) {
+    game_string targeting_cards::get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &targets) const {
         if (targets.size() != ncards) {
             return "ERROR_INVALID_TARGETS";
         }
@@ -28,19 +28,19 @@ namespace banggame {
         return {};
     }
 
-    prompt_string targeting_cards::on_prompt(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &targets) {
+    prompt_string targeting_cards::on_prompt(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &targets) const {
         return prompts::select_prompt(targets | rv::transform([&](card_ptr c) {
             return effect.on_prompt(origin_card, origin, c, effect_flag::multi_target, ctx);
         }));
     }
 
-    void targeting_cards::add_context(card_ptr origin_card, player_ptr origin, const effect_holder &effect, effect_context &ctx, const card_list &targets) {
+    void targeting_cards::add_context(card_ptr origin_card, player_ptr origin, const effect_holder &effect, effect_context &ctx, const card_list &targets) const {
         for (card_ptr c : targets) {
             target_card.add_context(origin_card, origin, effect, ctx, c);
         }
     }
 
-    void targeting_cards::on_play(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &targets) {
+    void targeting_cards::on_play(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &targets) const {
         for (card_ptr c : targets) {
             effect.on_play(origin_card, origin, c, effect_flag::multi_target, ctx);
         }
