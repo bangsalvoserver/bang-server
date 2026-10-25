@@ -6,7 +6,7 @@
 
 namespace banggame {
 
-    void equip_pixie_pete::on_enable(card_ptr target_card, player_ptr target) {
+    void equip_pixie_pete::on_enable(card_ptr target_card, player_ptr target) const {
         target->m_game->add_listener<event_type::init_request_draw>({target_card, 2}, [=](player_ptr origin, shared_request_draw req) {
             if (origin == target && req->num_cards_to_draw == 2) {
                 req->num_cards_to_draw = 3;

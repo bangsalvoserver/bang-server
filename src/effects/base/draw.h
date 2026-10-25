@@ -12,10 +12,10 @@ namespace banggame {
         int ncards;
         effect_draw(int ncards = 1) : ncards{ncards} {}
         
-        void on_play(card_ptr origin_card, player_ptr origin) {
+        void on_play(card_ptr origin_card, player_ptr origin) const {
             on_play(origin_card, origin, origin);
         }
-        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target);
+        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target) const;
     };
 
     DEFINE_EFFECT(draw, effect_draw)
@@ -24,21 +24,21 @@ namespace banggame {
         int ncards;
         effect_queue_draw(int ncards = 1) : ncards{ncards} {}
 
-        void on_play(card_ptr origin_card, player_ptr origin) {
+        void on_play(card_ptr origin_card, player_ptr origin) const {
             on_play(origin_card, origin, origin);
         }
-        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target);
+        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target) const;
     };
 
     DEFINE_EFFECT(queue_draw, effect_queue_draw)
 
     struct effect_draw_discard {
-        bool can_play(card_ptr origin_card, player_ptr origin);
+        bool can_play(card_ptr origin_card, player_ptr origin) const;
 
-        void on_play(card_ptr origin_card, player_ptr origin) {
+        void on_play(card_ptr origin_card, player_ptr origin) const {
             return on_play(origin_card, origin, origin);
         }
-        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target);
+        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target) const;
     };
 
     DEFINE_EFFECT(draw_discard, effect_draw_discard)
@@ -47,27 +47,27 @@ namespace banggame {
         int ncards;
         effect_draw_to_discard(int ncards = 1) : ncards{ncards} {}
 
-        void on_play(card_ptr origin_card, player_ptr origin);
+        void on_play(card_ptr origin_card, player_ptr origin) const;
     };
 
     DEFINE_EFFECT(draw_to_discard, effect_draw_to_discard)
 
     struct effect_no_cards_drawn {
-        void add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx);
-        bool can_play(card_ptr origin_card, player_ptr origin);
+        void add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) const;
+        bool can_play(card_ptr origin_card, player_ptr origin) const;
     };
 
     DEFINE_EFFECT(no_cards_drawn, effect_no_cards_drawn)
 
     struct effect_add_draw_card {
-        bool can_play(card_ptr origin_card, player_ptr origin);
-        void on_play(card_ptr origin_card, player_ptr origin);
+        bool can_play(card_ptr origin_card, player_ptr origin) const;
+        void on_play(card_ptr origin_card, player_ptr origin) const;
     };
 
     DEFINE_EFFECT(add_draw_card, effect_add_draw_card)
 
     struct effect_skip_drawing: effect_no_cards_drawn {
-        void on_play(card_ptr origin_card, player_ptr origin);
+        void on_play(card_ptr origin_card, player_ptr origin) const;
     };
 
     DEFINE_EFFECT(skip_drawing, effect_skip_drawing)

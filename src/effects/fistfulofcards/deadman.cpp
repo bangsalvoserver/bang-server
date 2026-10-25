@@ -11,7 +11,7 @@
 
 namespace banggame {
 
-    void equip_deadman::on_enable(card_ptr target_card, player_ptr origin) {
+    void equip_deadman::on_enable(card_ptr target_card, player_ptr origin) const {
         origin->m_game->add_listener<event_type::check_revivers>(target_card, [=](player_ptr target) {
             player_ptr first_dead = origin->m_game->call_event(event_type::get_first_dead_player{});
 

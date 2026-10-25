@@ -6,7 +6,7 @@
 namespace banggame {
 
     struct effect_knife_revolver {
-        void on_play(card_ptr origin_card, player_ptr origin);
+        void on_play(card_ptr origin_card, player_ptr origin) const;
     };
 
     DEFINE_EFFECT(knife_revolver, effect_knife_revolver)

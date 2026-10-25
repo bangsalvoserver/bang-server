@@ -8,7 +8,7 @@ namespace banggame {
     struct effect_black_jack_legend {
         static int get_card_rank_value(card_rank rank);
 
-        void on_play(card_ptr origin_card, player_ptr origin);
+        void on_play(card_ptr origin_card, player_ptr origin) const;
     };
 
     DEFINE_EFFECT(black_jack_legend, effect_black_jack_legend)

@@ -6,8 +6,8 @@
 namespace banggame {
     
     struct equip_dragoon {
-        void on_enable(card_ptr origin_card, player_ptr origin);
-        void on_disable(card_ptr origin_card, player_ptr origin);
+        void on_enable(card_ptr origin_card, player_ptr origin) const;
+        void on_disable(card_ptr origin_card, player_ptr origin) const;
     };
 
     DEFINE_EQUIP(dragoon, equip_dragoon)

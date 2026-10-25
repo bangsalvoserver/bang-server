@@ -10,7 +10,7 @@
 
 namespace banggame {
 
-    bool effect_evan_babbit::can_play(card_ptr origin_card, player_ptr origin) {
+    bool effect_evan_babbit::can_play(card_ptr origin_card, player_ptr origin) const {
         if (auto req = origin->m_game->top_request<request_bang>(target_is{origin})) {
             return req->num_cards_used() == 0
                 && req->flags.check(effect_flag::is_bang);
@@ -19,12 +19,12 @@ namespace banggame {
         }
     }
 
-    game_string effect_evan_babbit::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {
+    game_string effect_evan_babbit::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) const {
         MAYBE_RETURN(prompts::bot_check_target_enemy(origin, target));
         return {};
     }
 
-    void effect_evan_babbit::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) {
+    void effect_evan_babbit::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) const {
         bot_suggestion::signal_hostile_action(origin, target);
         
         auto req = origin->m_game->top_request();

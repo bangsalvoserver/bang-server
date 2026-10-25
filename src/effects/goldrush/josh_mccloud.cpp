@@ -64,16 +64,16 @@ namespace banggame {
         }
     };
 
-    bool effect_forced_play::can_play(card_ptr origin_card, player_ptr target) {
+    bool effect_forced_play::can_play(card_ptr origin_card, player_ptr target) const {
         return target->m_game->top_request<request_force_play_card>(target_is{target}) != nullptr;
     }
 
-    void effect_forced_play::on_play(card_ptr origin_card, player_ptr target) {
+    void effect_forced_play::on_play(card_ptr origin_card, player_ptr target) const {
         auto req = target->m_game->top_request<request_force_play_card>();
         req->pop_request();
     }
 
-    game_string modifier_forced_play::get_error(card_ptr origin_card, player_ptr origin, card_ptr target_card, const effect_context &ctx) {
+    game_string modifier_forced_play::get_error(card_ptr origin_card, player_ptr origin, card_ptr target_card, const effect_context &ctx) const {
         if (auto req = origin->m_game->top_request<request_force_play_card>(target_is{origin})) {
             if (card_ptr choice_card = ctx.get<contexts::card_choice>()) {
                 target_card = choice_card;
@@ -83,12 +83,12 @@ namespace banggame {
         return "INVALID_MODIFIER_CARD";
     }
 
-    void modifier_forced_play::add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) {
+    void modifier_forced_play::add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) const {
         auto req = origin->m_game->top_request<request_force_play_card>();
         ctx.add(contexts::forced_play{ req->target_card });
     }
 
-    void effect_josh_mccloud::on_play(card_ptr origin_card, player_ptr target) {
+    void effect_josh_mccloud::on_play(card_ptr origin_card, player_ptr target) const {
         card_ptr target_card = draw_shop_card(target->m_game);
         target->m_game->queue_request<request_force_play_card>(origin_card, target, target_card);
     }

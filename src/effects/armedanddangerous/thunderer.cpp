@@ -5,7 +5,7 @@
 
 namespace banggame {
 
-    void effect_thunderer::on_play(card_ptr origin_card, player_ptr origin) {
+    void effect_thunderer::on_play(card_ptr origin_card, player_ptr origin) const {
         event_card_key key{origin_card, 1};
         origin->m_game->add_listener<event_type::apply_bang_modifier>(key, [=](player_ptr p, shared_request_bang req) {
             if (p == origin) {

@@ -8,7 +8,7 @@ namespace banggame {
         return static_cast<int>(rn::count_if(target->m_table, std::not_fn(&card::is_black)));
     }
 
-    game_string effect_cattle_drive::on_prompt(card_ptr origin_card, player_ptr origin) {
+    game_string effect_cattle_drive::on_prompt(card_ptr origin_card, player_ptr origin) const {
         int count = get_table_count(origin);
         if (count == 0) {
             return {"PROMPT_CARD_NO_EFFECT", origin_card};
@@ -19,7 +19,7 @@ namespace banggame {
         return {};
     }
     
-    void effect_cattle_drive::on_play(card_ptr origin_card, player_ptr origin) {
+    void effect_cattle_drive::on_play(card_ptr origin_card, player_ptr origin) const {
         origin->draw_card(get_table_count(origin), origin_card);
     }
 

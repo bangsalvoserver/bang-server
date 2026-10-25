@@ -6,14 +6,14 @@
 namespace banggame {
 
     struct equip_alexander_noon : event_equip {
-        void on_enable(card_ptr target_card, player_ptr target);
+        void on_enable(card_ptr target_card, player_ptr target) const;
     };
 
     DEFINE_EQUIP(alexander_noon, equip_alexander_noon)
 
     struct effect_alexander_noon {
-        bool can_play(card_ptr origin_card, player_ptr origin);
-        void on_play(card_ptr origin_card, player_ptr origin);
+        bool can_play(card_ptr origin_card, player_ptr origin) const;
+        void on_play(card_ptr origin_card, player_ptr origin) const;
     };
 
     DEFINE_EFFECT(alexander_noon, effect_alexander_noon)

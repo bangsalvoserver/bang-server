@@ -8,7 +8,7 @@
 namespace banggame {
 
     struct equip_wilhelm_scream : feat_equip {
-        void on_enable(card_ptr target_card, player_ptr target);
+        void on_enable(card_ptr target_card, player_ptr target) const;
     };
 
     DEFINE_EQUIP(wilhelm_scream, equip_wilhelm_scream)

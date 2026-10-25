@@ -17,7 +17,7 @@ namespace banggame {
         return {};
     }
 
-    void equip_sermon::on_enable(card_ptr target_card, player_ptr target) {
+    void equip_sermon::on_enable(card_ptr target_card, player_ptr target) const {
         target->m_game->add_listener<event_type::check_play_card>(target_card, [=](player_ptr origin, card_ptr origin_card, const effect_context &ctx)  {
             return get_sermon_error(target_card, origin, origin_card);
         });

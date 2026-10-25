@@ -9,15 +9,15 @@
 
 namespace banggame {
 
-    game_string effect_evelyn_shebang::get_error(card_ptr origin_card, player_ptr origin, player_ptr target) {
+    game_string effect_evelyn_shebang::get_error(card_ptr origin_card, player_ptr origin, player_ptr target) const {
         return origin->m_game->call_event(event_type::check_bang_target{ origin_card, origin, target, effect_flags{} });
     }
 
-    prompt_string effect_evelyn_shebang::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {
+    prompt_string effect_evelyn_shebang::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) const {
         return effect_bang{}.on_prompt(origin_card, origin, target);
     }
 
-    void effect_evelyn_shebang::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) {
+    void effect_evelyn_shebang::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) const {
         origin->m_game->add_listener<event_type::check_bang_target>(origin_card, [=](card_ptr e_origin_card, player_ptr e_origin, player_ptr e_target, effect_flags flags) -> game_string {
             if (e_origin_card == origin_card && e_origin == origin && e_target == target) {
                 return "ERROR_TARGET_NOT_UNIQUE";

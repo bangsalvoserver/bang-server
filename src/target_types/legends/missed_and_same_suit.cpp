@@ -24,12 +24,12 @@ namespace banggame {
         });
     }
     
-    bool targeting_missed_and_same_suit::is_possible(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) {
+    bool targeting_missed_and_same_suit::is_possible(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
         auto targets = target_card.possible_targets(origin_card, origin, effect, ctx);
         return contains_at_least(missed_cards_with_same_suits_range(origin, targets, ncards), 1);
     }
 
-    card_list targeting_missed_and_same_suit::random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) {
+    card_list targeting_missed_and_same_suit::random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
         auto range = target_card.possible_targets(origin_card, origin, effect, ctx);
         auto missed_cards = missed_cards_with_same_suits_range(origin, range, ncards);
         card_ptr missed_card = random_element(missed_cards, origin->m_game->bot_rng);
@@ -43,7 +43,7 @@ namespace banggame {
         return result;
     }
 
-    game_string targeting_missed_and_same_suit::get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &targets) {
+    game_string targeting_missed_and_same_suit::get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &targets) const {
         MAYBE_RETURN(targeting_cards::get_error(origin_card, origin, effect, ctx, targets));
 
         if (rn::none_of(targets, [&](card_ptr target) {

@@ -10,7 +10,7 @@
 
 namespace banggame {
 
-    void equip_ghosttown::on_enable(card_ptr target_card, player_ptr origin) {
+    void equip_ghosttown::on_enable(card_ptr target_card, player_ptr origin) const {
         origin->m_game->add_listener<event_type::check_revivers>(target_card, [=](player_ptr target) {
             if (!target->alive()) {
                 origin->m_game->add_log("LOG_REVIVE", target, target_card);

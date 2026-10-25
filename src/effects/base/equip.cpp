@@ -38,25 +38,25 @@ namespace banggame {
         return {};
     }
     
-    game_string effect_equip_on::get_error(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) {
+    game_string effect_equip_on::get_error(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) const {
         if (card_ptr equipped = target->find_equipped_card(origin_card)) {
             return {"ERROR_DUPLICATED_CARD", equipped};
         }
         return origin->m_game->call_event(event_type::check_equip_card{ origin, origin_card, target, ctx });
     }
 
-    void effect_equip_on::add_context(card_ptr origin_card, player_ptr origin, player_ptr target, effect_context &ctx) {
+    void effect_equip_on::add_context(card_ptr origin_card, player_ptr origin, player_ptr target, effect_context &ctx) const {
         ctx.add(contexts::equip_target{ target });
     }
 
-    prompt_string effect_equip_on::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) {
+    prompt_string effect_equip_on::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) const {
         MAYBE_RETURN(origin->m_game->call_event(event_type::get_equip_prompt{ origin, origin_card, target, ctx }));
         return prompts::select_prompt(origin_card->equips | rv::transform([&](const equip_holder &holder) {
             return holder.on_prompt(origin_card, origin, target, ctx);
         }));
     }
 
-    void effect_equip_on::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) {
+    void effect_equip_on::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) const {
         if (origin != target) {
             if (origin_card->has_tag(tag_type::penalty)) {
                 bot_suggestion::signal_hostile_action(origin, target);

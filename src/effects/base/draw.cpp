@@ -8,28 +8,28 @@
 
 namespace banggame {
 
-    void effect_draw::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) {
+    void effect_draw::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) const {
         target->draw_card(ncards, origin_card);
     }
 
-    void effect_queue_draw::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) {
+    void effect_queue_draw::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) const {
         origin->m_game->queue_action([=, ncards=ncards]{
             target->draw_card(ncards, origin_card);
         });
     }
 
-    bool effect_draw_discard::can_play(card_ptr origin_card, player_ptr origin) {
+    bool effect_draw_discard::can_play(card_ptr origin_card, player_ptr origin) const {
         return !origin->m_game->m_discards.empty()
             && !origin->m_game->check_flags(game_flag::phase_one_draw_discard);
     }
     
-    void effect_draw_discard::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) {
+    void effect_draw_discard::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) const {
         card_ptr drawn_card = target->m_game->m_discards.back();
         target->m_game->add_log("LOG_DRAWN_FROM_DISCARD", target, drawn_card);
         target->add_to_hand(drawn_card);
     }
 
-    void effect_draw_to_discard::on_play(card_ptr origin_card, player_ptr origin) {
+    void effect_draw_to_discard::on_play(card_ptr origin_card, player_ptr origin) const {
         for (int i=0; i<ncards; ++i) {
             origin->m_game->top_of_deck()->move_to(pocket_type::discard_pile);
         }
@@ -162,26 +162,26 @@ namespace banggame {
         }
     }
 
-    void effect_no_cards_drawn::add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) {
+    void effect_no_cards_drawn::add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) const {
         ctx.add(contexts::drawing_effect{});
     }
     
-    bool effect_no_cards_drawn::can_play(card_ptr origin_card, player_ptr origin) {
+    bool effect_no_cards_drawn::can_play(card_ptr origin_card, player_ptr origin) const {
         if (auto req = origin->m_game->top_request<request_draw>(target_is{origin})) {
             return req->num_drawn_cards == 0;
         }
         return false;
     }
     
-    bool effect_add_draw_card::can_play(card_ptr origin_card, player_ptr origin) {
+    bool effect_add_draw_card::can_play(card_ptr origin_card, player_ptr origin) const {
         return origin->m_game->top_request<request_draw>(target_is{origin}) != nullptr;
     }
 
-    void effect_add_draw_card::on_play(card_ptr origin_card, player_ptr origin) {
+    void effect_add_draw_card::on_play(card_ptr origin_card, player_ptr origin) const {
         ++origin->m_game->top_request<request_draw>()->num_drawn_cards;
     }
 
-    void effect_skip_drawing::on_play(card_ptr origin_card, player_ptr origin) {
+    void effect_skip_drawing::on_play(card_ptr origin_card, player_ptr origin) const {
         auto req = origin->m_game->top_request<request_draw>();
         req->cleanup_selection();
         req->pop_request();

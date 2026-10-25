@@ -27,17 +27,17 @@ namespace banggame {
     void queue_request_perform_feat(card_ptr origin_card, player_ptr target);
 
     struct effect_perform_feat {
-        bool can_play(card_ptr origin_card, player_ptr origin);
-        prompt_string on_prompt(card_ptr origin_card, player_ptr origin);
-        void on_play(card_ptr origin_card, player_ptr origin);
+        bool can_play(card_ptr origin_card, player_ptr origin) const;
+        prompt_string on_prompt(card_ptr origin_card, player_ptr origin) const;
+        void on_play(card_ptr origin_card, player_ptr origin) const;
     };
     
     DEFINE_EFFECT(perform_feat, effect_perform_feat)
 
     struct effect_damage_legend {
-        bool can_play(card_ptr origin_card, player_ptr origin);
-        game_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target);
-        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target);
+        bool can_play(card_ptr origin_card, player_ptr origin) const;
+        game_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) const;
+        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target) const;
     };
 
     DEFINE_EFFECT(damage_legend, effect_damage_legend)

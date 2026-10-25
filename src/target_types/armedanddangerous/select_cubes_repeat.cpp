@@ -4,20 +4,20 @@
 
 namespace banggame {
 
-    card_list targeting_select_cubes_repeat::random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) {
+    card_list targeting_select_cubes_repeat::random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
         size_t max_count = count_cubes(origin) / ncubes;
         size_t num_repeats = std::uniform_int_distribution<size_t>{0, max_count}(origin->m_game->bot_rng);
 
         return sample_elements(get_all_cubes(origin), ncubes * num_repeats, origin->m_game->bot_rng);
     }
     
-    void targeting_select_cubes_repeat::add_context(card_ptr origin_card, player_ptr origin, const effect_holder &effect, effect_context &ctx, const card_list &target) {
+    void targeting_select_cubes_repeat::add_context(card_ptr origin_card, player_ptr origin, const effect_holder &effect, effect_context &ctx, const card_list &target) const {
         for (auto chunk : target | rv::chunk(ncubes)) {
             ctx.add(contexts::selected_cubes{ origin_card, rn::to<card_list>(chunk) });
         }
     }
 
-    game_string targeting_select_cubes_repeat::get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &target_cards) {
+    game_string targeting_select_cubes_repeat::get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &target_cards) const {
         if (target_cards.size() % ncubes != 0) {
             return "ERROR_INVALID_TARGETS";
         }

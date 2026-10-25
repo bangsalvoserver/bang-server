@@ -6,13 +6,13 @@
 namespace banggame {
 
     struct equip_colorado_bill : event_equip {
-        void on_enable(card_ptr target_card, player_ptr target);
+        void on_enable(card_ptr target_card, player_ptr target) const;
     };
 
     DEFINE_EQUIP(colorado_bill, equip_colorado_bill)
 
     struct equip_colorado_bill2 : event_equip {
-        void on_enable(card_ptr target_card, player_ptr target);
+        void on_enable(card_ptr target_card, player_ptr target) const;
     };
 
     DEFINE_EQUIP(colorado_bill2, equip_colorado_bill2)

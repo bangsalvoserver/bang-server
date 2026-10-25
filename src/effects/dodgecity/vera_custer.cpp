@@ -88,7 +88,7 @@ namespace banggame {
         }
     };
 
-    void equip_vera_custer::on_enable(card_ptr origin_card, player_ptr origin) {
+    void equip_vera_custer::on_enable(card_ptr origin_card, player_ptr origin) const {
         origin->m_game->add_listener<event_type::check_character_modifier>({origin_card, 0}, [=](player_ptr target, card_set &handlers) {
             if (origin == target && !handlers.contains(origin_card)
                 && !target->check_player_flags(player_flag::extra_turn)
@@ -101,7 +101,7 @@ namespace banggame {
         });
     }
 
-    void equip_vera_custer::on_disable(card_ptr origin_card, player_ptr origin) {
+    void equip_vera_custer::on_disable(card_ptr origin_card, player_ptr origin) const {
         origin->m_game->remove_listeners(event_card_key{ origin_card, 0 });
     }
 

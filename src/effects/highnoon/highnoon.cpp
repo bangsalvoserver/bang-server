@@ -6,7 +6,7 @@
 
 namespace banggame {
 
-    void equip_highnoon::on_enable(card_ptr target_card, player_ptr target) {
+    void equip_highnoon::on_enable(card_ptr target_card, player_ptr target) const {
         target->m_game->add_listener<event_type::pre_turn_start>(target_card, [=](player_ptr p) {
             p->damage(target_card, nullptr, 1);
         });

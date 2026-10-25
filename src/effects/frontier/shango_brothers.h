@@ -13,7 +13,7 @@ namespace banggame {
             : card_count{card_count}
             , max_cards{max_cards} {}
 
-        void on_enable(card_ptr target_card, player_ptr target);
+        void on_enable(card_ptr target_card, player_ptr target) const;
     };
 
     DEFINE_EQUIP(shango_brothers, equip_shango_brothers)

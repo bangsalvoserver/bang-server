@@ -31,38 +31,38 @@ namespace banggame {
             return args{ target_player.player_filter, target_cubes.ncubes };
         }
         
-        auto possible_targets(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) {
+        auto possible_targets(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
             return target_player.possible_targets(origin_card, origin, effect, ctx)
                 | rv::transform([](player_ptr target) {
                     return value_type{ .player = target };
                 });
         }
 
-        value_type random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) {
+        value_type random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
             auto cubes = target_cubes.random_target(origin_card, origin, effect, ctx);
             auto target = random_element(target_player.possible_targets(origin_card, origin, effect, ctx), origin->m_game->bot_rng);
             return { cubes, target };
         }
 
-        game_string get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const value_type &target) {
+        game_string get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const value_type &target) const {
             MAYBE_RETURN(target_cubes.get_error(origin_card, origin, effect, ctx, target.cubes));
             MAYBE_RETURN(target_player.get_error(origin_card, origin, effect, ctx, target.player));
             return {};
         }
 
-        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const value_type &target) {
+        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const value_type &target) const {
             return prompts::select_prompt(std::array{
                 target_cubes.on_prompt(origin_card, origin, effect, ctx, target.cubes),
                 target_player.on_prompt(origin_card, origin, effect, ctx, target.player)
             });
         }
 
-        void add_context(card_ptr origin_card, player_ptr origin, const effect_holder &effect, effect_context &ctx, const value_type &target) {    
+        void add_context(card_ptr origin_card, player_ptr origin, const effect_holder &effect, effect_context &ctx, const value_type &target) const {    
             target_cubes.add_context(origin_card, origin, effect, ctx, target.cubes);
             target_player.add_context(origin_card, origin, effect, ctx, target.player);
         }
 
-        void on_play(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const value_type &target) {
+        void on_play(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const value_type &target) const {
             target_cubes.on_play(origin_card, origin, effect, ctx, target.cubes);
             target_player.on_play(origin_card, origin, effect, ctx, target.player);
         }

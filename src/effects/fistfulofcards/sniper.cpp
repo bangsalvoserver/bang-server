@@ -8,13 +8,13 @@
 
 namespace banggame {
 
-    game_string effect_sniper::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {
+    game_string effect_sniper::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) const {
         MAYBE_RETURN(prompts::bot_check_target_enemy(origin, target, bot_suggestion::action_type::damage));
         MAYBE_RETURN(prompts::prompt_target_ghost(origin_card, origin, target));
         return {};
     }
 
-    void effect_sniper::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) {
+    void effect_sniper::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) const {
         bot_suggestion::signal_hostile_action(origin, target);
         
         target->m_game->add_log("LOG_PLAYED_CARD_ON", origin_card, origin, target);

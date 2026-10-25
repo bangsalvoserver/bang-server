@@ -6,8 +6,8 @@
 namespace banggame {
 
     struct handler_doc_holyday {
-        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, const card_list &target_cards, player_ptr target);
-        void on_play(card_ptr origin_card, player_ptr origin, const card_list &target_cards, player_ptr target);
+        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, const card_list &target_cards, player_ptr target) const;
+        void on_play(card_ptr origin_card, player_ptr origin, const card_list &target_cards, player_ptr target) const;
     };
 
     DEFINE_MTH(doc_holyday, handler_doc_holyday)

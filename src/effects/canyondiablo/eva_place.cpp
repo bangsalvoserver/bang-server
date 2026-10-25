@@ -65,7 +65,7 @@ namespace banggame {
         }
     };
 
-    void effect_eva_place::on_play(card_ptr origin_card, player_ptr origin) {
+    void effect_eva_place::on_play(card_ptr origin_card, player_ptr origin) const {
         origin->m_game->queue_request<request_eva_place>(origin_card, nullptr, origin);
     }
 }

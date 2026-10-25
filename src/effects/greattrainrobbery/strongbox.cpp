@@ -6,7 +6,7 @@
 
 namespace banggame {
 
-    void equip_strongbox::on_enable(card_ptr origin_card, player_ptr origin) {
+    void equip_strongbox::on_enable(card_ptr origin_card, player_ptr origin) const {
         origin->m_game->add_listener<event_type::on_turn_end>({origin_card, -4}, [=](player_ptr target, bool skipped) {
             if (origin == target && target->alive()) {
                 origin_card->flash_card();

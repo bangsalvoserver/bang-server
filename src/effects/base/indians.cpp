@@ -65,7 +65,7 @@ namespace banggame {
         }
     };
 
-    prompt_string effect_indians::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
+    prompt_string effect_indians::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) const {
         MAYBE_RETURN(prompts::bot_check_kill_sheriff(origin, target));
         MAYBE_RETURN(prompts::bot_check_target_enemy(origin, target, bot_suggestion::action_type::damage));
         MAYBE_RETURN(prompts::prompt_target_immunity(origin_card, origin, target, flags));
@@ -73,7 +73,7 @@ namespace banggame {
         return {};
     }
     
-    void effect_indians::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
+    void effect_indians::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) const {
         bot_suggestion::signal_hostile_action(origin, target, flags);
         
         if (!flags.check(effect_flag::target_players)) {

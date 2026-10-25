@@ -56,12 +56,12 @@ namespace banggame {
         }
     };
 
-    game_string effect_jesse_jones_legend::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target) {
+    game_string effect_jesse_jones_legend::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target) const {
         MAYBE_RETURN(prompts::bot_check_target_enemy(origin, target->owner));
         return {};
     }
 
-    void effect_jesse_jones_legend::on_play(card_ptr origin_card, player_ptr origin, card_ptr target) {
+    void effect_jesse_jones_legend::on_play(card_ptr origin_card, player_ptr origin, card_ptr target) const {
         if (target->owner->m_hand.size() == 1) {
             effect_steal{}.on_play(origin_card, origin, target);
         } else {

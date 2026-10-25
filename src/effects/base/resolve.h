@@ -16,9 +16,9 @@ namespace banggame {
         resolve_type type;
         effect_resolve(resolve_type type): type{type} {}
 
-        prompt_string on_prompt(card_ptr origin_card, player_ptr origin);
-        bool can_play(card_ptr origin_card, player_ptr origin);
-        void on_play(card_ptr origin_card, player_ptr origin);
+        prompt_string on_prompt(card_ptr origin_card, player_ptr origin) const;
+        bool can_play(card_ptr origin_card, player_ptr origin) const;
+        void on_play(card_ptr origin_card, player_ptr origin) const;
     };
 
     DEFINE_EFFECT(resolve, effect_resolve)

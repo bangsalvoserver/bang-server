@@ -6,14 +6,14 @@
 namespace banggame {
 
     struct equip_trap : event_equip {
-        game_string on_prompt(card_ptr target_card, player_ptr origin, player_ptr target);
-        void on_enable(card_ptr target_card, player_ptr target);
+        game_string on_prompt(card_ptr target_card, player_ptr origin, player_ptr target) const;
+        void on_enable(card_ptr target_card, player_ptr target) const;
     };
 
     DEFINE_EQUIP(trap, equip_trap)
 
     struct effect_trap {
-        void on_play(card_ptr origin_card, player_ptr origin);
+        void on_play(card_ptr origin_card, player_ptr origin) const;
     };
 
     DEFINE_EFFECT(trap, effect_trap)

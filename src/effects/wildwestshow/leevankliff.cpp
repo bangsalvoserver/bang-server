@@ -28,7 +28,7 @@ namespace banggame {
         }
     }
     
-    void equip_leevankliff::on_enable(card_ptr origin_card, player_ptr origin) {
+    void equip_leevankliff::on_enable(card_ptr origin_card, player_ptr origin) const {
         auto last_played = std::make_shared<card_ptr>(nullptr);
 
         origin->m_game->add_listener<event_type::on_turn_start>(origin_card, [=](player_ptr e_origin) {
@@ -63,7 +63,7 @@ namespace banggame {
         });
     }
 
-    game_string modifier_leevankliff::get_error(card_ptr origin_card, player_ptr origin, card_ptr playing_card, const effect_context &ctx) {
+    game_string modifier_leevankliff::get_error(card_ptr origin_card, player_ptr origin, card_ptr playing_card, const effect_context &ctx) const {
         card_ptr repeat_card = ctx.get<contexts::repeat_card>();
         if (!repeat_card) {
             return {"ERROR_CANT_PLAY_CARD", origin_card};
@@ -82,7 +82,7 @@ namespace banggame {
         return {};
     }
 
-    void modifier_leevankliff::add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) {
+    void modifier_leevankliff::add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) const {
         if (card_ptr last_played = origin->m_game->call_event(event_type::get_last_played_brown_card{ origin })) {
             ctx.add(contexts::repeat_card{ last_played });
             ctx.add(contexts::auto_discarded{ last_played });

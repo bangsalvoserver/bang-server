@@ -7,7 +7,7 @@
 
 namespace banggame {
 
-    void equip_henry_block::on_enable(card_ptr target_card, player_ptr p) {
+    void equip_henry_block::on_enable(card_ptr target_card, player_ptr p) const {
         p->m_game->add_listener<event_type::on_destroy_card>(target_card, [=](player_ptr origin, card_ptr e_origin_card, card_ptr discarded_card, destroy_flags &flags) {
             player_ptr target = discarded_card->owner;
             if (p == target && p != origin && flags.check(destroy_flag::intentional)) {

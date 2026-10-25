@@ -80,7 +80,7 @@ namespace banggame {
         }
     };
 
-    game_string effect_add_cube::on_prompt(card_ptr origin_card, player_ptr origin) {
+    game_string effect_add_cube::on_prompt(card_ptr origin_card, player_ptr origin) const {
         if (rn::all_of(cube_slots(origin), [](card_ptr target) {
             return target->num_cubes() == max_cubes_per_card;
         })) {
@@ -90,13 +90,13 @@ namespace banggame {
         }
     }
 
-    void effect_add_cube::on_play(card_ptr origin_card, player_ptr origin) {
+    void effect_add_cube::on_play(card_ptr origin_card, player_ptr origin) const {
         if (int num = std::min<int>(ncubes, origin->m_game->num_tokens(card_token_type::cube))) {
             origin->m_game->queue_request<request_add_cube>(origin_card, origin, num);
         }
     }
 
-    game_string effect_add_cube::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target) {
+    game_string effect_add_cube::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target) const {
         if (origin->is_bot() && target->has_tag(tag_type::penalty)) {
             return "BOT_BAD_ADD_CUBE";
         }
@@ -106,11 +106,11 @@ namespace banggame {
         return {};
     }
 
-    void effect_add_cube::on_play(card_ptr origin_card, player_ptr origin, card_ptr target) {
+    void effect_add_cube::on_play(card_ptr origin_card, player_ptr origin, card_ptr target) const {
         target->add_cubes(ncubes);
     }
 
-    bool effect_min_cubes::can_play(card_ptr origin_card, player_ptr origin) {
+    bool effect_min_cubes::can_play(card_ptr origin_card, player_ptr origin) const {
         return origin_card->num_cubes() >= ncubes;
     }
 

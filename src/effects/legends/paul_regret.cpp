@@ -9,7 +9,7 @@
 
 namespace banggame {
 
-    void equip_paul_regret_legend::on_enable(card_ptr origin_card, player_ptr origin) {
+    void equip_paul_regret_legend::on_enable(card_ptr origin_card, player_ptr origin) const {
         origin->m_game->add_listener<event_type::check_bang_target>(origin_card, [=](card_ptr e_origin_card, player_ptr e_origin, player_ptr e_target, effect_flags flags) -> game_string {
             if (e_origin_card && e_origin != e_target && e_target == origin && e_origin->m_hand.size() == 1 && flags.check(effect_flag::is_bang)) {
                 return {"ERROR_CANNOT_TARGET_PLAYER", origin_card, origin, e_origin_card};

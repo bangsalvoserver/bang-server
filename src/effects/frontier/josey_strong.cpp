@@ -6,7 +6,7 @@
 
 namespace banggame {
 
-    void effect_josey_strong::on_play(card_ptr origin_card, player_ptr origin) {
+    void effect_josey_strong::on_play(card_ptr origin_card, player_ptr origin) const {
         origin->m_game->add_listener<event_type::apply_bang_modifier>(origin_card, [=](player_ptr e_origin, shared_request_bang req) {
             if (e_origin == origin) {
                 req->unavoidable = true;

@@ -51,7 +51,7 @@ namespace banggame {
         }
     };
 
-    prompt_string effect_circus_wagon::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {
+    prompt_string effect_circus_wagon::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) const {
         if (origin->is_bot()) {
             if (bot_suggestion::is_target_enemy(origin, target)) {
                 if (rn::any_of(target->m_table, [](card_ptr target_card) {
@@ -66,7 +66,7 @@ namespace banggame {
         return {};
     }
 
-    void effect_circus_wagon::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) {
+    void effect_circus_wagon::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) const {
         origin->m_game->queue_request<request_discard_table>(origin_card, origin, target);
     }
 }

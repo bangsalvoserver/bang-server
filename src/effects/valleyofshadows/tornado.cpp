@@ -65,12 +65,12 @@ namespace banggame {
         }
     };
 
-    prompt_string effect_tornado::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
+    prompt_string effect_tornado::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) const {
         MAYBE_RETURN(prompts::prompt_target_immunity(origin_card, origin, target, flags));
         return {};
     }
     
-    void effect_tornado::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
+    void effect_tornado::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) const {
         target->m_game->queue_request<request_tornado>(origin_card, origin, target, flags);
     }
 
@@ -128,27 +128,27 @@ namespace banggame {
         }
     };
 
-    prompt_string effect_tornado2::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
+    prompt_string effect_tornado2::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) const {
         MAYBE_RETURN(prompts::prompt_target_immunity(origin_card, origin, target, flags));
         return {};
     }
     
-    void effect_tornado2::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
+    void effect_tornado2::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) const {
         target->m_game->queue_request<request_tornado2>(origin_card, origin, target, flags);
     }
 
-    bool effect_tornado2_response::can_play(card_ptr origin_card, player_ptr origin) {
+    bool effect_tornado2_response::can_play(card_ptr origin_card, player_ptr origin) const {
         return origin->m_game->top_request<request_tornado2>(target_is{origin}) != nullptr;
     }
 
-    prompt_string effect_tornado2_response::on_prompt(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
+    prompt_string effect_tornado2_response::on_prompt(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const {
         for (card_ptr target_card : ctx.get_all<contexts::selected_card>()) {
             MAYBE_RETURN(prompts::bot_check_discard_card(origin, target_card));
         }
         return {};
     }
 
-    void effect_tornado2_response::on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
+    void effect_tornado2_response::on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const {
         auto req = origin->m_game->top_request<request_tornado2>();
         req->on_resolve(ctx.get_all<contexts::selected_card>() | rn::to<card_list>());
     }

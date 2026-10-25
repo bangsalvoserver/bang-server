@@ -63,20 +63,20 @@ namespace banggame {
         }
     };
 
-    game_string handler_switch_cards::get_error(card_ptr origin_card, player_ptr origin, card_ptr chosen_card, card_ptr target_card) {
+    game_string handler_switch_cards::get_error(card_ptr origin_card, player_ptr origin, card_ptr chosen_card, card_ptr target_card) const {
         player_ptr target = target_card->owner;
         MAYBE_RETURN(get_equip_error(target_card, origin));
         MAYBE_RETURN(get_equip_error(chosen_card, target));
         return {};
     }
 
-    prompt_string handler_switch_cards::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr chosen_card, card_ptr target_card, const effect_context &ctx) {
+    prompt_string handler_switch_cards::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr chosen_card, card_ptr target_card, const effect_context &ctx) const {
         MAYBE_RETURN(prompts::bot_check_target_card(origin, target_card));
         MAYBE_RETURN(effect_equip_on{}.on_prompt(target_card, origin, origin, ctx));
         return {};
     }
 
-    void handler_switch_cards::on_play(card_ptr origin_card, player_ptr origin, card_ptr chosen_card, card_ptr target_card) {
+    void handler_switch_cards::on_play(card_ptr origin_card, player_ptr origin, card_ptr chosen_card, card_ptr target_card) const {
         bot_suggestion::signal_remove_card(origin, target_card);
         
         origin->m_game->queue_request<request_switch_cards>(origin_card, origin, chosen_card, target_card);

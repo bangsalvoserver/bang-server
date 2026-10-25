@@ -9,48 +9,48 @@
 namespace banggame {
     
     struct effect_bang {
-        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags = {}, const effect_context &ctx = {});
-        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags = {});
+        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags = {}, const effect_context &ctx = {}) const;
+        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags = {}) const;
     };
 
     DEFINE_EFFECT(bang, effect_bang)
 
     struct effect_bangcard {
-        game_string get_error(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx);
-        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx = {});
-        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags);
+        game_string get_error(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) const;
+        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx = {}) const;
+        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) const;
     };
 
     DEFINE_EFFECT(bangcard, effect_bangcard)
 
     struct effect_play_as_bang {
-        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx);
-        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx);
+        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx) const;
+        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx) const;
     };
 
     DEFINE_EFFECT(play_as_bang, effect_play_as_bang)
 
     struct effect_play_as_bangcard {
-        game_string get_error(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx);
-        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx);
-        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx);
+        game_string get_error(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) const;
+        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx) const;
+        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx) const;
     };
 
     DEFINE_EFFECT(play_as_bangcard, effect_play_as_bangcard)
 
     struct effect_banglimit {
-        game_string get_error(card_ptr origin_card, player_ptr origin, const effect_context &ctx);
-        void on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx);
+        game_string get_error(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const;
+        void on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const;
     };
 
     DEFINE_EFFECT(banglimit, effect_banglimit)
 
     struct modifier_bangmod {
-        bool valid_with_equip(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
+        bool valid_with_equip(card_ptr origin_card, player_ptr origin, card_ptr target_card) const {
             return false;
         }
-        bool valid_with_modifier(card_ptr origin_card, player_ptr origin, card_ptr target_card);
-        bool valid_with_card(card_ptr origin_card, player_ptr origin, card_ptr target_card);
+        bool valid_with_modifier(card_ptr origin_card, player_ptr origin, card_ptr target_card) const;
+        bool valid_with_card(card_ptr origin_card, player_ptr origin, card_ptr target_card) const;
     };
 
     DEFINE_MODIFIER(bangmod, modifier_bangmod)
@@ -115,8 +115,8 @@ namespace banggame {
     };
 
     struct effect_bangresponse {
-        bool can_play(card_ptr origin_card, player_ptr origin);
-        void on_play(card_ptr origin_card, player_ptr origin);
+        bool can_play(card_ptr origin_card, player_ptr origin) const;
+        void on_play(card_ptr origin_card, player_ptr origin) const;
     };
     
     DEFINE_EFFECT(bangresponse, effect_bangresponse)

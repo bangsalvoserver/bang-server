@@ -51,7 +51,7 @@ namespace banggame {
         }
     };
 
-    prompt_string effect_bandidos::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
+    prompt_string effect_bandidos::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) const {
         MAYBE_RETURN(prompts::bot_check_kill_sheriff(origin, target));
         MAYBE_RETURN(prompts::prompt_target_immunity(origin_card, origin, target, flags));
         if (origin == target && !origin->is_ghost()) {
@@ -65,15 +65,15 @@ namespace banggame {
         return {};
     }
 
-    void effect_bandidos::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
+    void effect_bandidos::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) const {
         target->m_game->queue_request<request_bandidos>(origin_card, origin, target, flags);
     }
 
-    bool effect_bandidos_response::can_play(card_ptr origin_card, player_ptr origin) {
+    bool effect_bandidos_response::can_play(card_ptr origin_card, player_ptr origin) const {
         return origin->m_game->top_request<request_bandidos>(target_is{origin}) != nullptr;
     }
 
-    void effect_bandidos_response::on_play(card_ptr origin_card, player_ptr origin) {
+    void effect_bandidos_response::on_play(card_ptr origin_card, player_ptr origin) const {
         auto req = origin->m_game->top_request<request_bandidos>();
         req->pop_request();
     }
@@ -112,20 +112,20 @@ namespace banggame {
         }
     };
     
-    prompt_string effect_bandidos2::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
+    prompt_string effect_bandidos2::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) const {
         MAYBE_RETURN(prompts::prompt_target_immunity(origin_card, origin, target, flags));
         return {};
     }
 
-    void effect_bandidos2::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
+    void effect_bandidos2::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) const {
         target->m_game->queue_request<request_bandidos2>(origin_card, origin, target, flags);
     }
 
-    bool effect_bandidos2_response::can_play(card_ptr origin_card, player_ptr origin) {
+    bool effect_bandidos2_response::can_play(card_ptr origin_card, player_ptr origin) const {
         return origin->m_game->top_request<request_bandidos2>(target_is{origin}) != nullptr;
     }
 
-    void effect_bandidos2_response::on_play(card_ptr origin_card, player_ptr origin) {
+    void effect_bandidos2_response::on_play(card_ptr origin_card, player_ptr origin) const {
         auto req = origin->m_game->top_request<request_bandidos2>();
         req->pop_request();
     }

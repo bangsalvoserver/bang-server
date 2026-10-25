@@ -6,7 +6,7 @@
 
 namespace banggame {
 
-    bool effect_card_choice::can_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
+    bool effect_card_choice::can_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const {
         if (ctx.contains<contexts::repeat_card>()) {
             return true;
         }
@@ -16,12 +16,12 @@ namespace banggame {
         return false;
     }
 
-    bool modifier_card_choice::valid_with_card(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
+    bool modifier_card_choice::valid_with_card(card_ptr origin_card, player_ptr origin, card_ptr target_card) const {
         return target_card->pocket == pocket_type::hidden_deck
             && target_card->get_tag_value(tag_type::card_choice) == origin_card->get_tag_value(tag_type::card_choice);
     }
 
-    void modifier_card_choice::add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) {
+    void modifier_card_choice::add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) const {
         ctx.add(contexts::card_choice{ origin_card });
     }
 }

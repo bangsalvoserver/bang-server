@@ -7,7 +7,7 @@
 
 namespace banggame {
 
-    game_string equip_wanted::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {
+    game_string equip_wanted::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) const {
         MAYBE_RETURN(prompts::bot_check_target_enemy(origin, target, bot_suggestion::action_type::jail));
         MAYBE_RETURN(prompts::prompt_target_ghost(origin_card, origin, target));
         MAYBE_RETURN(prompts::prompt_target_self(origin_card, origin, target));
@@ -18,7 +18,7 @@ namespace banggame {
         }
     }
 
-    void equip_wanted::on_enable(card_ptr target_card, player_ptr p) {
+    void equip_wanted::on_enable(card_ptr target_card, player_ptr p) const {
         p->m_game->add_listener<event_type::on_player_eliminated>({target_card, 3}, [p, target_card](player_ptr origin, player_ptr target, death_type type) {
             if (type == death_type::death && origin && origin->alive() && p == target && origin != target) {
                 target_card->flash_card();

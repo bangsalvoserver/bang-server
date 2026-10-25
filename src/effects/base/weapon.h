@@ -11,9 +11,9 @@ namespace banggame {
         int range;
         equip_weapon(int range): range(range) {}
 
-        game_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target);
-        void on_enable(card_ptr target_card, player_ptr target);
-        void on_disable(card_ptr target_card, player_ptr target);
+        game_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) const;
+        void on_enable(card_ptr target_card, player_ptr target) const;
+        void on_disable(card_ptr target_card, player_ptr target) const;
     };
 
     DEFINE_EQUIP(weapon, equip_weapon)

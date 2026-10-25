@@ -6,8 +6,8 @@
 namespace banggame {
 
     struct effect_ricochet {
-        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target);
-        void on_play(card_ptr origin_card, player_ptr origin, card_ptr target);
+        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target) const;
+        void on_play(card_ptr origin_card, player_ptr origin, card_ptr target) const;
     };
 
     DEFINE_EFFECT(ricochet, effect_ricochet)

@@ -42,7 +42,7 @@ namespace banggame {
         }
     };
 
-    game_string effect_cattle_truck::on_prompt(card_ptr origin_card, player_ptr origin) {
+    game_string effect_cattle_truck::on_prompt(card_ptr origin_card, player_ptr origin) const {
         if (origin->m_game->m_discards.empty()) {
             return {"PROMPT_CARD_NO_EFFECT", origin_card};
         } else {
@@ -50,7 +50,7 @@ namespace banggame {
         }
     }
 
-    void effect_cattle_truck::on_play(card_ptr origin_card, player_ptr origin) {
+    void effect_cattle_truck::on_play(card_ptr origin_card, player_ptr origin) const {
         origin->m_game->queue_request<request_cattle_truck>(origin_card, origin);
     }
 }

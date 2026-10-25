@@ -75,14 +75,14 @@ namespace banggame {
         using request_duel_base::request_duel_base;
     };
 
-    prompt_string effect_duel::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
+    prompt_string effect_duel::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) const {
         MAYBE_RETURN(prompts::bot_check_target_enemy(origin, target, bot_suggestion::action_type::damage));
         MAYBE_RETURN(prompts::prompt_target_immunity(origin_card, origin, target, flags));
         MAYBE_RETURN(prompts::prompt_target_ghost(origin_card, origin, target));
         return {};
     }
 
-    void effect_duel::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
+    void effect_duel::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) const {
         bot_suggestion::signal_hostile_action(origin, target, flags);
         
         target->m_game->add_log("LOG_PLAYED_CARD_ON", origin_card, origin, target);

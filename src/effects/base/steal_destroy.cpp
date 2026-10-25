@@ -16,14 +16,14 @@
 
 namespace banggame {
 
-    game_string effect_steal::get_error(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
+    game_string effect_steal::get_error(card_ptr origin_card, player_ptr origin, card_ptr target_card) const {
         if (target_card->pocket == pocket_type::player_table && target_card->owner != origin && target_card->is_train()) {
             MAYBE_RETURN(get_equip_error(target_card, origin));
         }
         return {};
     }
 
-    prompt_string effect_steal::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card, effect_flags flags) {
+    prompt_string effect_steal::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card, effect_flags flags) const {
         MAYBE_RETURN(prompts::bot_check_target_card(origin, target_card));
         MAYBE_RETURN(prompts::prompt_target_immunity(origin_card, origin, target_card->owner, flags));
 
@@ -126,25 +126,25 @@ namespace banggame {
         }
     };
 
-    void effect_steal::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card, effect_flags flags) {
+    void effect_steal::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card, effect_flags flags) const {
         bot_suggestion::signal_remove_card(origin, target_card, flags);
 
         origin->m_game->queue_request<request_steal>(origin_card, origin, target_card, flags);
     }
 
-    void effect_discard::add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) {
+    void effect_discard::add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) const {
         ctx.add(contexts::auto_discarded{ origin_card });
     }
 
-    void effect_discard::on_play(card_ptr origin_card, player_ptr origin) {
+    void effect_discard::on_play(card_ptr origin_card, player_ptr origin) const {
         origin->discard_used_card(origin_card);
     }
 
-    game_string effect_discard::get_error(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
+    game_string effect_discard::get_error(card_ptr origin_card, player_ptr origin, card_ptr target_card) const {
         return get_use_card_error(origin, target_card);
     }
 
-    game_string effect_discard::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
+    game_string effect_discard::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card) const {
         if (origin->is_bot() && target_card->has_tag(tag_type::strong)) {
             return "BOT_DONT_DISCARD_STRONG";
         }
@@ -157,7 +157,7 @@ namespace banggame {
         return {};
     }
 
-    void effect_discard::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
+    void effect_discard::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card) const {
         player_ptr target_player = target_card->owner;
         if (origin != target_player) {
             origin->m_game->add_log("LOG_DISCARDED_CARD", origin, target_player, target_card);
@@ -167,7 +167,7 @@ namespace banggame {
         target_player->discard_used_card(target_card);
     }
 
-    game_string effect_discard_hand::on_prompt(card_ptr origin_card, player_ptr origin) {
+    game_string effect_discard_hand::on_prompt(card_ptr origin_card, player_ptr origin) const {
         if (origin->is_bot()) {
             possible_to_play state{origin};
             if (rn::any_of(origin->m_hand, [&](card_ptr c) { return state.check(c); })) {
@@ -179,11 +179,11 @@ namespace banggame {
         return {};
     }
     
-    void effect_discard_hand::on_play(card_ptr origin_card, player_ptr origin) {
+    void effect_discard_hand::on_play(card_ptr origin_card, player_ptr origin) const {
         origin->m_game->queue_request<request_discard_hand>(origin_card, origin, origin);
     }
 
-    prompt_string effect_destroy::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card, effect_flags flags) {
+    prompt_string effect_destroy::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card, effect_flags flags) const {
         MAYBE_RETURN(prompts::bot_check_target_card(origin, target_card));
         MAYBE_RETURN(prompts::prompt_target_self_card(origin_card, origin, target_card));
         MAYBE_RETURN(prompts::prompt_target_immunity(origin_card, origin, target_card->owner, flags));
@@ -264,7 +264,7 @@ namespace banggame {
         }
     };
     
-    void effect_destroy::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card, effect_flags flags) {
+    void effect_destroy::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card, effect_flags flags) const {
         bot_suggestion::signal_remove_card(origin, target_card, flags);
         
         origin->m_game->queue_request<request_destroy>(origin_card, origin, target_card, flags);

@@ -40,7 +40,7 @@ namespace banggame {
         return target->m_game->call_event(event_type::check_card_taker{ target, card_taker_type::draw_check_select });
     }
     
-    void equip_laura_billion::on_enable(card_ptr target_card, player_ptr player_end) {
+    void equip_laura_billion::on_enable(card_ptr target_card, player_ptr player_end) const {
         player_end->m_game->add_listener<event_type::check_card_taker>(target_card, [=](player_ptr e_target, card_taker_type type) -> card_ptr {
             if (type == card_taker_type::draw_check_select && e_target == player_end) {
                 return target_card;
@@ -60,11 +60,11 @@ namespace banggame {
         });
     }
 
-    bool effect_laura_billion::can_play(card_ptr origin_card, player_ptr origin) {
+    bool effect_laura_billion::can_play(card_ptr origin_card, player_ptr origin) const {
         return origin->m_game->top_request<request_laura_billion>(target_is{origin}) != nullptr;
     }
 
-    void effect_laura_billion::on_play(card_ptr origin_card, player_ptr origin) {
+    void effect_laura_billion::on_play(card_ptr origin_card, player_ptr origin) const {
         auto req = origin->m_game->top_request<request_laura_billion>();
         card_ptr target_card = req->target_card;
         req->pop_request();

@@ -7,11 +7,11 @@
 
 namespace banggame {
 
-    bool targeting_player_per_cube::is_possible(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) {
+    bool targeting_player_per_cube::is_possible(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
         return contains_at_least(target_player.possible_targets(origin_card, origin, effect, ctx), extra_players);
     }
 
-    targeting_player_per_cube::value_type targeting_player_per_cube::random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) {
+    targeting_player_per_cube::value_type targeting_player_per_cube::random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
         auto players = target_player.possible_targets(origin_card, origin, effect, ctx);
         
         size_t max_count = std::min<size_t>(count_cubes(origin), rn::distance(players) - static_cast<size_t>(extra_players));
@@ -22,7 +22,7 @@ namespace banggame {
         return { std::move(random_cubes), std::move(random_players) };
     }
 
-    game_string targeting_player_per_cube::get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const value_type &target) {
+    game_string targeting_player_per_cube::get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const value_type &target) const {
         for (card_ptr c : target.cubes) {
             if (c->owner != origin) {
                 return {"ERROR_TARGET_NOT_SELF", origin_card};
@@ -45,7 +45,7 @@ namespace banggame {
         return flags;
     }
 
-    prompt_string targeting_player_per_cube::on_prompt(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const value_type &target) {
+    prompt_string targeting_player_per_cube::on_prompt(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const value_type &target) const {
         effect_flags flags = get_flags(target);
 
         return prompts::select_prompt(rv::concat(
@@ -57,14 +57,14 @@ namespace banggame {
         ));
     }
 
-    void targeting_player_per_cube::add_context(card_ptr origin_card, player_ptr origin, const effect_holder &effect, effect_context &ctx, const value_type &target) {
+    void targeting_player_per_cube::add_context(card_ptr origin_card, player_ptr origin, const effect_holder &effect, effect_context &ctx, const value_type &target) const {
         target_cubes.add_context(origin_card, origin, effect, ctx, target.cubes);
         for (player_ptr target : target.players) {
             target_player.add_context(origin_card, origin, effect, ctx, target);
         }
     }
 
-    void targeting_player_per_cube::on_play(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const value_type &target) {
+    void targeting_player_per_cube::on_play(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const value_type &target) const {
         effect_flags flags = get_flags(target);
 
         target_cubes.on_play(origin_card, origin, effect, ctx, target.cubes);

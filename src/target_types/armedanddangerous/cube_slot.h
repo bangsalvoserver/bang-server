@@ -22,7 +22,7 @@ namespace banggame {
             return args { player_filter, stealing };
         }
         
-        auto possible_targets(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) {
+        auto possible_targets(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
             return origin->m_game->m_players
                 | rv::for_each([](player_ptr target) {
                     return rv::concat(
@@ -35,8 +35,8 @@ namespace banggame {
                 });
         }
 
-        void add_context(card_ptr origin_card, player_ptr origin, const effect_holder &effect, effect_context &ctx, card_ptr target);
-        game_string get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, card_ptr target);
+        void add_context(card_ptr origin_card, player_ptr origin, const effect_holder &effect, effect_context &ctx, card_ptr target) const;
+        game_string get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, card_ptr target) const;
     };
 
     DEFINE_TARGETING(cube_slot, targeting_cube_slot)

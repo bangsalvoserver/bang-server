@@ -4,7 +4,7 @@
 
 namespace banggame {
 
-    game_string targeting_card::get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, card_ptr target) {
+    game_string targeting_card::get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, card_ptr target) const {
         if (target->owner) {
             MAYBE_RETURN(check_player_filter(origin_card, origin, player_filter, target->owner, ctx));
         }
@@ -15,16 +15,16 @@ namespace banggame {
         return {};
     }
 
-    prompt_string targeting_card::on_prompt(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, card_ptr target) {
+    prompt_string targeting_card::on_prompt(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, card_ptr target) const {
         return effect.on_prompt(origin_card, origin, target, effect_flag::single_target, ctx);
     }
 
-    void targeting_card::add_context(card_ptr origin_card, player_ptr origin, const effect_holder &effect, effect_context &ctx, card_ptr target) {
+    void targeting_card::add_context(card_ptr origin_card, player_ptr origin, const effect_holder &effect, effect_context &ctx, card_ptr target) const {
         ctx.add(contexts::selected_card{ target });
         effect.add_context(origin_card, origin, target, ctx);
     }
 
-    void targeting_card::on_play(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, card_ptr target) {
+    void targeting_card::on_play(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, card_ptr target) const {
         effect.on_play(origin_card, origin, target, effect_flag::single_target, ctx);
     }
 

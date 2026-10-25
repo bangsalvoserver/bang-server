@@ -27,7 +27,7 @@ namespace banggame {
         }
     };
 
-    void equip_alexander_noon::on_enable(card_ptr target_card, player_ptr target) {
+    void equip_alexander_noon::on_enable(card_ptr target_card, player_ptr target) const {
         target->m_game->add_listener<event_type::on_draw_check_start>({ target_card, -1 }, [=](player_ptr origin, shared_request_check req) {
             if (req->target == target && !req->drawn_card && !req->handlers.contains(target_card)) {
                 req->handlers.add(target_card);
@@ -78,11 +78,11 @@ namespace banggame {
         }
     };
 
-    bool effect_alexander_noon::can_play(card_ptr origin_card, player_ptr origin) {
+    bool effect_alexander_noon::can_play(card_ptr origin_card, player_ptr origin) const {
         return origin->m_game->top_request<request_alexander_noon>(target_is{origin}) != nullptr;
     }
 
-    void effect_alexander_noon::on_play(card_ptr origin_card, player_ptr origin) {
+    void effect_alexander_noon::on_play(card_ptr origin_card, player_ptr origin) const {
         auto req = origin->m_game->top_request<request_alexander_noon>();
         req->pop_request();
         origin->m_game->queue_request<request_alexander_noon_draw>(origin_card, origin, std::move(req->req));

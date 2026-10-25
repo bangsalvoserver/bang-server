@@ -17,10 +17,10 @@ namespace banggame {
     };
 
     struct effect_generalstore {
-        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags);
+        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) const;
         
-        void on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx);
-        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx);
+        void on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const;
+        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx) const;
     };
 
     DEFINE_EFFECT(generalstore, effect_generalstore)

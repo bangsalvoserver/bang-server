@@ -15,10 +15,10 @@ namespace banggame {
         int amount;
         effect_add_gold(int amount): amount{amount} {}
 
-        void on_play(card_ptr origin_card, player_ptr origin) {
+        void on_play(card_ptr origin_card, player_ptr origin) const {
             on_play(origin_card, origin, origin);
         }
-        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target);
+        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target) const;
     };
 
     DEFINE_EFFECT(add_gold, effect_add_gold)

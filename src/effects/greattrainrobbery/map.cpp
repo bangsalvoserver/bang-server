@@ -71,7 +71,7 @@ namespace banggame {
         }
     };
 
-    void equip_map::on_enable(card_ptr origin_card, player_ptr origin) {
+    void equip_map::on_enable(card_ptr origin_card, player_ptr origin) const {
         origin->m_game->add_listener<event_type::on_turn_start>({origin_card, -5}, [=](player_ptr target) {
             if (origin == target) {
                 origin->m_game->queue_request<request_map>(origin_card, origin);

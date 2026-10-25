@@ -9,7 +9,7 @@
 
 namespace banggame {
 
-    void equip_clash_the_stampede::on_enable(card_ptr origin_card, player_ptr target) {
+    void equip_clash_the_stampede::on_enable(card_ptr origin_card, player_ptr target) const {
         target->m_game->add_listener<event_type::on_turn_start>({origin_card, -2}, [=](player_ptr origin) {
             if (target == origin) {
                 size_t max_num_cards = rn::max(target->m_game->m_players | rv::transform([](player_ptr p) {

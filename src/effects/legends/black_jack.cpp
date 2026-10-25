@@ -23,7 +23,7 @@ namespace banggame {
         }
     }
 
-    void effect_black_jack_legend::on_play(card_ptr origin_card, player_ptr origin) {
+    void effect_black_jack_legend::on_play(card_ptr origin_card, player_ptr origin) const {
         int sum = 0;
         while (sum <= 21) {
             card_ptr drawn_card = origin->m_game->top_of_deck();

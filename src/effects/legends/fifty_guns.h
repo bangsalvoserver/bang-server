@@ -8,7 +8,7 @@
 namespace banggame {
 
     struct equip_fifty_guns : feat_equip {
-        void on_enable(card_ptr target_card, player_ptr target);
+        void on_enable(card_ptr target_card, player_ptr target) const;
     };
 
     DEFINE_EQUIP(fifty_guns, equip_fifty_guns)

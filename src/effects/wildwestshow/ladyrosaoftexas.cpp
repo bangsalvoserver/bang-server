@@ -15,7 +15,7 @@ namespace banggame {
         }
     }
 
-    game_string effect_ladyrosaoftexas::get_error(card_ptr origin_card, player_ptr origin) {
+    game_string effect_ladyrosaoftexas::get_error(card_ptr origin_card, player_ptr origin) const {
         if (origin->m_game->num_alive() <= 2) {
             return {"ERROR_CANT_PLAY_CARD", origin_card};
         } else {
@@ -23,12 +23,12 @@ namespace banggame {
         }
     }
 
-    game_string effect_ladyrosaoftexas::on_prompt(card_ptr origin_card, player_ptr origin) {
+    game_string effect_ladyrosaoftexas::on_prompt(card_ptr origin_card, player_ptr origin) const {
         MAYBE_RETURN(prompts::bot_check_target_enemy(origin, get_swapping_player(origin)));
         return {};
     }
 
-    void effect_ladyrosaoftexas::on_play(card_ptr origin_card, player_ptr origin) {
+    void effect_ladyrosaoftexas::on_play(card_ptr origin_card, player_ptr origin) const {
         player_ptr target = get_swapping_player(origin);
         target->add_player_flags(player_flag::skip_turn);
         std::iter_swap(

@@ -4,7 +4,7 @@
 
 namespace banggame {
 
-    void effect_evaded::on_play(card_ptr origin_card, player_ptr origin) {
+    void effect_evaded::on_play(card_ptr origin_card, player_ptr origin) const {
         card_ptr target_card = origin->m_game->top_request()->origin_card;
         
         effect_missed::on_play(origin_card, origin);

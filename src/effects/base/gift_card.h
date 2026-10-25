@@ -13,8 +13,8 @@ namespace banggame {
             : used{used}
             , forced_response{forced_response} {}
 
-        game_string on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card, player_ptr target);
-        void on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card, player_ptr target);
+        game_string on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card, player_ptr target) const;
+        void on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card, player_ptr target) const;
     };
 
     DEFINE_MTH(gift_card, handler_gift_card)

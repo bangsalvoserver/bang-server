@@ -8,15 +8,15 @@
 
 namespace banggame {
 
-    bool effect_pick::can_play(card_ptr origin_card, player_ptr origin) {
+    bool effect_pick::can_play(card_ptr origin_card, player_ptr origin) const {
         return origin->m_game->top_request<interface_picking>(target_is{origin}) != nullptr;
     }
 
-    prompt_string effect_pick::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target) {
+    prompt_string effect_pick::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target) const {
         return origin->m_game->top_request<interface_picking>()->pick_prompt(target);
     }
 
-    void effect_pick::on_play(card_ptr origin_card, player_ptr origin, card_ptr target) {
+    void effect_pick::on_play(card_ptr origin_card, player_ptr origin, card_ptr target) const {
         auto req = origin->m_game->top_request<interface_picking>();
         req->on_pick(target);
     }
@@ -40,15 +40,15 @@ namespace banggame {
         return target_player->alive() && can_pick(target_player);
     }
 
-    bool effect_pick_player::can_play(card_ptr origin_card, player_ptr origin) {
+    bool effect_pick_player::can_play(card_ptr origin_card, player_ptr origin) const {
         return origin->m_game->top_request<interface_picking_player>(target_is{origin}) != nullptr;
     }
 
-    prompt_string effect_pick_player::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {
+    prompt_string effect_pick_player::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) const {
         return origin->m_game->top_request<interface_picking_player>()->pick_prompt(target);
     }
 
-    void effect_pick_player::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) {
+    void effect_pick_player::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) const {
         auto req = origin->m_game->top_request<interface_picking_player>();
         req->on_pick(target);
     }

@@ -16,12 +16,12 @@ namespace banggame {
             });
     }
 
-    bool targeting_move_cube_slot::is_possible(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) {
+    bool targeting_move_cube_slot::is_possible(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
         return origin->get_character()->num_cubes() != 0
             && contains_at_least(make_move_cube_target_set(origin, origin_card, ctx), 1);
     }
 
-    card_list targeting_move_cube_slot::random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) {
+    card_list targeting_move_cube_slot::random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
         return sample_elements(
             make_move_cube_target_set(origin, origin_card, ctx),
             std::min(origin->get_character()->num_cubes(), max_cubes),
@@ -29,7 +29,7 @@ namespace banggame {
         );
     }
 
-    game_string targeting_move_cube_slot::get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &targets) {
+    game_string targeting_move_cube_slot::get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &targets) const {
         if (targets.empty() || targets.size() > max_cubes) {
             return "ERROR_INVALID_TARGETS";
         }
@@ -52,7 +52,7 @@ namespace banggame {
         return {};
     }
 
-    void targeting_move_cube_slot::on_play(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &targets) {
+    void targeting_move_cube_slot::on_play(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &targets) const {
         if (rn::all_of(targets, [first=targets.front()](card_ptr target_card) { return target_card == first; })) {
             origin->get_character()->move_cubes(targets.front(), static_cast<int>(targets.size()));
         } else {

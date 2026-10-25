@@ -19,7 +19,7 @@ namespace banggame {
         );
     }
 
-    card_list targeting_card_per_player::random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) {
+    card_list targeting_card_per_player::random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
         card_list ret;
         player_ptr skipped_player = ctx.get<contexts::skipped_player>();
         for (player_ptr target : origin->m_game->range_all_players(origin)) {
@@ -32,7 +32,7 @@ namespace banggame {
         return ret;
     }
 
-    game_string targeting_card_per_player::get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &target_cards) {
+    game_string targeting_card_per_player::get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &target_cards) const {
         player_ptr skipped_player = ctx.get<contexts::skipped_player>();
         if (skipped_player && check_player_filter(origin_card, origin, player_filter, skipped_player, ctx)) {
             return {"ERROR_CANNOT_SKIP_PLAYER", skipped_player};
@@ -61,7 +61,7 @@ namespace banggame {
         return flags;
     }
 
-    prompt_string targeting_card_per_player::on_prompt(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &target_cards) {
+    prompt_string targeting_card_per_player::on_prompt(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &target_cards) const {
         if (target_cards.empty()) {
             return {"PROMPT_CARD_NO_EFFECT", origin_card};
         }
@@ -71,13 +71,13 @@ namespace banggame {
         }));
     }
 
-    void targeting_card_per_player::add_context(card_ptr origin_card, player_ptr origin, const effect_holder &effect, effect_context &ctx, const card_list &target_cards) {
+    void targeting_card_per_player::add_context(card_ptr origin_card, player_ptr origin, const effect_holder &effect, effect_context &ctx, const card_list &target_cards) const {
         for (card_ptr target_card : target_cards) {
             effect.add_context(origin_card, origin, target_card, ctx);
         }
     }
 
-    void targeting_card_per_player::on_play(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &target_cards) {
+    void targeting_card_per_player::on_play(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &target_cards) const {
         effect_flags flags = get_flags(target_cards);
         for (card_ptr target_card : target_cards) {
             if (target_card->pocket == pocket_type::player_hand) {

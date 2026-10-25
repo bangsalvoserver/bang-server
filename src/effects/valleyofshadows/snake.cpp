@@ -9,13 +9,13 @@
 
 namespace banggame {
 
-    game_string equip_snake::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {
+    game_string equip_snake::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) const {
         MAYBE_RETURN(prompts::bot_check_target_enemy(origin, target));
         MAYBE_RETURN(prompts::prompt_target_self(origin_card, origin, target));
         return {};
     }
     
-    void equip_snake::on_enable(card_ptr target_card, player_ptr target) {
+    void equip_snake::on_enable(card_ptr target_card, player_ptr target) const {
         target->m_game->add_listener<event_type::on_predraw_check>(target_card, [=](player_ptr p, card_ptr e_card) {
             if (p == target && e_card == target_card) {
                 target->m_game->queue_request<request_check>(target, target_card, [=](card_sign sign) {

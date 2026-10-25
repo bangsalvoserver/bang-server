@@ -53,7 +53,7 @@ namespace banggame {
         }
     };
 
-    void equip_thedaltons::on_enable(card_ptr target_card, player_ptr target) {
+    void equip_thedaltons::on_enable(card_ptr target_card, player_ptr target) const {
         for (player_ptr p : target->m_game->range_alive_players(target)) {
             if (rn::any_of(p->m_table, &card::is_blue)) {
                 p->m_game->queue_request<request_thedaltons>(target_card, p);

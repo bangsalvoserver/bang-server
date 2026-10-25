@@ -6,7 +6,7 @@
 
 namespace banggame {
 
-    void equip_dragoon::on_enable(card_ptr origin_card, player_ptr origin) {
+    void equip_dragoon::on_enable(card_ptr origin_card, player_ptr origin) const {
         origin->m_game->add_listener<event_type::count_bangs_played>(origin_card, [=](const_player_ptr target, int &value, bool real_count) {
             if (origin == target && !real_count) {
                 --value;
@@ -14,7 +14,7 @@ namespace banggame {
         });
     }
 
-    void equip_dragoon::on_disable(card_ptr origin_card, player_ptr origin) {
+    void equip_dragoon::on_disable(card_ptr origin_card, player_ptr origin) const {
         origin->m_game->remove_listeners({origin_card, 0});
     }
 }

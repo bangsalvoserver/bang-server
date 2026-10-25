@@ -9,7 +9,7 @@ namespace banggame {
         card_suit suit;
         equip_suit_modifier(card_suit suit): suit{suit} {}
 
-        void on_enable(card_ptr target_card, player_ptr target);
+        void on_enable(card_ptr target_card, player_ptr target) const;
     };
 
     DEFINE_EQUIP(suit_modifier, equip_suit_modifier)
