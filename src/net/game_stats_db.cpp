@@ -19,6 +19,7 @@ namespace game_stats {
             s_connection.exec_sql(R"SQL(
                 CREATE TABLE IF NOT EXISTS games(
                     game_id INTEGER PRIMARY KEY,
+                    lobby_name TEXT NOT NULL,
                     started_at INTEGER NOT NULL,
                     ended_at INTEGER NOT NULL,
                     num_players INTEGER NOT NULL,
@@ -65,15 +66,16 @@ namespace game_stats {
         try {
             {
                 auto stmt = s_connection.prepare(
-                    "INSERT INTO games (game_id, started_at, ended_at, num_players, num_rounds, options) "
-                    "VALUES (?1, ?2, ?3, ?4, ?5, ?6)"
+                    "INSERT INTO games (game_id, lobby_name, started_at, ended_at, num_players, num_rounds, options) "
+                    "VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)"
                 );
                 stmt.bind(1, report.game_id);
-                stmt.bind(2, report.started_at);
-                stmt.bind(3, report.ended_at);
-                stmt.bind(4, report.num_players);
-                stmt.bind(5, report.num_rounds);
-                stmt.bind(6, json::to_string(report.options));
+                stmt.bind(2, report.lobby_name);
+                stmt.bind(3, report.started_at);
+                stmt.bind(4, report.ended_at);
+                stmt.bind(5, report.num_players);
+                stmt.bind(6, report.num_rounds);
+                stmt.bind(7, json::to_string(report.options));
                 stmt.step();
             }
 
@@ -94,7 +96,7 @@ namespace game_stats {
             game_report report;
             {
                 auto stmt = s_connection.prepare(
-                    "SELECT game_id, started_at, ended_at, num_players, num_rounds, options "
+                    "SELECT game_id, lobby_name, started_at, ended_at, num_players, num_rounds, options "
                     "FROM games WHERE game_id = ?1"
                 );
                 stmt.bind(1, game_id);
@@ -102,11 +104,12 @@ namespace game_stats {
                     return std::nullopt;
                 }
                 report.game_id = stmt.column_int(0);
-                report.started_at = stmt.column_int64(1);
-                report.ended_at = stmt.column_int64(2);
-                report.num_players = stmt.column_int(3);
-                report.num_rounds = stmt.column_int(4);
-                report.options = json::parse_string<game_options>(stmt.column_text(5));
+                report.lobby_name = stmt.column_text(1);
+                report.started_at = stmt.column_int64(2);
+                report.ended_at = stmt.column_int64(3);
+                report.num_players = stmt.column_int(4);
+                report.num_rounds = stmt.column_int(5);
+                report.options = json::parse_string<game_options>(stmt.column_text(6));
             }
 
             auto stmt = s_connection.prepare("SELECT player_report FROM game_players WHERE game_id = ?1");

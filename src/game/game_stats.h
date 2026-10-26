@@ -47,6 +47,7 @@ namespace banggame {
 
     struct game_report {
         int game_id = 0;
+        std::string lobby_name;
         int64_t started_at = 0;
         int64_t ended_at = 0;
         int num_players = 0;
