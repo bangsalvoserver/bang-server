@@ -1,0 +1,32 @@
+#ifndef __VLCATA_EFFECTS_H__
+#define __VLCATA_EFFECTS_H__
+
+#include "ruleset.h"
+#include "horous.h"
+#include "miki.h"
+#include "martin.h"
+#include "tuctuc.h"
+#include "elis.h"
+#include "vudce.h"
+#include "jednorucka_rizek.h"
+#include "petuna.h"
+#include "smig.h"
+#include "cyril.h"
+#include "vena.h"
+#include "bejcek.h"
+#include "verca.h"
+#include "helena.h"
+#include "terka_p.h"
+#include "julka.h"
+#include "simi.h"
+#include "libor.h"
+#include "el_bagito.h"
+#include "krecek.h"
+#include "edie.h"
+#include "patka.h"
+#include "kotel.h"
+#include "termit.h"
+#include "sitej.h"
+#include "budha.h"
+
+#endif
