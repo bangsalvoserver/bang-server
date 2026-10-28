@@ -11,7 +11,7 @@
 
 namespace banggame {
 
-    void ruleset_fistfulofcards::on_apply(game_ptr game) {
+    void ruleset_fistfulofcards::on_apply(game_ptr game) const {
         if (!game->m_options.expansions.contains(GET_RULESET(highnoon))) {
             ruleset_highnoon{}.on_apply(game);
         }

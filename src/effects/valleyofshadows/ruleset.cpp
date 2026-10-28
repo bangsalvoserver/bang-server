@@ -17,7 +17,7 @@ namespace banggame {
 
     using namespace std::string_view_literals;
 
-    void ruleset_valleyofshadows::on_apply(game_ptr game) {
+    void ruleset_valleyofshadows::on_apply(game_ptr game) const {
         game->add_listener<event_type::apply_escapable_modifier>({nullptr, -1},
             [](card_ptr origin_card, player_ptr origin, const_player_ptr target, effect_flags flags, const interface_escapable &req) -> escape_type {
                 if (!target->empty_hand()
@@ -40,7 +40,7 @@ namespace banggame {
         }
     }
 
-    void ruleset_udolistinu::on_apply(game_ptr game) {
+    void ruleset_udolistinu::on_apply(game_ptr game) const {
         game->add_listener<event_type::apply_escapable_modifier>({nullptr, -1},
             [](card_ptr origin_card, player_ptr origin, const_player_ptr target, effect_flags flags, const interface_escapable &req) -> escape_type {
                 if (!target->empty_hand()
@@ -63,7 +63,7 @@ namespace banggame {
         }
     }
 
-    bool ruleset_udolistinu::is_valid_with(const expansion_set &set) {
+    bool ruleset_udolistinu::is_valid_with(const expansion_set &set) const {
         return !set.contains(GET_RULESET(valleyofshadows));
     }
 }

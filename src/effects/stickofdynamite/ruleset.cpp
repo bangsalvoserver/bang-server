@@ -29,7 +29,7 @@ namespace banggame {
         return nullptr;
     }
 
-    void ruleset_stickofdynamite::on_apply(game_ptr game) {
+    void ruleset_stickofdynamite::on_apply(game_ptr game) const {
         game->add_listener<event_type::on_game_setup>({nullptr, 20}, [=](player_ptr origin){
             origin->add_player_flags(player_flag::stick_of_dynamite);
 

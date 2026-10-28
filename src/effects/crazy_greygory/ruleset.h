@@ -6,7 +6,7 @@
 namespace banggame {
 
     struct ruleset_crazy_greygory {
-        void on_apply(game_ptr game);
+        void on_apply(game_ptr game) const;
     };
 
     DEFINE_RULESET(crazy_greygory, ruleset_crazy_greygory)

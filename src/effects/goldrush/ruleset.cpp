@@ -41,7 +41,7 @@ namespace banggame {
         return target_card->get_tag_value(tag_type::buy_cost).value_or(0) - ctx.contains<contexts::discount>();
     }
     
-    void ruleset_goldrush::on_apply(game_ptr game) {
+    void ruleset_goldrush::on_apply(game_ptr game) const {
         game->add_listener<event_type::on_game_setup>({nullptr, 2}, [](player_ptr origin){
             origin->m_game->add_tokens(card_token_type::gold, 30, token_positions::table{});
             for (int i=0; i<3; ++i) {
@@ -113,7 +113,7 @@ namespace banggame {
         return alive_count == 2 && has_sheriff && has_renegade;
     }
 
-    void ruleset_shadowgunslingers::on_apply(game_ptr game) {
+    void ruleset_shadowgunslingers::on_apply(game_ptr game) const {
         game->add_listener<event_type::check_revivers>({nullptr, -2}, [](player_ptr target) {
             if (!target->alive() && !only_sheriff_and_renegade_alive(target)) {
                 target->m_game->add_log("LOG_SHADOW_GUNSLINGER", target);

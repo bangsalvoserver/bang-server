@@ -6,7 +6,7 @@
 namespace banggame {
 
     struct ruleset_goldrush {
-        void on_apply(game_ptr game);
+        void on_apply(game_ptr game) const;
     };
 
     DEFINE_RULESET(goldrush, ruleset_goldrush)
@@ -26,7 +26,7 @@ namespace banggame {
     card_ptr draw_shop_card(game_ptr game);
 
     struct ruleset_shadowgunslingers {
-        void on_apply(game_ptr game);
+        void on_apply(game_ptr game) const;
     };
 
     DEFINE_RULESET(shadowgunslingers, ruleset_shadowgunslingers)

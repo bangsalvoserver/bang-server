@@ -93,7 +93,7 @@ namespace banggame {
         }
     };
 
-    void ruleset_frontier::on_apply(game_ptr game) {
+    void ruleset_frontier::on_apply(game_ptr game) const {
         if (!game->m_options.expansions.contains(GET_RULESET(wildwestshow))) {
             track_played_cards(game);
         }

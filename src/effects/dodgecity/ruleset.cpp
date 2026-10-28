@@ -7,7 +7,7 @@
 
 namespace banggame {
 
-    void ruleset_dodgecity::on_apply(game_ptr game) {
+    void ruleset_dodgecity::on_apply(game_ptr game) const {
         event_card_key key{nullptr, 25};
 
         game->add_listener<event_type::on_auto_discard>(nullptr, [](player_ptr origin, card_ptr origin_card, const effect_context &ctx) {

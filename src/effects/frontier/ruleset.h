@@ -13,7 +13,7 @@ namespace banggame {
     void remove_pardner_token(card_ptr origin_card, player_ptr origin);
 
     struct ruleset_frontier {
-        void on_apply(game_ptr game);
+        void on_apply(game_ptr game) const;
     };
 
     DEFINE_RULESET(frontier, ruleset_frontier)

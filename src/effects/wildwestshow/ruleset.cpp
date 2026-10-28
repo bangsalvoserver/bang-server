@@ -54,7 +54,7 @@ namespace banggame {
         return count;
     }
 
-    void ruleset_wildwestshow::on_apply(game_ptr game) {
+    void ruleset_wildwestshow::on_apply(game_ptr game) const {
         track_played_cards(game);
         
         if (game->m_options.expansions.contains(GET_RULESET(ghost_cards))) {
