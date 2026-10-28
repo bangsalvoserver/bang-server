@@ -72,7 +72,7 @@ When the ability can't be parametrized from YAML but requires **reacting to an e
 namespace banggame {
 
     struct equip_my_binoculars : event_equip {
-        void on_enable(card_ptr target_card, player_ptr target);
+        void on_enable(card_ptr target_card, player_ptr target) const;
     };
 
     DEFINE_EQUIP(my_binoculars, equip_my_binoculars)
@@ -88,7 +88,7 @@ namespace banggame {
 #include "game/game_table.h"
 
 namespace banggame {
-    void equip_my_binoculars::on_enable(card_ptr target_card, player_ptr target) {
+    void equip_my_binoculars::on_enable(card_ptr target_card, player_ptr target) const {
         target->m_game->add_listener<event_type::count_range_mod>(target_card,
             [=](const_player_ptr origin, range_mod_type type, int &value) {
                 if (origin == target && type == range_mod_type::range_mod) {
@@ -129,14 +129,14 @@ Real implementation (`effects/base/bart_cassidy.h/.cpp`):
 struct equip_bart_cassidy : event_equip {
     int ncards;
     equip_bart_cassidy(int ncards = 1): ncards{ncards} {}
-    void on_enable(card_ptr target_card, player_ptr target);
+    void on_enable(card_ptr target_card, player_ptr target) const;
 };
 DEFINE_EQUIP(bart_cassidy, equip_bart_cassidy)
 ```
 
 ```cpp
 // bart_cassidy.cpp
-void equip_bart_cassidy::on_enable(card_ptr target_card, player_ptr p) {
+void equip_bart_cassidy::on_enable(card_ptr target_card, player_ptr p) const {
     p->m_game->add_listener<event_type::on_hit>({target_card, 1},
         [p, target_card, ncards=ncards](card_ptr origin_card, player_ptr origin,
                                           player_ptr target, int damage, effect_flags flags) {
@@ -196,8 +196,8 @@ struct request_duel : request_auto_resolvable, interface_picking, respondable_wi
 };
 
 struct effect_duel {
-    prompt_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags = {});
-    void on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags = {}) {
+    prompt_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags = {}) const;
+    void on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags = {}) const {
         target->m_game->queue_request<request_duel>(origin_card, origin, target, origin, flags);
     }
 };
@@ -235,7 +235,7 @@ namespace banggame {
     struct targeting_distinct_suits : targeting_max_cards {
         using targeting_max_cards::targeting_max_cards;
 
-        game_string get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &targets);
+        game_string get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &targets) const;
     };
 
     DEFINE_TARGETING(distinct_suits, targeting_distinct_suits)
@@ -250,7 +250,7 @@ namespace banggame {
 
 namespace banggame {
 
-    game_string targeting_distinct_suits::get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &targets) {
+    game_string targeting_distinct_suits::get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &targets) const {
         MAYBE_RETURN(targeting_max_cards::get_error(origin_card, origin, effect, ctx, targets));
         for (size_t i = 0; i < targets.size(); ++i) {
             for (size_t j = i + 1; j < targets.size(); ++j) {
@@ -352,7 +352,7 @@ Because `call_event(apply_bang_modifier{...})` fires **after the request exists 
 
 **Slab the Killer** — a permanent, *offensive* character passive (`effects/base/slab_the_killer.cpp`) — boosts Slab's own Bang!s, not Bang!s aimed at him:
 ```cpp
-void equip_slab_the_killer::on_enable(card_ptr target_card, player_ptr target) {
+void equip_slab_the_killer::on_enable(card_ptr target_card, player_ptr target) const {
     target->m_game->add_listener<event_type::apply_bang_modifier>(target_card,
         [target](player_ptr origin, shared_request_bang req) {
             if (target == origin) {
@@ -364,7 +364,7 @@ void equip_slab_the_killer::on_enable(card_ptr target_card, player_ptr target) {
 
 **Aim** — a one-shot offensive card played by the attacker (`effects/valleyofshadows/aim.cpp`):
 ```cpp
-void effect_aim::on_play(card_ptr origin_card, player_ptr origin) {
+void effect_aim::on_play(card_ptr origin_card, player_ptr origin) const {
     origin->m_game->add_listener<event_type::apply_bang_modifier>(origin_card,
         [=](player_ptr p, shared_request_bang req) {
             if (p == origin) {
@@ -401,13 +401,13 @@ Real modifiers like *Aim*'s `bangmod` (covered in the architecture doc) reuse th
 namespace banggame {
 
     struct modifier_steadyaim {
-        bool valid_with_equip(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
+        bool valid_with_equip(card_ptr origin_card, player_ptr origin, card_ptr target_card) const {
             return false;                                          // never before an equip card
         }
-        bool valid_with_modifier(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
+        bool valid_with_modifier(card_ptr origin_card, player_ptr origin, card_ptr target_card) const {
             return target_card->has_tag(tag_type::steadyaimmod);    // allow stacking with itself
         }
-        bool valid_with_card(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
+        bool valid_with_card(card_ptr origin_card, player_ptr origin, card_ptr target_card) const {
             return target_card->pocket == pocket_type::player_hand
                 && target_card->has_tag(tag_type::missedcard);      // must be a real Missed!
         }
@@ -415,7 +415,7 @@ namespace banggame {
     DEFINE_MODIFIER(steadyaimmod, modifier_steadyaim)
 
     struct effect_steady_aim {
-        void on_play(card_ptr origin_card, player_ptr origin);
+        void on_play(card_ptr origin_card, player_ptr origin) const;
     };
     DEFINE_EFFECT(steady_aim, effect_steady_aim)
 }
@@ -430,7 +430,7 @@ namespace banggame {
 #include "game/game_table.h"
 
 namespace banggame {
-    void effect_steady_aim::on_play(card_ptr origin_card, player_ptr origin) {
+    void effect_steady_aim::on_play(card_ptr origin_card, player_ptr origin) const {
         if (auto req = origin->m_game->top_request<request_bang>([&](const request_base &base) {
             return base.target == origin;
         })) {
@@ -493,7 +493,7 @@ The two target groups are declared exactly like they would be on any other multi
 namespace banggame {
 
     struct handler_marksman {
-        void on_play(card_ptr origin_card, player_ptr origin, const card_list &discarded, player_ptr target);
+        void on_play(card_ptr origin_card, player_ptr origin, const card_list &discarded, player_ptr target) const;
     };
 
     DEFINE_MTH(marksman, handler_marksman)
@@ -508,7 +508,7 @@ namespace banggame {
 #include "game/game_table.h"
 
 namespace banggame {
-    void handler_marksman::on_play(card_ptr origin_card, player_ptr origin, const card_list &discarded, player_ptr target) {
+    void handler_marksman::on_play(card_ptr origin_card, player_ptr origin, const card_list &discarded, player_ptr target) const {
         int amount = 1 + rn::count_if(discarded, [](card_ptr c) { return c->sign.is_hearts(); });
         target->damage(origin_card, origin, amount);
     }
@@ -589,11 +589,11 @@ The concrete example is a new card, **Comrade's Aid** — "choose a player, heal
 namespace banggame {
 
     struct effect_comrades_aid {
-        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {
+        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) const {
             MAYBE_RETURN(prompts::bot_check_target_friend(origin, target));
             return {};
         }
-        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target) {
+        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target) const {
             target->heal(origin_card, origin, 1);
         }
     };
@@ -633,7 +633,7 @@ This is one of a small family of similarly-shaped `bot_check_*` helpers in `game
 The concrete example is the built-in **Gatling**: `bang players alive notself` in `config/sets/base.yml`, the ordinary `bang` effect (`effects/base/bang.cpp`) aimed at every `alive`, non-self player at once. `targeting_players::on_prompt` (`target_types/base/players.cpp`) is where the per-target verdicts get gathered:
 
 ```cpp
-prompt_string targeting_players::on_prompt(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, value_type) {
+prompt_string targeting_players::on_prompt(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, value_type) const {
     auto targets = get_player_targets_range(origin_card, origin, player_filter, ctx);
     if (targets.empty()) {
         return {"PROMPT_CARD_NO_EFFECT", origin_card};
@@ -648,7 +648,7 @@ prompt_string targeting_players::on_prompt(card_ptr origin_card, player_ptr orig
 Nothing here is Gatling-specific — `get_player_targets_range` just recomputes the same `alive`+`notself` range `on_play` will hit for real, and the actual per-target judgment is delegated straight to `effect.on_prompt`, which for Gatling resolves to `effect_bang::on_prompt` — the same function an ordinary single-target Bang! calls, with no idea it's being asked once per player from inside this loop:
 
 ```cpp
-prompt_string effect_bang::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
+prompt_string effect_bang::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) const {
     MAYBE_RETURN(prompts::bot_check_kill_sheriff(origin, target));
     MAYBE_RETURN(prompts::bot_check_target_enemy(origin, target));
     MAYBE_RETURN(prompts::prompt_target_immunity(origin_card, origin, target, flags));
@@ -719,7 +719,7 @@ namespace banggame::event_type {
 
 namespace banggame {
     struct effect_buckshot {
-        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target);
+        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target) const;
     };
     DEFINE_EFFECT(buckshot, effect_buckshot)
 }
@@ -732,7 +732,7 @@ namespace banggame {
 #include "game/game_table.h"
 
 namespace banggame {
-    void effect_buckshot::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) {
+    void effect_buckshot::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) const {
         int ncards = 1;
         origin->m_game->call_event(event_type::apply_buckshot_modifier{ target, ncards });
         for (int i = 0; i < ncards && !target->m_hand.empty(); ++i) {
@@ -772,10 +772,10 @@ The real card is *Bell Tower* (Armed & Dangerous): "ignore distances for the ran
 ```cpp
 // effects/armedanddangerous/belltower.h
 struct modifier_belltower {
-    bool valid_with_card(card_ptr origin_card, player_ptr origin, card_ptr playing_card) {
+    bool valid_with_card(card_ptr origin_card, player_ptr origin, card_ptr playing_card) const {
         return playing_card->has_tag(tag_type::ranged_effect);
     }
-    void add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx);
+    void add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) const;
 };
 DEFINE_MODIFIER(belltower, modifier_belltower)
 
@@ -787,7 +787,7 @@ namespace contexts {
 ```
 ```cpp
 // belltower.cpp
-void modifier_belltower::add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) {
+void modifier_belltower::add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) const {
     ctx.add(contexts::ignore_distances{});
 }
 ```
@@ -841,6 +841,7 @@ Your list (YAML definition, effect struct, `.h`/`.cpp` file, `effects.h` + `CMak
 
 **3. Server C++ implementation**
 - [ ] New `.h`/`.cpp` under `effects/<expansion>/` (or `target_types/<expansion>/` for a new target type), with the struct registered via `DEFINE_EFFECT`/`DEFINE_EQUIP`/`DEFINE_MODIFIER`/`DEFINE_MTH`/`DEFINE_TARGETING`/`DEFINE_RULESET` as appropriate.
+- [ ] Every handler method (`can_play`, `get_error`, `on_prompt`, `add_context`, `on_play`, `on_enable`, `on_disable`, `valid_with_*`, ...) is declared **`const`**, in the header and in the out-of-line definition. A non-const method is silently ignored by `vtable_build.h` for effects, equips, modifiers and mth handlers (the card compiles but that hook never runs), and is a compile error for the mandatory `targeting` methods. See the architecture doc, section 4. (`ruleset::on_apply` is the exception.)
 - [ ] A `request_base` subclass (`game/request_queue.h`) only if the card starts a multi-step interaction rather than resolving immediately (Case 5) — most cards don't need one.
 - [ ] For an equip card with an ongoing passive: `on_enable`, and `on_disable` if the default cleanup (automatic listener removal via `event_card_key` when the card leaves play) isn't enough — e.g. if `on_enable` did more than register a listener (changed some other persistent state) and that also needs explicit reverting.
 - [ ] File added to the folder's `CMakeLists.txt` (`target_sources`), and included from that folder's collector header (`effects/<expansion>/effects.h` or `target_types/<expansion>/target_types.h`) — this second step is what actually gets the vtable *built*, not just declared (see the module doc's explanation of the `vtable_build.h` two-phase macro trick if a card ever compiles but links with an undefined-symbol error).

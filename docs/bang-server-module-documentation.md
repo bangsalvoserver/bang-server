@@ -175,6 +175,39 @@ This is only made to happen in exactly one place: the Python generator's `INCLUD
 ```
 `effects/effects.h` and `target_types/target_types.h` are the actual **collector headers** — they `#include` every single per-expansion `effects.h`, which in turn `#include`s every individual card header (`bang.h`, `beer.h`, ...). Because `vtable_build.h` is included *before* them, every `DEFINE_EFFECT`/`DEFINE_EQUIP`/`DEFINE_MODIFIER`/`DEFINE_MTH`/`DEFINE_RULESET`/`DEFINE_TARGETING` encountered while parsing those headers — i.e. literally every card effect, equip, modifier, ruleset, and target type in the entire project — gets its vtable actually *built* right there, in this one generated translation unit. Everywhere else in the codebase, the exact same headers only ever produce lightweight declarations, resolved at link time against the single definition living in `bang_cards.cpp`'s object file. The payoff is that the (fairly heavy) templated `build_*_vtable<T>` instantiation and the resulting static data exist exactly once in the whole build, no matter how many of the ~300 `.cpp` files include a given card's header.
 
+### Requirement: handler methods must be `const`
+
+Every handler struct registered with `DEFINE_EFFECT`, `DEFINE_EQUIP`, `DEFINE_MODIFIER`, `DEFINE_MTH`, `DEFINE_TARGETING` or `DEFINE_RULESET` is stored as immutable, shared data (`effect_value` / `target_value`) and reached through a `const` reference (`effect_cast<T>` in `vtable_build.h` returns `const T &`). The `requires`-probing in the `build_*_vtable` functions therefore only sees **`const` member functions**: a method declared without `const` is not callable on that reference, so the probe fails and the method is skipped.
+
+```cpp
+// Correct
+struct effect_example {
+    bool can_play(card_ptr origin_card, player_ptr origin) const;
+    void on_play(card_ptr origin_card, player_ptr origin) const;
+};
+
+// Wrong: compiles, but vtable_build.h never picks these up
+struct effect_example {
+    bool can_play(card_ptr origin_card, player_ptr origin);
+    void on_play(card_ptr origin_card, player_ptr origin);
+};
+```
+
+The same applies to out-of-line definitions (`void effect_example::on_play(...) const { ... }`), since the qualifier is part of the signature.
+
+What happens when `const` is missing depends on the kind of handler:
+
+| Handler kind | Methods | Without `const` |
+|---|---|---|
+| `effect`, `equip`, `modifier` | all hooks (`can_play`, `get_error`, `on_prompt`, `add_context`, `on_play`, `on_enable`, `on_disable`, `valid_with_*`, ...) | **Silently skipped.** The vtable falls back to its default (e.g. `can_play` returns `true`, `get_error`/`on_prompt` return nothing, `on_play` does nothing). No compiler error or warning: the card just misses that behavior. |
+| `mth` | `get_error`, `on_prompt`, `on_play` | **Silently skipped**, for the same reason: `mth_unwrapper` is keyed on a member-function-pointer type that ends in `const` (`fun_mem_ptr_t`), so a non-const method does not match. |
+| `targeting` | `get_error`, `on_prompt`, `add_context`, `on_play` (mandatory) | Hard compile error, because these are called unconditionally. |
+| `targeting` | `get_args`, `is_possible`, `random_target` (optional) | **Silently skipped**: `random_target` falls back to a random pick from `possible_targets`, `get_args` is not serialized. |
+
+If a card seems to ignore one of its hooks (a missing prompt, a `can_play` that never rejects, an equip that never registers its listener), check for a missing `const` first.
+
+Handlers cannot hold mutable per-game state: state that changes during a game belongs in the game itself (`request_base` subclasses, listeners registered with `add_listener`, `effect_context`), not in the handler struct.
+
 ### How it all fits together (a concrete example)
 
 Take the BANG! card defined in YAML (`config/sets/base.yml`):
@@ -209,11 +242,11 @@ The real example is *Aim* (`effects/valleyofshadows/aim.cpp`, already used in th
 `bangmod` isn't specific to Aim — it's a generic, reusable modifier defined once in `effects/base/bang.h`, meaning "whatever comes after this must be a Bang!-like card":
 ```cpp
 struct modifier_bangmod {
-    bool valid_with_equip(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
+    bool valid_with_equip(card_ptr origin_card, player_ptr origin, card_ptr target_card) const {
         return false;                              // never compatible with equip cards
     }
-    bool valid_with_modifier(card_ptr origin_card, player_ptr origin, card_ptr target_card);  // true if target_card is also tagged bangmod (stacking)
-    bool valid_with_card(card_ptr origin_card, player_ptr origin, card_ptr target_card);       // true if target_card is a real Bang! (or play_as_bang)
+    bool valid_with_modifier(card_ptr origin_card, player_ptr origin, card_ptr target_card) const;  // true if target_card is also tagged bangmod (stacking)
+    bool valid_with_card(card_ptr origin_card, player_ptr origin, card_ptr target_card) const;       // true if target_card is a real Bang! (or play_as_bang)
 };
 DEFINE_MODIFIER(bangmod, modifier_bangmod)
 ```
@@ -248,11 +281,11 @@ hidden:
 ```
 ```cpp
 struct modifier_card_choice {
-    bool valid_with_card(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
+    bool valid_with_card(card_ptr origin_card, player_ptr origin, card_ptr target_card) const {
         return target_card->pocket == pocket_type::hidden_deck
             && target_card->get_tag_value(tag_type::card_choice) == origin_card->get_tag_value(tag_type::card_choice);
     }
-    void add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) {
+    void add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) const {
         ctx.add(contexts::card_choice{ origin_card });
     }
 };
@@ -275,8 +308,8 @@ mth_effect: doc_holyday(1,2)
 Every target group is still declared as an ordinary `effect_holder` entry — `discard cards(2) self | hand` is validated and filtered exactly like it would be on any other card, and `none player alive reachable notself` uses the placeholder `none` effect purely to get a validated, filtered player target with no built-in behavior of its own. `mth_effect: doc_holyday(1,2)` then says: *take slots 1 and 2 of this card's flat target list (0-indexed; slot 0 is the `max_usages` gate and has no target of its own), and hand them to `handler_doc_holyday`*:
 ```cpp
 struct handler_doc_holyday {
-    prompt_string on_prompt(card_ptr origin_card, player_ptr origin, const card_list &target_cards, player_ptr target);
-    void on_play(card_ptr origin_card, player_ptr origin, const card_list &target_cards, player_ptr target);
+    prompt_string on_prompt(card_ptr origin_card, player_ptr origin, const card_list &target_cards, player_ptr target) const;
+    void on_play(card_ptr origin_card, player_ptr origin, const card_list &target_cards, player_ptr target) const;
 };
 DEFINE_MTH(doc_holyday, handler_doc_holyday)
 ```
@@ -289,15 +322,15 @@ mth_effect: switch_cards(0,1)
 ```
 ```cpp
 struct handler_switch_cards {
-    game_string get_error(card_ptr origin_card, player_ptr origin, card_ptr chosen_card, card_ptr target_card);
-    prompt_string on_prompt(card_ptr origin_card, player_ptr origin, card_ptr chosen_card, card_ptr target_card);
-    void on_play(card_ptr origin_card, player_ptr origin, card_ptr chosen_card, card_ptr target_card);
+    game_string get_error(card_ptr origin_card, player_ptr origin, card_ptr chosen_card, card_ptr target_card) const;
+    prompt_string on_prompt(card_ptr origin_card, player_ptr origin, card_ptr chosen_card, card_ptr target_card) const;
+    void on_play(card_ptr origin_card, player_ptr origin, card_ptr chosen_card, card_ptr target_card) const;
 };
 DEFINE_MTH(switch_cards, handler_switch_cards)
 ```
 Both parameters are `card_ptr`, but the *first* one is always "your card" (filtered `self | table`) and the *second* is always "their card" (filtered `notself | table`) — a distinction the flat wire format can't express by type alone, only by position, which is exactly what the explicit `(0,1)` index list pins down.
 
-Mechanically, `parse_mth` (`config/parse_bang_cards.py`) turns `doc_holyday(1,2)` into an `mth_holder` whose `effect_value` is an `mth_value<handler_doc_holyday>{ handler = {}, indices = {1, 2} }` (`cards/vtable_build.h`). The interesting part is how the two typed parameters (`const card_list&`, `player_ptr`) get pulled back out of the flat, type-erased `targets_view` at runtime: `mth_unwrapper` is a partial specialization keyed on the *exact member-function-pointer type* of the handler's own `on_play`/`get_error`/`on_prompt` — template argument deduction reads off `Args...` directly from whichever overload the handler happens to define, and `build_mth_args<Args...>(targets, indices, ctx)` then walks `indices` extracting `targets[indices[i]].get<Args_i>()` one by one, throwing a `game_error` if a position is out of range or holds the wrong type (with an automatic, optional trailing `const effect_context&` parameter, the same convention used everywhere else in the vtable system). None of `get_error`/`on_prompt`/`on_play` are mandatory on a handler — each is individually probed with `requires`, exactly like the rest of the vtable-building machinery.
+Mechanically, `parse_mth` (`config/parse_bang_cards.py`) turns `doc_holyday(1,2)` into an `mth_holder` whose `effect_value` is an `mth_value<handler_doc_holyday>{ handler = {}, indices = {1, 2} }` (`cards/vtable_build.h`). The interesting part is how the two typed parameters (`const card_list&`, `player_ptr`) get pulled back out of the flat, type-erased `targets_view` at runtime: `mth_unwrapper` is a partial specialization keyed on the *exact member-function-pointer type* (including its `const` qualifier, see the requirement above) of the handler's own `on_play`/`get_error`/`on_prompt` — template argument deduction reads off `Args...` directly from whichever overload the handler happens to define, and `build_mth_args<Args...>(targets, indices, ctx)` then walks `indices` extracting `targets[indices[i]].get<Args_i>()` one by one, throwing a `game_error` if a position is out of range or holds the wrong type (with an automatic, optional trailing `const effect_context&` parameter, the same convention used everywhere else in the vtable system). None of `get_error`/`on_prompt`/`on_play` are mandatory on a handler — each is individually probed with `requires`, exactly like the rest of the vtable-building machinery.
 
 That resolved handler is consulted in three places, all in `game/`:
 - **`play_verify.cpp::verify_target_list`** — after every individual slot's own `get_error`/`can_play` has already passed, it *additionally* calls `mth.get_error(origin_card, origin, targets, ctx)`, letting the handler reject combinations that are individually fine but jointly not (e.g. a constraint spanning both groups that no single slot's filter could express).
@@ -337,7 +370,7 @@ Contains the concrete implementation of **every single effect/equipment/expansio
 
 Each `.cpp`/`.h` file in these folders typically defines:
 1. A small struct representing the effect's **data** (e.g. `struct effect_weapon { int range; };` for a weapon with parametrized range).
-2. Static functions implementing the behavior (`can_play`, `on_play`, `get_error`, `on_prompt`...).
+2. `const` member functions implementing the behavior (`can_play`, `on_play`, `get_error`, `on_prompt`...). They **must** be `const`, otherwise `vtable_build.h` does not detect them (see *Requirement: handler methods must be `const`* in section 4).
 3. A `DEFINE_EFFECT(yaml_name, StructType)` macro (or `DEFINE_EQUIP`/`DEFINE_MODIFIER`/`DEFINE_MTH`/`DEFINE_RULESET`) registering the name↔type link, making it visible to `GET_EFFECT(yaml_name)` used by the YAML-generated code.
 
 Many expansion folders also carry a `ruleset.h`/`ruleset.cpp` pair implementing the `ruleset_vtable`: the logic applied **when an entire expansion is activated** in a match (e.g. preparing additional decks, adding starting tokens, validating compatibility with other expansions via `is_valid_with`) — see the modifiers/multi-target-handler sections above and the card-creation and expansion-addition guides for the detailed mechanics of how all of this fits together.

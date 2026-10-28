@@ -44,13 +44,13 @@ Real, simplified example (`effects/dodgecity/ruleset.cpp`):
 
 ```cpp
 struct ruleset_dodgecity {
-    void on_apply(game_ptr game);
+    void on_apply(game_ptr game) const;
 };
 DEFINE_RULESET(dodgecity, ruleset_dodgecity)
 ```
 
 ```cpp
-void ruleset_dodgecity::on_apply(game_ptr game) {
+void ruleset_dodgecity::on_apply(game_ptr game) const {
     // Any green card played gets deactivated for the rest of the turn...
     game->add_listener<event_type::on_equip_card>({nullptr, 5}, [=](player_ptr origin, player_ptr target, card_ptr target_card, const effect_context &ctx) {
         if (target_card->is_green()) {
@@ -81,7 +81,7 @@ void ruleset_dodgecity::on_apply(game_ptr game) {
 `ruleset_vtable` also exposes a second, optional hook, `is_valid_with(const expansion_set&)`, used to declare **dependencies or incompatibilities between expansions**. Real example (`effects/legends/ruleset.cpp`):
 
 ```cpp
-bool ruleset_legends::is_valid_with(const expansion_set &set) {
+bool ruleset_legends::is_valid_with(const expansion_set &set) const {
     return set.contains(GET_RULESET(legends_basemod));
 }
 ```
@@ -99,7 +99,7 @@ Many expansions introduce a new shared resource. The framework offers two paths,
 If the resource is a simple **counter/token** (not a pile of cards), the generic token system (`card_token_type`) is used, which is already extensible. Real example — the "cube" tokens of *Armed & Dangerous* (`effects/armedanddangerous/ruleset.cpp`):
 
 ```cpp
-void ruleset_armedanddangerous::on_apply(game_ptr game) {
+void ruleset_armedanddangerous::on_apply(game_ptr game) const {
     // At game setup, place 32 available cubes on the table
     game->add_listener<event_type::on_game_setup>({nullptr, 4}, [](player_ptr origin){
         origin->m_game->add_tokens(card_token_type::cube, 32, token_positions::table{});
@@ -171,7 +171,7 @@ dustdevil: !include sets/dustdevil.yml
 
 namespace banggame {
     struct ruleset_dustdevil {
-        void on_apply(game_ptr game);
+        void on_apply(game_ptr game) const;
     };
     DEFINE_RULESET(dustdevil, ruleset_dustdevil)
 }
@@ -185,7 +185,7 @@ namespace banggame {
 #include "game/game_table.h"
 
 namespace banggame {
-    void ruleset_dustdevil::on_apply(game_ptr game) {
+    void ruleset_dustdevil::on_apply(game_ptr game) const {
         game->add_listener<event_type::on_turn_end>({nullptr, 10}, [](player_ptr origin, bool skipped) {
             if (origin->m_hand.empty()) {
                 origin->m_game->add_log("LOG_DUSTDEVIL_BONUS_DRAW", origin);
