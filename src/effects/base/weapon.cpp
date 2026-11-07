@@ -5,6 +5,7 @@
 
 #include "game/game_table.h"
 #include "game/prompts.h"
+#include "game/bot_suggestion.h"
 
 namespace banggame {
 
@@ -19,7 +20,6 @@ namespace banggame {
 
     game_string equip_weapon::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) const {
         if (range == 0) {
-            MAYBE_RETURN(prompts::bot_check_target_enemy(origin, target));
             return prompts::prompt_target_self(origin_card, origin, target);
         } else if (target == origin && origin->get_weapon_range() != 0) {
             if (card_ptr target_card = find_weapon_card(origin_card, target)) {
@@ -29,6 +29,10 @@ namespace banggame {
             }
         }
         return {};
+    }
+
+    int equip_weapon::evaluate(card_ptr, player_ptr origin, player_ptr target) const {
+        return range == 0 ? bot_suggestion::evaluate_neutral(origin, target) : 0;
     }
 
     void equip_weapon::on_enable(card_ptr origin_card, player_ptr target) const {
