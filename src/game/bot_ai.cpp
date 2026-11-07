@@ -47,8 +47,10 @@ namespace banggame {
             ret.action.targets.emplace_back(std::move(value.target));
             ret.score += value.score;
         }
-        if (const mth_holder &mth = args.card->get_mth(args.effect_list)) {
-            ret.score += mth.evaluate(args.card, origin, ret.action.targets, ctx);
+        if (args.effect_list != effect_list_type::equip_effects) {
+            if (const mth_holder &mth = args.card->get_mth(args.effect_list)) {
+                ret.score += mth.evaluate(args.card, origin, ret.action.targets, ctx);
+            }
         }
 
         return ret;
