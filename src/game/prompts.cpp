@@ -43,25 +43,5 @@ namespace banggame::prompts {
         }
         return {};
     }
-
-    game_string bot_check_target_enemy(player_ptr origin, player_ptr target, bot_suggestion::action_type type) {
-        if (origin->is_bot() && !bot_suggestion::is_target_enemy(origin, target, type)) {
-            return "BOT_TARGET_ENEMY";
-        }
-        return {};
-    }
-
-    game_string bot_check_target_friend(player_ptr origin, player_ptr target) {
-        if (origin->is_bot() && !bot_suggestion::is_target_friend(origin, target)) {
-            return "BOT_TARGET_FRIEND";
-        }
-        return {};
-    }
-
-    prompt_string bot_check_discard_card(player_ptr origin, card_ptr target) {
-        if (origin->is_bot() && target->has_tag(tag_type::strong)) {
-            return "BOT_TARGET_STRONG_CARD";
-        }
-        return {};
-    }
+    
 }

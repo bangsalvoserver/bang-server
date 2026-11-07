@@ -142,11 +142,12 @@ namespace banggame {
         return origin->m_game->top_request<request_tornado2>(target_is{origin}) != nullptr;
     }
 
-    prompt_string effect_tornado2_response::on_prompt(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const {
+    int effect_tornado2_response::evaluate(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const {
+        int score = 0;
         for (card_ptr target_card : ctx.get_all<contexts::selected_card>()) {
-            MAYBE_RETURN(prompts::bot_check_discard_card(origin, target_card));
+            score += bot_suggestion::evaluate_discard_card(target_card);
         }
-        return {};
+        return score;
     }
 
     void effect_tornado2_response::on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const {
