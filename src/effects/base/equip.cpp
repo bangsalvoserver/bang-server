@@ -45,6 +45,14 @@ namespace banggame {
         return origin->m_game->call_event(event_type::check_equip_card{ origin, origin_card, target, ctx });
     }
 
+    int effect_equip_on::evaluate(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) const {
+        int score = 0;
+        for (const equip_holder &holder : origin_card->equips) {
+            score += holder.evaluate(origin_card, origin, target, ctx);
+        }
+        return score;
+    }
+
     void effect_equip_on::add_context(card_ptr origin_card, player_ptr origin, player_ptr target, effect_context &ctx) const {
         ctx.add(contexts::equip_target{ target });
     }

@@ -170,6 +170,13 @@ namespace banggame {
                 return {};
             },
 
+            .evaluate = [](const void *effect_value, card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) -> int {
+                const T &value = effect_cast<T>(effect_value);
+                TRY_RETURN(value.evaluate(origin_card, origin, target, ctx));
+                TRY_RETURN(value.evaluate(origin_card, origin, target));
+                return 0;
+            },
+
             .on_enable = [](const void *effect_value, card_ptr target_card, player_ptr target) {
                 const T &value = effect_cast<T>(effect_value);
                 TRY_RETURN(value.on_enable(target_card, target));
