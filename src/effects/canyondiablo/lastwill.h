@@ -7,6 +7,7 @@ namespace banggame {
 
     struct equip_lastwill : event_equip {
         game_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) const;
+        int evaluate(card_ptr origin_card, player_ptr origin, player_ptr target) const;
         void on_enable(card_ptr origin_card, player_ptr origin) const;
     };
 
@@ -19,7 +20,7 @@ namespace banggame {
     DEFINE_EFFECT(lastwill, effect_lastwill)
 
     struct handler_lastwill {
-        game_string on_prompt(card_ptr origin_card, player_ptr origin, const card_list &target_cards, player_ptr target) const;
+        int evaluate(card_ptr origin_card, player_ptr origin, const card_list &target_cards, player_ptr target) const;
         void on_play(card_ptr origin_card, player_ptr origin, const card_list &target_cards, player_ptr target) const;
     };
 

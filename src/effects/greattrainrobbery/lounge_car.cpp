@@ -76,13 +76,11 @@ namespace banggame {
         return {};
     }
 
-    game_string handler_lounge_car::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card, player_ptr target_player) const {
+    int handler_lounge_car::evaluate(card_ptr, player_ptr origin, card_ptr target_card, player_ptr target_player) const {
         if (target_card->has_tag(tag_type::penalty)) {
-            MAYBE_RETURN(prompts::bot_check_target_enemy(origin, target_player));
-        } else {
-            MAYBE_RETURN(prompts::bot_check_target_friend(origin, target_player));
+            return bot_suggestion::evaluate_neutral(origin, target_player);
         }
-        return {};
+        return bot_suggestion::evaluate_friend(origin, target_player);
     }
 
     void handler_lounge_car::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card, player_ptr target_player) const {

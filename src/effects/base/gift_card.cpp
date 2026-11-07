@@ -9,12 +9,11 @@
 
 namespace banggame {
     
-    game_string handler_gift_card::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card, player_ptr target_player) const {
-        if (forced_response) {
-            return {};
-        } else {
-            return prompts::bot_check_target_friend(origin, target_player);
+    int handler_gift_card::evaluate(card_ptr, player_ptr origin, card_ptr, player_ptr target_player) const {
+        if (!forced_response) {
+            return bot_suggestion::evaluate_friend(origin, target_player);
         }
+        return 0;
     }
 
     void handler_gift_card::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card, player_ptr target_player) const {

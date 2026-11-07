@@ -2,6 +2,7 @@
 
 #include "game/game_table.h"
 #include "game/prompts.h"
+#include "game/bot_suggestion.h"
 
 #include "effects/base/death.h"
 #include "effects/base/resolve.h"
@@ -31,12 +32,15 @@ namespace banggame {
     };
 
     game_string equip_lastwill::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) const {
-        MAYBE_RETURN(prompts::bot_check_target_friend(origin, target));
         if (target->is_sheriff()) {
             return {"PROMPT_CARD_NO_EFFECT", origin_card};
         } else {
             return {};
         }
+    }
+
+    int equip_lastwill::evaluate(card_ptr, player_ptr origin, player_ptr target) const {
+        return bot_suggestion::evaluate_friend(origin, target);
     }
 
     void equip_lastwill::on_enable(card_ptr origin_card, player_ptr origin) const {
@@ -51,9 +55,8 @@ namespace banggame {
         return origin->m_game->top_request<request_lastwill>(target_is{origin}) != nullptr;
     }
 
-    game_string handler_lastwill::on_prompt(card_ptr origin_card, player_ptr origin, const card_list &target_cards, player_ptr target) const {
-        MAYBE_RETURN(prompts::bot_check_target_friend(origin, target));
-        return {};
+    int handler_lastwill::evaluate(card_ptr, player_ptr origin, const card_list &, player_ptr target) const {
+        return bot_suggestion::evaluate_friend(origin, target);
     }
 
     void handler_lastwill::on_play(card_ptr origin_card, player_ptr origin, const card_list &target_cards, player_ptr target) const {
