@@ -35,6 +35,9 @@ namespace banggame {
                 targets.emplace_back(std::move(value.target));
                 ret.score += value.score;
             }
+            if (const mth_holder &mth = mod_card->get_mth(mod_response)) {
+                ret.score += mth.evaluate(mod_card, origin, targets, ctx);
+            }
         }
 
         const effect_list &effects = args.card->get_effect_list(args.effect_list);
@@ -43,6 +46,9 @@ namespace banggame {
             holder.add_context(args.card, origin, value.target, ctx);
             ret.action.targets.emplace_back(std::move(value.target));
             ret.score += value.score;
+        }
+        if (const mth_holder &mth = args.card->get_mth(args.effect_list)) {
+            ret.score += mth.evaluate(args.card, origin, ret.action.targets, ctx);
         }
 
         return ret;

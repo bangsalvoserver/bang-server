@@ -337,6 +337,13 @@ namespace banggame {
                 return {};
             },
 
+            .evaluate = [](const void *effect_value, card_ptr origin_card, player_ptr origin, targets_view targets, const effect_context &ctx) -> int {
+                if constexpr (requires { mth_unwrapper{&T::evaluate}; }) {
+                    return mth_unwrapper{&T::evaluate}(effect_value, origin_card, origin, targets, ctx);
+                }
+                return 0;
+            },
+
             .on_play = [](const void *effect_value, card_ptr origin_card, player_ptr origin, targets_view targets, const effect_context &ctx) {
                 if constexpr (requires { mth_unwrapper{&T::on_play}; }) {
                     mth_unwrapper{&T::on_play}(effect_value, origin_card, origin, targets, ctx);

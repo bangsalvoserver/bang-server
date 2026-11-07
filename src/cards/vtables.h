@@ -173,6 +173,7 @@ namespace banggame {
         
         game_string (*get_error)(const void *effect_value, card_ptr origin_card, player_ptr origin, targets_view targets, const effect_context &ctx);
         prompt_string (*on_prompt)(const void *effect_value, card_ptr origin_card, player_ptr origin, targets_view targets, const effect_context &ctx);
+        int (*evaluate)(const void *effect_value, card_ptr origin_card, player_ptr origin, targets_view targets, const effect_context &ctx);
         void (*on_play)(const void *effect_value, card_ptr origin_card, player_ptr origin, targets_view targets, const effect_context &ctx);
     };
 
@@ -182,6 +183,10 @@ namespace banggame {
 
     inline prompt_string mth_holder::on_prompt(card_ptr origin_card, player_ptr origin, targets_view targets, const effect_context &ctx) const {
         return type->on_prompt(effect_value, origin_card, origin, targets, ctx);
+    }
+
+    inline int mth_holder::evaluate(card_ptr origin_card, player_ptr origin, targets_view targets, const effect_context &ctx) const {
+        return type->evaluate(effect_value, origin_card, origin, targets, ctx);
     }
 
     inline void mth_holder::on_play(card_ptr origin_card, player_ptr origin, targets_view targets, const effect_context &ctx) const {
