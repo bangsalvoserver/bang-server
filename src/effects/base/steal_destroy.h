@@ -38,6 +38,7 @@ namespace banggame {
 
         game_string get_error(card_ptr origin_card, player_ptr origin, card_ptr target) const;
         game_string on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target) const;
+        int evaluate(card_ptr origin_card, player_ptr origin, card_ptr target) const;
         void on_play(card_ptr origin_card, player_ptr origin, card_ptr target) const;
     };
 
@@ -45,6 +46,7 @@ namespace banggame {
     
     struct effect_discard_hand {
         game_string on_prompt(card_ptr origin_card, player_ptr origin) const;
+        int evaluate(card_ptr origin_card, player_ptr origin) const;
         void on_play(card_ptr origin_card, player_ptr origin) const;
     };
 

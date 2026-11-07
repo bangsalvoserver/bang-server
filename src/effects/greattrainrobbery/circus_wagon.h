@@ -6,7 +6,7 @@
 namespace banggame {
 
     struct effect_circus_wagon {
-        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) const;
+        int evaluate(card_ptr origin_card, player_ptr origin, player_ptr target) const;
         void on_play(card_ptr origin_card, player_ptr origin, player_ptr target) const;
     };
 

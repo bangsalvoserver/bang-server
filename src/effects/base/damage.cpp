@@ -16,11 +16,11 @@ namespace banggame {
         return {};
     }
 
-    game_string effect_damage::on_prompt(card_ptr origin_card, player_ptr origin) const {
-        if (origin->is_bot() && origin->m_hp <= origin->m_max_hp - 2) {
-            return "BOT_TOO_MUCH_DAMAGE";
+    int effect_damage::evaluate(card_ptr, player_ptr origin) const {
+        if (origin->m_hp <= origin->m_max_hp - 2) {
+            return -5;
         }
-        return {};
+        return 0;
     }
 
     void effect_damage::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) const {

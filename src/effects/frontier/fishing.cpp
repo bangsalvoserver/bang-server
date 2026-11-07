@@ -6,14 +6,12 @@
 
 namespace banggame {
 
-    game_string effect_fishing::on_prompt(card_ptr origin_card, player_ptr origin) const {
-        if (origin->is_bot()) {
-            card_suit suit_mod = origin->m_game->call_event(event_type::get_suit_modifier{});
-            if (suit_mod != card_suit::none && suit_mod != suit) {
-                return "BOT_WRONG_SUIT";
-            }
+    int effect_fishing::evaluate(card_ptr, player_ptr origin) const {
+        card_suit suit_mod = origin->m_game->call_event(event_type::get_suit_modifier{});
+        if (suit_mod != card_suit::none && suit_mod != suit) {
+            return -5;
         }
-        return {};
+        return 0;
     }
 
     void effect_fishing::on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const {

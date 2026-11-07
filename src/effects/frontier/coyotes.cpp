@@ -41,11 +41,11 @@ namespace banggame {
             target->discard_used_card(target_card);
         }
 
-        prompt_string resolve_prompt() const override {
-            if (target->is_bot() && target->m_hp <= 2 && rn::any_of(target->m_hand, [&](card_ptr c) { return can_pick(c); })) {
-                return "BOT_MUST_RESPOND_COYOTES";
+        int evaluate_resolve() const override {
+            if (target->m_hp <= 2 && rn::any_of(target->m_hand, [&](card_ptr c) { return can_pick(c); })) {
+                return -5;
             }
-            return {};
+            return 0;
         }
 
         void on_resolve() override {

@@ -34,13 +34,13 @@ namespace banggame {
             target->damage(origin_card, origin, 1);
         }
 
-        prompt_string resolve_prompt() const override {
-            if (target->is_bot() && target->m_hp <= 2 && rn::any_of(target->m_hand, [&](card_ptr target_card) {
+        int evaluate_resolve() const override {
+            if (target->m_hp <= 2 && rn::any_of(target->m_hand, [&](card_ptr target_card) {
                 return !get_use_card_error(target, target_card);
             })) {
-                return "BOT_MUST_RESPOND_BANDIDOS";
+                return -5;
             }
-            return {};
+            return 0;
         }
 
         game_string status_text(player_ptr owner) const override {

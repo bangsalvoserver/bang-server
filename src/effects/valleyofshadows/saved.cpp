@@ -48,15 +48,10 @@ namespace banggame {
             }
         }
 
-        prompt_string pick_prompt(card_ptr target_card) const override {
-            if (target->is_bot()
-                && (bot_suggestion::is_target_enemy(target, saved)
-                != (target_card->pocket == pocket_type::player_hand)))
-            {
-                return "BOT_SAVED_WRONG_PICK";
-            } else {
-                return {};
-            }
+        int evaluate_pick(card_ptr target_card) const override {
+            bool enemy = bot_suggestion::is_target_enemy(target, saved);
+            bool picks_hand = target_card->pocket == pocket_type::player_hand;
+            return enemy == picks_hand ? 5 : -5;
         }
 
         bool can_pick(card_ptr target_card) const override {
@@ -97,18 +92,15 @@ namespace banggame {
         return false;
     }
 
-    prompt_string effect_saved::on_prompt(card_ptr origin_card, player_ptr origin) const {
-        if (origin->is_bot()) {
-            auto req = origin->m_game->top_request<request_damage>();
-            player_ptr saved = req->target;
-            if (saved->m_hp <= req->damage && saved->is_sheriff()) {
-                auto role = origin->get_base_role();
-                if (role == player_role::outlaw || role == player_role::renegade && origin->m_game->num_alive(true) <= 2) {
-                    return "BOT_DONT_SAVE_SHERIFF";
-                }
-            }
+    int effect_saved::evaluate(card_ptr origin_card, player_ptr origin) const {
+        auto req = origin->m_game->top_request<request_damage>();
+        player_ptr saved = req->target;
+        auto role = origin->get_base_role();
+        if (saved->m_hp <= req->damage && saved->is_sheriff()
+            && (role == player_role::outlaw || role == player_role::renegade && origin->m_game->num_alive(true) <= 2)) {
+            return -5;
         }
-        return {};
+        return 0;
     }
 
     void effect_saved::on_play(card_ptr origin_card, player_ptr origin) const {
@@ -128,20 +120,18 @@ namespace banggame {
             && effect_saved{}.can_play(origin_card, origin);
     }
 
-    prompt_string effect_saved2::on_prompt(card_ptr origin_card, player_ptr origin) const {
-        if (origin->is_bot()) {
-            auto req = origin->m_game->top_request<request_damage>();
-            player_ptr saved = req->target;
-            if (saved->m_hp > req->damage) {
-                return "BOT_DONT_SAVE";
-            } else if (saved->is_sheriff()) {
-                auto role = origin->get_base_role();
-                if (role == player_role::outlaw || role == player_role::renegade && origin->m_game->num_alive(true) <= 2) {
-                    return "BOT_DONT_SAVE_SHERIFF";
-                }
-            }
+    int effect_saved2::evaluate(card_ptr origin_card, player_ptr origin) const {
+        auto req = origin->m_game->top_request<request_damage>();
+        player_ptr saved = req->target;
+        if (saved->m_hp > req->damage) {
+            return -5;
         }
-        return {};
+        auto role = origin->get_base_role();
+        if (saved->is_sheriff()
+            && (role == player_role::outlaw || role == player_role::renegade && origin->m_game->num_alive(true) <= 2)) {
+            return -5;
+        }
+        return 0;
     }
 
     void effect_saved2::on_play(card_ptr origin_card, player_ptr origin) const {

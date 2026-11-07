@@ -36,14 +36,12 @@ namespace banggame {
             req->on_pick(target_card);
         }
 
-        prompt_string pick_prompt(card_ptr target_card) const override {
-            if (target->is_bot()) {
-                auto result = req->get_result(target_card);
-                if (!result.indifferent && result.lucky != bot_suggestion::is_target_friend(target, origin)) {
-                    return "BOT_BAD_DRAW";
-                }
+        int evaluate_pick(card_ptr target_card) const override {
+            auto result = req->get_result(target_card);
+            if (!result.indifferent && result.lucky != bot_suggestion::is_target_friend(target, origin)) {
+                return -5;
             }
-            return {};
+            return 0;
         }
         
         game_string status_text(player_ptr owner) const override {

@@ -33,11 +33,11 @@ namespace banggame {
             }
         }
 
-        prompt_string resolve_prompt() const override {
-            if (target->is_bot() && target->m_hp <= 2 && rn::any_of(target->m_hand, [&](card_ptr target_card) { return can_pick(target_card); })) {
-                return "BOT_MUST_RESPOND_DUEL";
+        int evaluate_resolve() const override {
+            if (target->m_hp <= 2 && rn::any_of(target->m_hand, [&](card_ptr target_card) { return can_pick(target_card); })) {
+                return -5;
             }
-            return {};
+            return 0;
         }
 
         bool can_pick(card_ptr target_card) const override {

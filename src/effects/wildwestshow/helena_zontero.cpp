@@ -67,14 +67,12 @@ namespace banggame {
             return origin_card;
         }
 
-        prompt_string redraw_prompt(card_ptr target_card, player_ptr owner) const override {
-            if (owner->is_bot()) {
-                auto sign = get_modified_sign(drawn_card);
-                if (sign.modified || sign.is_black()) {
-                    return "BOT_DONT_REDRAW_HELENA_ZONTERO";
-                }
+        int evaluate_redraw(card_ptr, player_ptr) const override {
+            auto sign = get_modified_sign(drawn_card);
+            if (sign.modified || sign.is_black()) {
+                return -5;
             }
-            return {};
+            return 0;
         }
         
         void resolve() override {

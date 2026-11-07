@@ -11,7 +11,7 @@ namespace banggame {
         virtual card_list get_drawn_cards() const = 0;
         virtual card_ptr get_drawing_card() const = 0;
 
-        virtual prompt_string redraw_prompt(card_ptr target_card, player_ptr owner) const = 0;
+        virtual int evaluate_redraw(card_ptr target_card, player_ptr owner) const { return 0; }
 
         virtual void resolve() = 0;
         virtual void restart() {}
@@ -81,8 +81,6 @@ namespace banggame {
 
         void on_update() override;
 
-        prompt_string pick_prompt(card_ptr target_card) const override;
-
         void on_pick(card_ptr target_card) override;
 
         game_string status_text(player_ptr owner) const override;
@@ -97,7 +95,8 @@ namespace banggame {
             return origin_card;
         }
 
-        prompt_string redraw_prompt(card_ptr target_card, player_ptr owner) const override;
+        int evaluate_pick(card_ptr target_card) const override;
+        int evaluate_redraw(card_ptr target_card, player_ptr owner) const override;
         
         void resolve() override;
         void restart() override;

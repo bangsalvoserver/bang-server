@@ -22,11 +22,8 @@ namespace banggame {
         request_tornado(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags = {})
             : request_picking(origin_card, origin, target, flags) {}
         
-        prompt_string escape_prompt(player_ptr owner) const override {
-            if (owner->is_bot()) {
-                return "BOT_ESCAPE_TORNADO";
-            }
-            return {};
+        int evaluate_escape(player_ptr) const override {
+            return -5;
         }
 
         int evaluate_pick(card_ptr target_card) const override {

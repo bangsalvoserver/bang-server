@@ -17,6 +17,7 @@ namespace banggame {
         effect_resolve(resolve_type type): type{type} {}
 
         prompt_string on_prompt(card_ptr origin_card, player_ptr origin) const;
+        int evaluate(card_ptr origin_card, player_ptr origin) const;
         bool can_play(card_ptr origin_card, player_ptr origin) const;
         void on_play(card_ptr origin_card, player_ptr origin) const;
     };
@@ -27,6 +28,7 @@ namespace banggame {
         virtual void on_resolve() = 0;
         virtual resolve_type get_resolve_type() const { return resolve_type::resolve; }
         virtual prompt_string resolve_prompt() const { return {}; }
+        virtual int evaluate_resolve() const { return 0; }
     };
 
     class request_resolvable: public request_base, public interface_resolvable {
