@@ -22,7 +22,7 @@ namespace banggame {
     namespace event_type {
         struct get_tracked_player {
             using result_type = player_ptr;
-            card_ptr target_card;
+            const_card_ptr target_card;
         };
     }
 
@@ -32,7 +32,7 @@ namespace banggame {
         return pardner_tokens[*tag_value - 1];
     }
 
-    player_ptr get_tracked_player(card_ptr target_card) {
+    player_ptr get_tracked_player(const_card_ptr target_card) {
         return target_card->m_game->call_event(event_type::get_tracked_player{ target_card });
     }
 
@@ -53,7 +53,7 @@ namespace banggame {
             origin->m_game->move_tokens(token, token_positions::card{ origin_card }, token_positions::player{ target }, 1);
         }
 
-        origin->m_game->add_listener<event_type::get_tracked_player>(key, [=](card_ptr target_card) {
+        origin->m_game->add_listener<event_type::get_tracked_player>(key, [=](const_card_ptr target_card) {
             return origin_card == target_card ? target : nullptr;
         });
 

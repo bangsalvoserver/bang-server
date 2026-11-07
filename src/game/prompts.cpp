@@ -3,9 +3,6 @@
 #include "cards/filter_enums.h"
 #include "cards/game_enums.h"
 
-#include "effects/ghost_cards/ruleset.h"
-#include "effects/frontier/ruleset.h"
-
 #include "game_table.h"
 #include "bot_suggestion.h"
 #include "game_options.h"
@@ -57,40 +54,6 @@ namespace banggame::prompts {
     game_string bot_check_target_friend(player_ptr origin, player_ptr target) {
         if (origin->is_bot() && !bot_suggestion::is_target_friend(origin, target)) {
             return "BOT_TARGET_FRIEND";
-        }
-        return {};
-    }
-
-    prompt_string bot_check_target_card(player_ptr origin, card_ptr target_card) {
-        if (origin->is_bot()) {
-            player_ptr target = target_card->owner;
-            if (target->is_ghost()) {
-                if (bot_suggestion::is_target_enemy(origin, target)) {
-                    if (target_card->pocket == pocket_type::player_table && is_ghost_card(target_card)) {
-                        return {};
-                    } else {
-                        return {1, "BOT_TARGET_NOT_GHOST_CARD"};
-                    }
-                } else if (bot_suggestion::is_target_friend(origin, target)) {
-                    if (target_card->pocket == pocket_type::player_table && is_ghost_card(target_card)) {
-                        return {1, "BOT_TARGET_GHOST_CARD"};
-                    }
-                }
-                return "BOT_TARGET_ENEMY";
-            }
-            if (target_card->pocket == pocket_type::player_table && target_card->is_purple()) {
-                if (player_ptr tracked_player = get_tracked_player(target_card)) {
-                    if (target_card->has_tag(tag_type::pardner_penalty)) {
-                        return bot_check_target_friend(origin, tracked_player);
-                    } else {
-                        return bot_check_target_enemy(origin, tracked_player);
-                    }
-                }
-            } else if (target_card->pocket == pocket_type::player_table && target_card->has_tag(tag_type::penalty)) {
-                return bot_check_target_friend(origin, target);
-            } else {
-                return bot_check_target_enemy(origin, target);
-            }
         }
         return {};
     }

@@ -6,6 +6,7 @@
 
 #include "game/game_table.h"
 #include "game/prompts.h"
+#include "game/bot_suggestion.h"
 
 #include "target_types/armedanddangerous/select_cubes.h"
 
@@ -19,10 +20,13 @@ namespace banggame {
     }
 
     prompt_string effect_squaw::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card, effect_flags flags, const effect_context &ctx) const {
-        MAYBE_RETURN(prompts::bot_check_target_card(origin, target_card));
         MAYBE_RETURN(prompts::prompt_target_self_card(origin_card, origin, target_card));
         MAYBE_RETURN(prompts::prompt_target_immunity(origin_card, origin, target_card->owner, flags));
         return {};
+    }
+
+    int effect_squaw::evaluate(card_ptr, player_ptr origin, card_ptr target_card) const {
+        return bot_suggestion::evaluate_target_card(origin, target_card);
     }
 
     void effect_squaw::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card, effect_flags flags, const effect_context &ctx) const {

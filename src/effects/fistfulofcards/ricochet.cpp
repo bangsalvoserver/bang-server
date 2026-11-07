@@ -1,7 +1,6 @@
 #include "ricochet.h"
 
 #include "game/game_table.h"
-#include "game/prompts.h"
 #include "game/bot_suggestion.h"
 
 #include "effects/base/bang.h"
@@ -44,9 +43,8 @@ namespace banggame {
         }
     };
 
-    prompt_string effect_ricochet::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card) const {
-        MAYBE_RETURN(prompts::bot_check_target_card(origin, target_card));
-        return {};
+    int effect_ricochet::evaluate(card_ptr, player_ptr origin, card_ptr target_card) const {
+        return bot_suggestion::evaluate_target_card(origin, target_card);
     }
 
     void effect_ricochet::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card) const {

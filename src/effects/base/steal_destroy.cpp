@@ -24,7 +24,6 @@ namespace banggame {
     }
 
     prompt_string effect_steal::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card, effect_flags flags) const {
-        MAYBE_RETURN(prompts::bot_check_target_card(origin, target_card));
         MAYBE_RETURN(prompts::prompt_target_immunity(origin_card, origin, target_card->owner, flags));
 
         if (origin == target_card->owner) {
@@ -35,6 +34,10 @@ namespace banggame {
             }
         }
         return {};
+    }
+
+    int effect_steal::evaluate(card_ptr, player_ptr origin, card_ptr target_card) const {
+        return bot_suggestion::evaluate_target_card(origin, target_card);
     }
 
     void effect_steal::on_resolve(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
@@ -184,10 +187,13 @@ namespace banggame {
     }
 
     prompt_string effect_destroy::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card, effect_flags flags) const {
-        MAYBE_RETURN(prompts::bot_check_target_card(origin, target_card));
         MAYBE_RETURN(prompts::prompt_target_self_card(origin_card, origin, target_card));
         MAYBE_RETURN(prompts::prompt_target_immunity(origin_card, origin, target_card->owner, flags));
         return {};
+    }
+
+    int effect_destroy::evaluate(card_ptr, player_ptr origin, card_ptr target_card) const {
+        return bot_suggestion::evaluate_target_card(origin, target_card);
     }
 
     void effect_destroy::on_resolve(card_ptr origin_card, player_ptr origin, card_ptr target_card) {

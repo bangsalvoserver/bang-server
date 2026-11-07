@@ -71,9 +71,13 @@ namespace banggame {
     }
 
     prompt_string handler_switch_cards::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr chosen_card, card_ptr target_card, const effect_context &ctx) const {
-        MAYBE_RETURN(prompts::bot_check_target_card(origin, target_card));
         MAYBE_RETURN(effect_equip_on{}.on_prompt(target_card, origin, origin, ctx));
         return {};
+    }
+
+    int handler_switch_cards::evaluate(card_ptr origin_card, player_ptr origin, card_ptr chosen_card, card_ptr target_card, const effect_context &ctx) const {
+        return bot_suggestion::evaluate_target_card(origin, target_card)
+            + effect_equip_on{}.evaluate(target_card, origin, origin, ctx);
     }
 
     void handler_switch_cards::on_play(card_ptr origin_card, player_ptr origin, card_ptr chosen_card, card_ptr target_card) const {

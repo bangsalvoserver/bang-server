@@ -8,6 +8,7 @@ namespace banggame {
     struct handler_switch_cards {
         game_string get_error(card_ptr origin_card, player_ptr origin, card_ptr chosen_card, card_ptr target_card) const;
         prompt_string on_prompt(card_ptr origin_card, player_ptr origin, card_ptr chosen_card, card_ptr target_card, const effect_context &ctx) const;
+        int evaluate(card_ptr origin_card, player_ptr origin, card_ptr chosen_card, card_ptr target_card, const effect_context &ctx) const;
         void on_play(card_ptr origin_card, player_ptr origin, card_ptr chosen_card, card_ptr target_card) const;
     };
 
@@ -20,6 +21,10 @@ namespace banggame {
 
         prompt_string on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card, const effect_context &ctx) const {
             return handler_switch_cards{}.on_prompt(origin_card, origin, origin_card, target_card, ctx);
+        }
+
+        int evaluate(card_ptr origin_card, player_ptr origin, card_ptr target_card, const effect_context &ctx) const {
+            return handler_switch_cards{}.evaluate(origin_card, origin, origin_card, target_card, ctx);
         }
 
         void on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card) const {

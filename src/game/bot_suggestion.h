@@ -27,6 +27,8 @@ namespace banggame::bot_suggestion {
 
     int evaluate_friend(const_player_ptr origin, const_player_ptr target);
 
+    int evaluate_target_card(const_player_ptr origin, const_card_ptr target_card);
+
 }
 
 #endif
