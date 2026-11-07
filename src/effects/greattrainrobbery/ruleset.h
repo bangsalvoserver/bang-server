@@ -31,8 +31,8 @@ namespace banggame {
             shared_locomotive_context ctx;
         };
 
-        struct get_locomotive_prompt {
-            using result_type = prompt_string;
+        struct evaluate_locomotive {
+            using result_type = int;
             player_ptr origin;
             int locomotive_count;
         };

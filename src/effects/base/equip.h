@@ -35,6 +35,14 @@ namespace banggame {
             player_ptr target;
             const effect_context &ctx;
         };
+
+        struct evaluate_equip_card {
+            using result_type = int;
+            player_ptr origin;
+            card_ptr origin_card;
+            player_ptr target;
+            const effect_context &ctx;
+        };
     }
 
 }

@@ -8,8 +8,8 @@
 
 namespace banggame {
 
-    prompt_string effect_full_steam::on_prompt(card_ptr origin_card, player_ptr origin) const {
-        return origin->m_game->call_event(event_type::get_locomotive_prompt{ origin, value });
+    int effect_full_steam::evaluate(card_ptr, player_ptr origin) const {
+        return origin->m_game->call_event(event_type::evaluate_locomotive{ origin, value });
     }
     
     void effect_full_steam::on_play(card_ptr origin_card, player_ptr origin) const {
