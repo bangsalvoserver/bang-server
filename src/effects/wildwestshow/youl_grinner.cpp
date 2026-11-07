@@ -5,7 +5,7 @@
 #include "cards/game_events.h"
 
 #include "game/game_table.h"
-#include "game/prompts.h"
+#include "game/bot_suggestion.h"
 
 namespace banggame {
 
@@ -13,8 +13,8 @@ namespace banggame {
         return target_card->pocket == pocket_type::player_hand && target_card->owner == target;
     }
 
-    prompt_string request_youl_grinner::pick_prompt(card_ptr target_card) const {
-        return prompts::bot_check_discard_card(target, target_card);
+    int request_youl_grinner::evaluate_pick(card_ptr target_card) const {
+        return bot_suggestion::evaluate_discard_card(target_card);
     }
 
     void request_youl_grinner::on_pick(card_ptr target_card) {

@@ -8,6 +8,7 @@ namespace banggame {
     struct effect_pick {
         bool can_play(card_ptr origin_card, player_ptr origin) const;
         prompt_string on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target) const;
+        int evaluate(card_ptr origin_card, player_ptr origin, card_ptr target) const;
         void on_play(card_ptr origin_card, player_ptr origin, card_ptr target) const;
     };
     
@@ -16,6 +17,7 @@ namespace banggame {
     struct effect_pick_player {
         bool can_play(card_ptr origin_card, player_ptr origin) const;
         prompt_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) const;
+        int evaluate(card_ptr origin_card, player_ptr origin, player_ptr target) const;
         void on_play(card_ptr origin_card, player_ptr origin, player_ptr target) const;
     };
     
@@ -29,6 +31,7 @@ namespace banggame {
         virtual bool can_pick(card_ptr target_card) const = 0;
         virtual void on_pick(card_ptr target_card) = 0;
         virtual prompt_string pick_prompt(card_ptr target_card) const { return {}; }
+        virtual int evaluate_pick(card_ptr target_card) const { return 0; }
     };
 
     class request_picking : public request_base, public interface_picking {
@@ -44,7 +47,7 @@ namespace banggame {
         using request_picking::request_picking;
 
         bool can_pick(card_ptr target_card) const override;
-        prompt_string pick_prompt(card_ptr target_card) const override;
+        int evaluate_pick(card_ptr target_card) const override;
     };
 
     struct interface_picking_player : interface_target_set_players {
@@ -53,6 +56,7 @@ namespace banggame {
         virtual bool can_pick(player_ptr target_player) const = 0;
         virtual void on_pick(player_ptr target_player) = 0;
         virtual prompt_string pick_prompt(player_ptr target_player) const { return {}; }
+        virtual int evaluate_pick(player_ptr target_player) const { return 0; }
     };
 
     class request_picking_player : public request_base, public interface_picking_player {

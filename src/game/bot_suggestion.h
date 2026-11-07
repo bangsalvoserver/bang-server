@@ -29,6 +29,8 @@ namespace banggame::bot_suggestion {
 
     int evaluate_target_card(const_player_ptr origin, const_card_ptr target_card);
 
+    int evaluate_discard_card(const_card_ptr target_card);
+
 }
 
 #endif

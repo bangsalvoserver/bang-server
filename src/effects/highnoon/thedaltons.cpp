@@ -4,7 +4,6 @@
 #include "effects/ghost_cards/ruleset.h"
 
 #include "game/game_table.h"
-#include "game/prompts.h"
 
 #include "cards/filter_enums.h"
 
@@ -30,18 +29,17 @@ namespace banggame {
             target->discard_card(target_card);
         }
 
-        prompt_string pick_prompt(card_ptr target_card) const override {
-            if (target->is_bot()) {
-                MAYBE_RETURN(prompts::bot_check_discard_card(target, target_card));
-                if (is_ghost_card(target_card)) {
-                    return {1, "BOT_DISCARD_GHOST"};
-                }
-                auto is_penalty_card = [](card_ptr c) { return c->has_tag(tag_type::penalty); };
-                if (rn::any_of(target->m_table, is_penalty_card) && !is_penalty_card(target_card)) {
-                    return "BOT_DISCARD_PENALTY";
-                }
+        int evaluate_pick(card_ptr target_card) const override {
+            if (target_card->has_tag(tag_type::penalty)) {
+                return 5;
             }
-            return {};
+            if (auto value = target_card->get_tag_value(tag_type::strong)) {
+                return -5 - *value;
+            }
+            if (is_ghost_card(target_card)) {
+                return -10;
+            }
+            return 0;
         }
 
         game_string status_text(player_ptr owner) const override {

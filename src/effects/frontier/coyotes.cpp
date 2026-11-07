@@ -7,7 +7,7 @@
 #include "cards/game_enums.h"
 
 #include "game/game_table.h"
-#include "game/prompts.h"
+#include "game/bot_suggestion.h"
 #include "game/play_verify.h"
 
 namespace banggame {
@@ -26,8 +26,8 @@ namespace banggame {
             }
         }
 
-        prompt_string pick_prompt(card_ptr target_card) const override {
-            return prompts::bot_check_discard_card(target, target_card);
+        int evaluate_pick(card_ptr target_card) const override {
+            return bot_suggestion::evaluate_discard_card(target_card);
         }
 
         bool can_pick(card_ptr target_card) const override {

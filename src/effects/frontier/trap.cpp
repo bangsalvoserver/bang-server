@@ -51,8 +51,8 @@ namespace banggame {
             target_player->equip_card(origin_card);
         }
 
-        prompt_string pick_prompt(player_ptr target_player) const override {
-            return prompts::bot_check_target_enemy(target, target_player);
+        int evaluate_pick(player_ptr target_player) const override {
+            return bot_suggestion::evaluate_neutral(target, target_player);
         }
 
         game_string status_text(player_ptr owner) const override {

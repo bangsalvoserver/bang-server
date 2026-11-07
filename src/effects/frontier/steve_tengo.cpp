@@ -10,6 +10,7 @@
 
 #include "game/game_table.h"
 #include "game/prompts.h"
+#include "game/bot_suggestion.h"
 
 namespace banggame {
 
@@ -33,9 +34,8 @@ namespace banggame {
             apply_pardner_token(origin_card, target, target_player);
         }
 
-        prompt_string pick_prompt(player_ptr target_player) const override {
-            MAYBE_RETURN(prompts::bot_check_target_enemy(target, target_player));
-            return {};
+        int evaluate_pick(player_ptr target_player) const override {
+            return bot_suggestion::evaluate_neutral(target, target_player);
         }
 
         game_string status_text(player_ptr owner) const override {

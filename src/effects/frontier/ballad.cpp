@@ -36,8 +36,8 @@ namespace banggame {
     struct request_ballad_steal : request_dismissable, interface_picking {
         using request_dismissable::request_dismissable;
 
-        prompt_string pick_prompt(card_ptr target_card) const override {
-            return prompts::bot_check_target_enemy(target, origin);
+        int evaluate_pick(card_ptr) const override {
+            return bot_suggestion::evaluate_neutral(target, origin);
         }
 
         bool can_pick(card_ptr target_card) const override {
