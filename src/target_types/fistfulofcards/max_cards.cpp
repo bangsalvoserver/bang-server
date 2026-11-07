@@ -17,13 +17,34 @@ namespace banggame {
         }
     }
 
-    card_list targeting_max_cards::random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
-        auto targets = target_card.possible_targets(origin_card, origin, effect, ctx);
-        if (ncards == 0) {
-            return sample_elements_streaming(targets, 0.6, origin->m_game->bot_rng);
-        } else {
-            return sample_elements(targets, ncards, origin->m_game->bot_rng);
+    std::pair<card_list, int> targeting_max_cards::random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
+        card_list candidates = rn::to<card_list>(target_card.possible_targets(origin_card, origin, effect, ctx));
+        auto evaluate_fun = [&](card_ptr target) {
+            return effect.evaluate(origin_card, origin, target, {}, ctx);
+        };
+
+        size_t max_count = ncards == 0 ? candidates.size() : std::min<size_t>(ncards, candidates.size());
+        size_t min_count = confirmable ? 1 : std::min<size_t>(std::max(ncards, 1), candidates.size());
+        if (!confirmable) {
+            max_count = min_count;
         }
+
+        std::optional<std::pair<card_list, int>> best;
+        size_t ties = 0;
+        for (size_t count = min_count; count <= max_count; ++count) {
+            auto candidate = random_max_elements(candidates, count, evaluate_fun, origin->m_game->bot_rng);
+            if (!best || candidate.second > best->second) {
+                best = std::move(candidate);
+                ties = 1;
+            } else if (candidate.second == best->second) {
+                ++ties;
+                std::uniform_int_distribution<size_t> dist(0, ties - 1);
+                if (dist(origin->m_game->bot_rng) == 0) {
+                    best = std::move(candidate);
+                }
+            }
+        }
+        return std::move(*best);
     }
 
     game_string targeting_max_cards::get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &targets) const {
