@@ -91,4 +91,34 @@ rn::range_value_t<R> random_element(R &&range, Rng &rng) {
     }
 }
 
+// Returns a uniformly random element among those with the highest score,
+// together with that score. Single pass, no allocation.
+template<rn::input_range R, typename Rng, typename ScoreFn>
+std::pair<rn::range_value_t<R>, int> random_max_element(R &&range, ScoreFn &&score_fn, Rng &rng) {
+    using value_t = rn::range_value_t<R>;
+
+    std::optional<value_t> chosen;
+    int best = 0;
+    size_t ties = 0;
+
+    for (auto &&elem : range) {
+        int score = score_fn(elem);
+        if (!chosen || score > best) {
+            // new maximum: restart the tie counter
+            chosen = elem;
+            best = score;
+            ties = 1;
+        } else if (score == best) {
+            // reservoir sampling: the k-th element tied for the maximum
+            // replaces the current choice with probability 1/k
+            ++ties;
+            std::uniform_int_distribution<size_t> dist(0, ties - 1);
+            if (dist(rng) == 0) chosen = elem;
+        }
+    }
+
+    if (!chosen) throw std::runtime_error("Empty range in random_max_element");
+    return { std::move(*chosen), best };
+}
+
 #endif

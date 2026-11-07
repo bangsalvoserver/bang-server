@@ -20,6 +20,14 @@ namespace banggame {
         return {};
     }
 
+    static effect_flags get_flags(const player_list &targets) {
+        effect_flags flags = effect_flag::multi_target;
+        if (targets.size() == 1) {
+            flags.add(effect_flag::single_target);
+        }
+        return flags;
+    }
+
     std::generator<player_list> targeting_adjacent_players::possible_targets(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
         for (player_ptr first_target : origin->m_game->range_all_players(origin)) {
             if (!check_player_filter(origin_card, origin, target_player.player_filter, first_target, ctx)
@@ -41,6 +49,21 @@ namespace banggame {
         }
     }
 
+    std::pair<player_list, int> targeting_adjacent_players::random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
+        return random_max_element(
+            possible_targets(origin_card, origin, effect, ctx),
+            [&](const player_list &targets) {
+                return rn::fold_left(
+                    targets | rv::transform([&, flags = get_flags(targets)](player_ptr target) {
+                        return effect.evaluate(origin_card, origin, target, flags, ctx);
+                    }),
+                    0, std::plus{}
+                );
+            },
+            origin->m_game->bot_rng
+        );
+    }
+
     game_string targeting_adjacent_players::get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const player_list &targets) const {
         if (targets.empty() || targets.size() > 2) {
             return "ERROR_INVALID_TARGETS";
@@ -59,14 +82,6 @@ namespace banggame {
             MAYBE_RETURN(effect.get_error(origin_card, origin, target, ctx));
         }
         return {};
-    }
-
-    static effect_flags get_flags(const player_list &targets) {
-        effect_flags flags = effect_flag::multi_target;
-        if (targets.size() == 1) {
-            flags.add(effect_flag::single_target);
-        }
-        return flags;
     }
 
     prompt_string targeting_adjacent_players::on_prompt(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const player_list &targets) const {

@@ -19,13 +19,27 @@ namespace banggame {
         );
     }
 
-    card_list targeting_card_per_player::random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
-        card_list ret;
+    static effect_flags get_flags(const card_list &target) {
+        effect_flags flags { effect_flag::multi_target, effect_flag::target_players };
+        if (target.size() == 1) {
+            flags.add(effect_flag::single_target);
+        }
+        return flags;
+    }
+
+    std::pair<card_list, int> targeting_card_per_player::random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
+        auto evaluate_fun = [&, flags = get_flags({})](card_ptr target_card) {
+            return effect.evaluate(origin_card, origin, target_card, flags, ctx);
+        };
+
+        std::pair<card_list, int> ret;
         player_ptr skipped_player = ctx.get<contexts::skipped_player>();
         for (player_ptr target : origin->m_game->range_all_players(origin)) {
             if (target != skipped_player && !check_player_filter(origin_card, origin, player_filter, target, ctx)) {
                 if (auto targets = cards_target_set(origin, origin_card, card_filter, target, ctx)) {
-                    ret.push_back(random_element(targets, origin->m_game->bot_rng));
+                    auto [target, score] = random_max_element(targets, evaluate_fun, origin->m_game->bot_rng);
+                    ret.first.push_back(target);
+                    ret.second += score;
                 }
             }
         }
@@ -51,14 +65,6 @@ namespace banggame {
             }
             return {};
         }
-    }
-
-    static effect_flags get_flags(const card_list &target) {
-        effect_flags flags { effect_flag::multi_target, effect_flag::target_players };
-        if (target.size() == 1) {
-            flags.add(effect_flag::single_target);
-        }
-        return flags;
     }
 
     prompt_string targeting_card_per_player::on_prompt(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &target_cards) const {
