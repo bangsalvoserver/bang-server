@@ -14,16 +14,19 @@ namespace banggame {
         
         game_string (*get_error)(const void *effect_value, card_ptr origin_card, player_ptr origin, const effect_context &ctx);
         prompt_string (*on_prompt)(const void *effect_value, card_ptr origin_card, player_ptr origin, effect_flags flags, const effect_context &ctx);
+        int (*evaluate)(const void *effect_value, card_ptr origin_card, player_ptr origin, effect_flags flags, const effect_context &ctx);
         void (*add_context)(const void *effect_value, card_ptr origin_card, player_ptr origin, effect_context &ctx);
         void (*on_play)(const void *effect_value, card_ptr origin_card, player_ptr origin, effect_flags flags, const effect_context &ctx);
 
         game_string (*get_error_player)(const void *effect_value, card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx);
         prompt_string (*on_prompt_player)(const void *effect_value, card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx);
+        int (*evaluate_player)(const void *effect_value, card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx);
         void (*add_context_player)(const void *effect_value, card_ptr origin_card, player_ptr origin, player_ptr target, effect_context &ctx);
         void (*on_play_player)(const void *effect_value, card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx);
         
         game_string (*get_error_card)(const void *effect_value, card_ptr origin_card, player_ptr origin, card_ptr target, const effect_context &ctx);
         prompt_string (*on_prompt_card)(const void *effect_value, card_ptr origin_card, player_ptr origin, card_ptr target, effect_flags flags, const effect_context &ctx);
+        int (*evaluate_card)(const void *effect_value, card_ptr origin_card, player_ptr origin, card_ptr target, effect_flags flags, const effect_context &ctx);
         void (*add_context_card)(const void *effect_value, card_ptr origin_card, player_ptr origin, card_ptr target, effect_context &ctx);
         void (*on_play_card)(const void *effect_value, card_ptr origin_card, player_ptr origin, card_ptr target, effect_flags flags, const effect_context &ctx);
     };
@@ -54,6 +57,18 @@ namespace banggame {
 
     inline prompt_string effect_holder::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target, effect_flags flags, const effect_context &ctx) const {
         return type->on_prompt_card(effect_value, origin_card, origin, target, flags, ctx);
+    }
+
+    inline int effect_holder::evaluate(card_ptr origin_card, player_ptr origin, effect_flags flags, const effect_context &ctx) const {
+        return type->evaluate(effect_value, origin_card, origin, flags, ctx);
+    }
+
+    inline int effect_holder::evaluate(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx) const {
+        return type->evaluate_player(effect_value, origin_card, origin, target, flags, ctx);
+    }
+
+    inline int effect_holder::evaluate(card_ptr origin_card, player_ptr origin, card_ptr target, effect_flags flags, const effect_context &ctx) const {
+        return type->evaluate_card(effect_value, origin_card, origin, target, flags, ctx);
     }
 
     inline void effect_holder::add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) const {
@@ -201,7 +216,7 @@ namespace banggame {
         void (*serialize_args)(const effect_holder &effect, json::string_writer &writer);
 
         std::generator<play_card_target> (*possible_targets)(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx);
-        play_card_target (*random_target)(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx);
+        scored_target (*random_target)(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx);
         game_string (*get_error)(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const play_card_target &target);
         prompt_string (*on_prompt)(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const play_card_target &target);
         void (*add_context)(card_ptr origin_card, player_ptr origin, const effect_holder &effect, effect_context &ctx, const play_card_target &target);
@@ -212,7 +227,7 @@ namespace banggame {
         return this->target->possible_targets(origin_card, origin, *this, ctx);
     }
 
-    inline play_card_target effect_holder::random_target(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const {
+    inline scored_target effect_holder::random_target(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const {
         return this->target->random_target(origin_card, origin, *this, ctx);
     }
 

@@ -51,6 +51,15 @@ namespace banggame {
                 return {};
             },
 
+            .evaluate = [](const void *effect_value, card_ptr origin_card, player_ptr origin, effect_flags flags, const effect_context &ctx) -> int {
+                const T &value = effect_cast<T>(effect_value);
+                TRY_RETURN(value.evaluate(origin_card, origin, flags, ctx));
+                TRY_RETURN(value.evaluate(origin_card, origin, ctx));
+                TRY_RETURN(value.evaluate(origin_card, origin, flags));
+                TRY_RETURN(value.evaluate(origin_card, origin));
+                return 0;
+            },
+
             .add_context = [](const void *effect_value, card_ptr origin_card, player_ptr origin, effect_context &ctx) {
                 const T &value = effect_cast<T>(effect_value);
                 TRY_RETURN(value.add_context(origin_card, origin, ctx));
@@ -78,6 +87,15 @@ namespace banggame {
                 TRY_RETURN(value.on_prompt(origin_card, origin, target, flags));
                 TRY_RETURN(value.on_prompt(origin_card, origin, target));
                 return {};
+            },
+            
+            .evaluate_player = [](const void *effect_value, card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx) -> int {
+                const T &value = effect_cast<T>(effect_value);
+                TRY_RETURN(value.evaluate(origin_card, origin, target, flags, ctx));
+                TRY_RETURN(value.evaluate(origin_card, origin, target, ctx));
+                TRY_RETURN(value.evaluate(origin_card, origin, target, flags));
+                TRY_RETURN(value.evaluate(origin_card, origin, target));
+                return 0;
             },
 
             .add_context_player = [](const void *effect_value, card_ptr origin_card, player_ptr origin, player_ptr target, effect_context &ctx) {
@@ -107,6 +125,15 @@ namespace banggame {
                 TRY_RETURN(value.on_prompt(origin_card, origin, target, flags));
                 TRY_RETURN(value.on_prompt(origin_card, origin, target));
                 return {};
+            },
+            
+            .evaluate_card = [](const void *effect_value, card_ptr origin_card, player_ptr origin, card_ptr target, effect_flags flags, const effect_context &ctx) -> int {
+                const T &value = effect_cast<T>(effect_value);
+                TRY_RETURN(value.evaluate(origin_card, origin, target, flags, ctx));
+                TRY_RETURN(value.evaluate(origin_card, origin, target, ctx));
+                TRY_RETURN(value.evaluate(origin_card, origin, target, flags));
+                TRY_RETURN(value.evaluate(origin_card, origin, target));
+                return 0;
             },
 
             .add_context_card = [](const void *effect_value, card_ptr origin_card, player_ptr origin, card_ptr target, effect_context &ctx) {
@@ -372,12 +399,19 @@ namespace banggame {
                 }
             },
 
-            .random_target = [](card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) -> play_card_target {
+            .random_target = [](card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) -> scored_target {
                 const T &handler = effect_cast<T>(effect.target_value);
                 if constexpr (requires { handler.random_target(origin_card, origin, effect, ctx); }) {
-                    return play_card_target{value_type{handler.random_target(origin_card, origin, effect, ctx)}};
+                    auto value = handler.random_target(origin_card, origin, effect, ctx);
+                    if constexpr (std::is_convertible_v<decltype(value), value_type>) {
+                        return scored_target{ play_card_target{value_type{std::move(value)}}, 0 };
+                    } else {
+                        auto &[target, score] = value;
+                        return scored_target{ play_card_target{value_type{std::move(target)}}, score };
+                    }
                 } else {
-                    return play_card_target{value_type{random_element(handler.possible_targets(origin_card, origin, effect, ctx), origin->m_game->bot_rng)}};
+                    auto target = random_element(handler.possible_targets(origin_card, origin, effect, ctx), origin->m_game->bot_rng);
+                    return scored_target{ play_card_target{value_type{std::move(target)}}, 0 };
                 }
             },
 

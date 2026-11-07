@@ -10,27 +10,39 @@
 
 namespace banggame {
 
-    static game_action generate_random_play(player_ptr origin, const playable_card_info &args) {
-        game_action ret {
-            .card = args.card,
-            .effect_list = args.effect_list
+    struct scored_action {
+        game_action action;
+        int score;
+    };
+
+    static scored_action generate_random_play(player_ptr origin, const playable_card_info &args) {
+        scored_action ret {
+            .action {
+                .card = args.card,
+                .effect_list = args.effect_list
+            },
+            .score = 0
         };
         effect_context ctx;
         
         for (const auto &[mod_card, mod_response] : args.modifiers) {
-            auto &targets = ret.modifiers.emplace_back(mod_card, mod_response).targets;
+            auto &targets = ret.action.modifiers.emplace_back(mod_card, mod_response).targets;
 
             mod_card->get_modifier(mod_response).add_context(mod_card, origin, ctx);
             for (const effect_holder &holder : mod_card->get_effect_list(mod_response)) {
-                const auto &target = targets.emplace_back(holder.random_target(mod_card, origin, ctx));
-                holder.add_context(mod_card, origin, target, ctx);
+                auto value = holder.random_target(mod_card, origin, ctx);
+                holder.add_context(mod_card, origin, value.target, ctx);
+                targets.emplace_back(std::move(value.target));
+                ret.score += value.score;
             }
         }
 
         const effect_list &effects = args.card->get_effect_list(args.effect_list);
         for (const effect_holder &holder : effects) {
-            const auto &target = ret.targets.emplace_back(holder.random_target(args.card, origin, ctx));
-            holder.add_context(args.card, origin, target, ctx);
+            auto value = holder.random_target(args.card, origin, ctx);
+            holder.add_context(args.card, origin, value.target, ctx);
+            ret.action.targets.emplace_back(std::move(value.target));
+            ret.score += value.score;
         }
 
         return ret;
@@ -90,12 +102,17 @@ namespace banggame {
                 rn::iter_swap(it, last);
                 node_set.erase(last, node_set.end());
 
-                auto args = generate_random_play(origin, *selected_node);
-                args.bypass_prompt =
-                    (i >= bot_info.settings.bypass_empty_index && node_set.empty())
+                auto play = generate_random_play(origin, *selected_node);
+                
+                bool bypass = (i >= bot_info.settings.bypass_empty_index && node_set.empty())
                     || i >= bot_info.settings.bypass_unconditional_index;
 
-                auto result = verify_and_play(origin, args);
+                if (play.score < 0 && !bypass) {
+                    continue;
+                }
+
+                play.action.bypass_prompt = bypass;
+                auto result = verify_and_play(origin, play.action);
 
                 if (std::visit(overloaded{
                     [](play_verify_results::ok) {
