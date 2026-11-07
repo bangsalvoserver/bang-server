@@ -338,14 +338,17 @@ namespace banggame::bot_suggestion {
             return 0;
         }
 
-        int strong_score = 0;
-        if (auto value = target_card->get_tag_value(tag_type::strong)) {
-            strong_score = 5 + *value;
-        }
         if (target_card->pocket == pocket_type::player_table && target_card->has_tag(tag_type::penalty)) {
-            return evaluate_friend(origin, target) - strong_score;
+            return evaluate_friend(origin, target);
         }
-        return evaluate_neutral(origin, target) + strong_score;
+        
+        int score = evaluate_neutral(origin, target);
+        if (target_card->pocket != pocket_type::player_hand) {
+            if (auto value = target_card->get_tag_value(tag_type::strong)) {
+                score += 5 + *value;
+            }
+        }
+        return score;
     }
 
     int evaluate_discard_card(const_card_ptr target_card) {

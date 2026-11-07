@@ -28,15 +28,12 @@ namespace banggame {
         }
 
         int evaluate_pick(card_ptr target_card) const override {
-            if (target_card->has_tag(tag_type::strong)) {
-                return -5;
-            }
-            if (is_ghost_card(target_card)) {
+            if (target_card->has_tag(tag_type::penalty)) {
+                return 5;
+            } else if (auto value = target_card->get_tag_value(tag_type::strong)) {
+                return -5 - *value;
+            } else if (is_ghost_card(target_card)) {
                 return -10;
-            }
-            auto is_penalty_card = [](card_ptr c) { return c->has_tag(tag_type::penalty); };
-            if (rn::any_of(target->m_table, is_penalty_card) && !is_penalty_card(target_card)) {
-                return -3;
             }
             return 0;
         }
@@ -51,12 +48,14 @@ namespace banggame {
     };
 
     int effect_circus_wagon::evaluate(card_ptr, player_ptr origin, player_ptr target) const {
-        if (!bot_suggestion::is_target_enemy(origin, target)) {
-            return -5;
-        } else if (rn::any_of(target->m_table, [](card_ptr c) { return c->has_tag(tag_type::jail); })) {
-            return -3;
+        if (bot_suggestion::is_target_enemy(origin, target)) {
+            if (rn::any_of(target->m_table, [](card_ptr c) { return c->has_tag(tag_type::jail); })) {
+                return -10;
+            } else {
+                return 4;
+            }
         }
-        return 0;
+        return -2;
     }
 
     void effect_circus_wagon::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) const {

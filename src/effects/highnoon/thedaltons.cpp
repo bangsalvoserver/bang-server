@@ -32,11 +32,9 @@ namespace banggame {
         int evaluate_pick(card_ptr target_card) const override {
             if (target_card->has_tag(tag_type::penalty)) {
                 return 5;
-            }
-            if (auto value = target_card->get_tag_value(tag_type::strong)) {
+            } else if (auto value = target_card->get_tag_value(tag_type::strong)) {
                 return -5 - *value;
-            }
-            if (is_ghost_card(target_card)) {
+            } else if (is_ghost_card(target_card)) {
                 return -10;
             }
             return 0;

@@ -100,15 +100,11 @@ namespace banggame {
         req->selected_cards.add(target_card);
     }
 
-    static bool is_penalty_card(const_card_ptr c) {
-        return c->has_tag(tag_type::penalty);
-    }
-
     int effect_train_robbery_discard::evaluate(card_ptr, player_ptr origin, const effect_context &ctx) const {
         if (origin->is_ghost()) {
             return -5;
-        } else if (rn::any_of(origin->m_table, is_penalty_card) && !is_penalty_card(ctx.get<contexts::train_robbery_target>())) {
-            return -3;
+        } else if (ctx.get<contexts::train_robbery_target>()->has_tag(tag_type::penalty)) {
+            return 5;
         }
         return 0;
     }
@@ -134,11 +130,11 @@ namespace banggame {
 
     int effect_train_robbery_bang::evaluate(card_ptr, player_ptr origin, const effect_context &) const {
         if (origin->is_ghost()) {
-            return 0;
-        } else if (rn::any_of(origin->m_table, is_penalty_card)) {
-            return -5;
+            return 5;
+        } else if (rn::any_of(origin->m_table, [](card_ptr c) { return c->has_tag(tag_type::penalty); })) {
+            return -10;
         } else if (origin->m_hp <= 1 && count_missed_cards(origin) == 0) {
-            return -3;
+            return -5;
         }
         return 0;
     }
