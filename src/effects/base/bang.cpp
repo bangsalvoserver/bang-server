@@ -15,13 +15,15 @@
 namespace banggame {
 
     prompt_string effect_bang::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx) const {
-        MAYBE_RETURN(prompts::bot_check_kill_sheriff(origin, target));
-        MAYBE_RETURN(prompts::bot_check_target_enemy(origin, target, bot_suggestion::action_type::damage));
         MAYBE_RETURN(prompts::prompt_target_ghost(origin_card, origin, target));
         if (!ctx.contains<contexts::disable_bang_checks>()) {
             MAYBE_RETURN(prompts::prompt_target_immunity(origin_card, origin, target, flags));
         }
         return {};
+    }
+
+    int effect_bang::evaluate(card_ptr origin_card, player_ptr origin, player_ptr target) const {
+        return bot_suggestion::evaluate_attack(origin, target);
     }
     
     void effect_bang::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) const {
@@ -41,6 +43,10 @@ namespace banggame {
         } else {
             return {};
         }
+    }
+
+    int effect_bangcard::evaluate(card_ptr origin_card, player_ptr origin, player_ptr target) const {
+        return bot_suggestion::evaluate_attack(origin, target);
     }
 
     prompt_string effect_bangcard::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx) const {
