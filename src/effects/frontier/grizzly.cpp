@@ -6,6 +6,7 @@
 
 #include "game/game_table.h"
 #include "game/prompts.h"
+#include "game/bot_suggestion.h"
 
 namespace banggame {
 
@@ -27,9 +28,11 @@ namespace banggame {
     };
 
     prompt_string effect_grizzly::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) const {
-        MAYBE_RETURN(prompts::bot_check_target_enemy(origin, target, bot_suggestion::action_type::damage));
-        MAYBE_RETURN(prompts::prompt_target_immunity(origin_card, origin, target, flags));
-        return {};
+        return prompts::prompt_target_immunity(origin_card, origin, target, flags);
+    }
+
+    int effect_grizzly::evaluate(card_ptr, player_ptr origin, player_ptr target) const {
+        return bot_suggestion::evaluate_attack(origin, target);
     }
 
     void effect_grizzly::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) const {

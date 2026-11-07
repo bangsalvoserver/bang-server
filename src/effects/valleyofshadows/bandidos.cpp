@@ -4,6 +4,7 @@
 #include "game/prompts.h"
 #include "game/possible_to_play.h"
 #include "game/play_verify.h"
+#include "game/bot_suggestion.h"
 
 #include "cards/game_enums.h"
 
@@ -52,7 +53,6 @@ namespace banggame {
     };
 
     prompt_string effect_bandidos::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) const {
-        MAYBE_RETURN(prompts::bot_check_kill_sheriff(origin, target));
         MAYBE_RETURN(prompts::prompt_target_immunity(origin_card, origin, target, flags));
         if (origin == target && !origin->is_ghost()) {
             int prompt_hp = target->is_bot() ? 2 : 1;
@@ -63,6 +63,10 @@ namespace banggame {
             }
         }
         return {};
+    }
+
+    int effect_bandidos::evaluate(card_ptr, player_ptr origin, player_ptr target) const {
+        return bot_suggestion::evaluate_attack(origin, target);
     }
 
     void effect_bandidos::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) const {

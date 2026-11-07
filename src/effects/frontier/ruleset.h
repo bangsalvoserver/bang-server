@@ -20,6 +20,7 @@ namespace banggame {
 
     struct effect_track {
         game_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) const;
+        int evaluate(card_ptr origin_card, player_ptr origin, player_ptr target) const;
         void add_context(card_ptr origin_card, player_ptr origin, player_ptr target, effect_context &ctx) const;
     };
 

@@ -5,13 +5,16 @@
 #include "game/game_table.h"
 #include "game/game_options.h"
 #include "game/prompts.h"
+#include "game/bot_suggestion.h"
 
 namespace banggame {
 
     game_string effect_frankie_canton::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card) const {
-        MAYBE_RETURN(prompts::bot_check_target_enemy(origin, target_card->owner));
-        MAYBE_RETURN(prompts::prompt_target_self(origin_card, origin, target_card->owner));
-        return {};
+        return prompts::prompt_target_self(origin_card, origin, target_card->owner);
+    }
+
+    int effect_frankie_canton::evaluate(card_ptr, player_ptr origin, card_ptr target) const {
+        return bot_suggestion::evaluate_neutral(origin, target->owner);
     }
 
     struct request_frankie_canton : request_resolvable_timer {

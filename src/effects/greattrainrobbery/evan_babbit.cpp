@@ -19,9 +19,8 @@ namespace banggame {
         }
     }
 
-    game_string effect_evan_babbit::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) const {
-        MAYBE_RETURN(prompts::bot_check_target_enemy(origin, target));
-        return {};
+    int effect_evan_babbit::evaluate(card_ptr, player_ptr origin, player_ptr target) const {
+        return bot_suggestion::evaluate_attack(origin, target);
     }
 
     void effect_evan_babbit::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) const {

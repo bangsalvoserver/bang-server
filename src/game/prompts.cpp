@@ -47,30 +47,6 @@ namespace banggame::prompts {
         return {};
     }
 
-    prompt_string bot_check_kill_sheriff(player_ptr origin, player_ptr target) {
-        if (origin->is_bot()) {
-            switch (origin->get_base_role()) {
-            case player_role::outlaw:
-                break;
-            case player_role::sheriff:
-                if (bot_suggestion::is_target_friend(origin, target) && target->m_hp <= 1) {   
-                    return {1, "BOT_DONT_KILL_DEPUTY"};
-                }
-                break;
-            case player_role::renegade:
-                if (origin->m_game->num_alive(true) <= 2) {
-                    break;
-                }
-                [[fallthrough]];
-            default:
-                if (target->is_sheriff() && target->m_hp <= 1) {
-                    return {1, "BOT_DONT_KILL_SHERIFF"};
-                }
-            }
-        }
-        return {};
-    }
-
     game_string bot_check_target_enemy(player_ptr origin, player_ptr target, bot_suggestion::action_type type) {
         if (origin->is_bot() && !bot_suggestion::is_target_enemy(origin, target, type)) {
             return "BOT_TARGET_ENEMY";

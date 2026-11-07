@@ -626,68 +626,11 @@ This is one of a small family of similarly-shaped `bot_check_*` helpers in `game
 
 ---
 
-## Case 12 — Reconciling several per-target bot prompts into one (multi-target bot prompts)
+## Case 12 — Scoring targets for bots
 
-**Goal**: the same soft-discouragement mechanism as Case 11, but for a card that doesn't have a single target to judge — it has several, all hit at once. `players` (`target_types/base/players.h/.cpp`) is the shape behind every all-players effect (*Indians!*, *General Store*, *Saloon*'s group heal, and — the one worth tracing end to end — **Gatling**): Case 11's `bot_check_*` helpers each judge one target in isolation, so a `players` card needs a step Case 11 didn't — folding several independent per-target verdicts into the single `prompt_string` `on_prompt` has to return for the whole play.
+Target handlers use `random_max_element` to select among legal targets with the highest score. Effects provide that score through `evaluate`: `bot_suggestion::evaluate_attack` accounts for damage and lethal HP, while `bot_suggestion::evaluate_neutral` uses `action_type::neutral` and ignores HP. For effects that hit several players, `targeting_players::random_target` sums the evaluation for each affected player. Equal-scoring target choices remain random.
 
-The concrete example is the built-in **Gatling**: `bang players alive notself` in `config/sets/base.yml`, the ordinary `bang` effect (`effects/base/bang.cpp`) aimed at every `alive`, non-self player at once. `targeting_players::on_prompt` (`target_types/base/players.cpp`) is where the per-target verdicts get gathered:
-
-```cpp
-prompt_string targeting_players::on_prompt(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, value_type) const {
-    auto targets = get_player_targets_range(origin_card, origin, player_filter, ctx);
-    if (targets.empty()) {
-        return {"PROMPT_CARD_NO_EFFECT", origin_card};
-    }
-    effect_flags flags = get_flags(targets);
-    return prompts::select_prompt_fallback_empty(targets | rv::transform([&](player_ptr target) {
-        return effect.on_prompt(origin_card, origin, target, flags, ctx);
-    }));
-}
-```
-
-Nothing here is Gatling-specific — `get_player_targets_range` just recomputes the same `alive`+`notself` range `on_play` will hit for real, and the actual per-target judgment is delegated straight to `effect.on_prompt`, which for Gatling resolves to `effect_bang::on_prompt` — the same function an ordinary single-target Bang! calls, with no idea it's being asked once per player from inside this loop:
-
-```cpp
-prompt_string effect_bang::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) const {
-    MAYBE_RETURN(prompts::bot_check_kill_sheriff(origin, target));
-    MAYBE_RETURN(prompts::bot_check_target_enemy(origin, target));
-    MAYBE_RETURN(prompts::prompt_target_immunity(origin_card, origin, target, flags));
-    MAYBE_RETURN(prompts::prompt_target_ghost(origin_card, origin, target));
-    return {};
-}
-```
-
-`bot_check_kill_sheriff` returns a **priority-1** result (`{1, "BOT_DONT_KILL_SHERIFF"}`/`{1, "BOT_DONT_KILL_DEPUTY"}`) when this one target is a near-death ally the bot's role shouldn't finish off; `bot_check_target_enemy` returns a plain **priority-0** `game_string` (`"BOT_TARGET_ENEMY"`, defaulting to priority 0 the same way Case 11's `bot_check_target_friend` does), whenever this one target simply isn't read as an enemy. Run once per player in range, this produces a *row* of independent verdicts — not yet the single answer the card needs.
-
-That row gets folded by `prompts::select_prompt_fallback_empty` (`game/prompts.h`), the multi-target sibling of the plain `select_prompt` used elsewhere in the codebase to reconcile several simultaneously-applicable prompts on one card:
-
-```cpp
-inline prompt_string select_prompt_fallback_empty(prompt_range auto &&prompts) {
-    prompt_string result;
-    bool found_empty = false;
-    for (const prompt_string &str : prompts) {
-        if (!str) {
-            found_empty = true;
-        } else if (!result || str.priority > result.priority) {
-            result = str;
-        }
-    }
-    if (found_empty && result.priority == 0) {
-        result = {};
-    }
-    return result;
-}
-```
-
-Two concrete 4-player deals show both branches. In both, the bot is the **Sheriff**, and Gatling's target range is `B` (an Outlaw, read as an enemy) and `C` (the Deputy):
-- **`C` is at 1 HP.** `B`'s row entry is `{}` (reads as an enemy, nothing to flag); `C`'s is `{1, "BOT_DONT_KILL_DEPUTY"}` (a friend at death's door — `bot_check_kill_sheriff` catches it before `bot_check_target_enemy` even runs, via `MAYBE_RETURN`). `found_empty` ends up `true` (from `B`), but `result.priority` is `1`, so the final `if` doesn't fire: the priority-1 verdict survives no matter what else is in range, and Gatling's `on_prompt` comes back non-empty.
-- **`C` is at a safe 4 HP.** Neither target is near death, so `B`'s entry is still `{}` and `C`'s is only the plain `{0, "BOT_TARGET_ENEMY"}` (not read as an enemy, but nothing worse). `found_empty` is `true` again, but this time `result.priority` is `0`, so the final `if` *does* fire and `result` is cleared: Gatling's `on_prompt` comes back empty.
-
-The difference between the two is exactly the point of using `select_prompt_fallback_empty` instead of `select_prompt` here: a `players` target can't be aimed around a bad outcome the way a single-target Bang! can simply pick a different player — Gatling hits `B` and `C` together or not at all. So a genuinely bad, unavoidable outcome anywhere in range (priority 1) has to survive regardless of who else is a legitimate target; but a merely "not an enemy" complaint (priority 0) is only ever about *that one* player, and gets forgiven the moment at least one real enemy (signaled by `found_empty`) is also caught in the blast — the collateral hit on a safe ally isn't worth vetoing an otherwise-good play over. (If every target in range had come back with a priority-0 complaint and none at all, `found_empty` would still fire, but there'd be no non-empty `result` worth protecting either — a bot correctly never fires a Gatling purely at friends.)
-
-**Why it works**: exactly the same mechanism as Case 11 — a non-empty `prompt_string` becomes a `play_verify_results::prompt`, which `bot_ai.cpp`'s `execute_random_play` treats as "try something else in the pool," never a confirmation dialog, and never something a human playing the same Gatling would ever see (every `bot_check_*` still starts with the same `origin->is_bot()` guard). Two things worth keeping straight:
-- **This is specifically the multi-target problem, not a new kind of check.** Every `bot_check_*` helper from Case 11 is reused completely unmodified here; `players` just needs a combinator able to tell "one bad target among several legitimate ones" from "the only target is bad" — `select_prompt` alone can't do that, since it would let a single stray priority-0 complaint from one friendly target block a play that's otherwise perfectly justified by a real enemy sitting right next to them.
-- **It's still only a soft discouragement.** As in Case 11, if a bot has no better option left after `bot_info.yml`'s `max_random_tries`, `bypass_prompt` forces the Gatling through anyway rather than stalling the game.
+For example, `effect_bang::evaluate` delegates to `evaluate_attack`, so the bot considers alignment and whether the target is close to death. A non-damaging effect that should prefer enemies can use `evaluate_neutral` instead. The scoring affects bot target selection without making an otherwise legal choice invalid for a human or bot.
 
 ---
 

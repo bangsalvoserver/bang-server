@@ -22,7 +22,9 @@ namespace banggame::bot_suggestion {
     bool is_target_friend(const_player_ptr origin, const_player_ptr target);
 
     int evaluate_attack(const_player_ptr origin, const_player_ptr target);
-    
+
+    int evaluate_neutral(const_player_ptr origin, const_player_ptr target);
+
 }
 
 #endif

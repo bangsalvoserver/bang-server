@@ -56,9 +56,8 @@ namespace banggame {
         }
     };
 
-    game_string effect_jesse_jones_legend::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target) const {
-        MAYBE_RETURN(prompts::bot_check_target_enemy(origin, target->owner));
-        return {};
+    int effect_jesse_jones_legend::evaluate(card_ptr, player_ptr origin, card_ptr target) const {
+        return bot_suggestion::evaluate_neutral(origin, target->owner);
     }
 
     void effect_jesse_jones_legend::on_play(card_ptr origin_card, player_ptr origin, card_ptr target) const {

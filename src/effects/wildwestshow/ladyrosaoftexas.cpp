@@ -4,6 +4,7 @@
 
 #include "game/game_table.h"
 #include "game/prompts.h"
+#include "game/bot_suggestion.h"
 
 namespace banggame {
 
@@ -23,9 +24,8 @@ namespace banggame {
         }
     }
 
-    game_string effect_ladyrosaoftexas::on_prompt(card_ptr origin_card, player_ptr origin) const {
-        MAYBE_RETURN(prompts::bot_check_target_enemy(origin, get_swapping_player(origin)));
-        return {};
+    int effect_ladyrosaoftexas::evaluate(card_ptr, player_ptr origin) const {
+        return bot_suggestion::evaluate_neutral(origin, get_swapping_player(origin));
     }
 
     void effect_ladyrosaoftexas::on_play(card_ptr origin_card, player_ptr origin) const {

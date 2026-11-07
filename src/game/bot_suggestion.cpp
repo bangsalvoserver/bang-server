@@ -294,4 +294,13 @@ namespace banggame::bot_suggestion {
         }
         return score;
     }
+
+    int evaluate_neutral(const_player_ptr origin, const_player_ptr target) {
+        if (is_target_enemy(origin, target, action_type::neutral)) {
+            return 5;
+        } else if (is_target_friend(origin, target)) {
+            return -5;
+        }
+        return 0;
+    }
 }
