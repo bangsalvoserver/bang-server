@@ -38,8 +38,8 @@ namespace banggame {
 
     int request_check_base::evaluate_pick(card_ptr target_card) const {
         auto result = get_result(target_card);
-        if (!result.indifferent && result.lucky) {
-            return 5;
+        if (!result.indifferent && !result.lucky) {
+            return -5;
         }
         return 0;
     }
@@ -85,6 +85,8 @@ namespace banggame {
             if (!result.lucky) return -5;
         } else if (bot_suggestion::is_target_friend(owner, target)) {
             if (result.lucky) return -5;
+        } else {
+            return -5;
         }
         return 0;
     }
