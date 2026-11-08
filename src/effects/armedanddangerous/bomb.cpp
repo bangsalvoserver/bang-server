@@ -44,7 +44,7 @@ namespace banggame {
         }
 
         int evaluate_pick(player_ptr target_player) const override {
-            return bot_suggestion::evaluate_neutral(target, target_player);
+            return bot_suggestion::evaluate_soft_attack(target, target_player);
         }
 
         game_string status_text(player_ptr owner) const override {
@@ -63,7 +63,7 @@ namespace banggame {
     }
 
     int equip_bomb::evaluate(card_ptr, player_ptr origin, player_ptr target) const {
-        return bot_suggestion::evaluate_neutral(origin, target);
+        return bot_suggestion::evaluate_soft_attack(origin, target);
     }
 
     void equip_bomb::on_enable(card_ptr target_card, player_ptr target) const {

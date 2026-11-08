@@ -597,7 +597,7 @@ struct effect_comrades_aid {
 };
 ```
 
-Use the appropriate evaluation hook for the decision being made: `evaluate` on effects/equips/MTH handlers, `evaluate_pick` on a pending card or player pick, `evaluate_resolve` for resolving a request, `evaluate_escape` for escaping, and `evaluate_redraw` for redraw decisions. Pick and resolve request interfaces default to `0`, so only override them when that request has a preference. Prefer shared helpers such as `bot_suggestion::evaluate_attack`, `evaluate_neutral`, and `evaluate_friend` when their semantics fit.
+Use the appropriate evaluation hook for the decision being made: `evaluate` on effects/equips/MTH handlers, `evaluate_pick` on a pending card or player pick, `evaluate_resolve` for resolving a request, `evaluate_escape` for escaping, and `evaluate_redraw` for redraw decisions. Pick and resolve request interfaces default to `0`, so only override them when that request has a preference. Prefer shared helpers such as `bot_suggestion::evaluate_attack`, `evaluate_soft_attack`, and `evaluate_help` when their semantics fit.
 
 Keep `on_prompt` for human-facing warnings or confirmations, such as target immunity. A prompt can still cause the bot's verifier to retry a candidate, so bot-only preference prompts should be migrated to `evaluate` rather than added to new effects.
 
@@ -605,9 +605,9 @@ Keep `on_prompt` for human-facing warnings or confirmations, such as target immu
 
 ## Case 12 — Scoring targets for bots
 
-Target handlers use `random_max_element` to select among legal targets with the highest score. Effects provide that score through `evaluate`: `bot_suggestion::evaluate_attack` accounts for damage and lethal HP, while `bot_suggestion::evaluate_neutral` uses `action_type::neutral` and ignores HP. For effects that hit several players, `targeting_players::random_target` sums the evaluation for each affected player. Equal-scoring target choices remain random.
+Target handlers use `random_max_element` to select among legal targets with the highest score. Effects provide that score through `evaluate`: `bot_suggestion::evaluate_attack` accounts for damage and lethal HP, while `bot_suggestion::evaluate_soft_attack` uses `action_type::neutral` and ignores HP. For effects that hit several players, `targeting_players::random_target` sums the evaluation for each affected player. Equal-scoring target choices remain random.
 
-For example, `effect_bang::evaluate` delegates to `evaluate_attack`, so the bot considers alignment and whether the target is close to death. A non-damaging effect that should prefer enemies can use `evaluate_neutral` instead. The scoring affects bot target selection without making an otherwise legal choice invalid for a human or bot.
+For example, `effect_bang::evaluate` delegates to `evaluate_attack`, so the bot considers alignment and whether the target is close to death. A non-damaging effect that should prefer enemies can use `evaluate_soft_attack` instead. The scoring affects bot target selection without making an otherwise legal choice invalid for a human or bot.
 
 ---
 

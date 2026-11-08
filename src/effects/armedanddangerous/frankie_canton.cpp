@@ -14,7 +14,7 @@ namespace banggame {
     }
 
     int effect_frankie_canton::evaluate(card_ptr, player_ptr origin, card_ptr target) const {
-        return bot_suggestion::evaluate_neutral(origin, target->owner);
+        return bot_suggestion::evaluate_soft_attack(origin, target->owner);
     }
 
     struct request_frankie_canton : request_resolvable_timer {

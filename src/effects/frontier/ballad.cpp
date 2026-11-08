@@ -30,14 +30,14 @@ namespace banggame {
     }
 
     int effect_ballad::evaluate(card_ptr, player_ptr origin, player_ptr target) const {
-        return bot_suggestion::evaluate_neutral(origin, target);
+        return bot_suggestion::evaluate_soft_attack(origin, target);
     }
 
     struct request_ballad_steal : request_dismissable, interface_picking {
         using request_dismissable::request_dismissable;
 
         int evaluate_pick(card_ptr) const override {
-            return bot_suggestion::evaluate_neutral(target, origin);
+            return bot_suggestion::evaluate_soft_attack(target, origin);
         }
 
         bool can_pick(card_ptr target_card) const override {

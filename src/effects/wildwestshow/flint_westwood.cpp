@@ -10,7 +10,7 @@
 namespace banggame {
 
     int handler_flint_westwood::evaluate(card_ptr, player_ptr origin, card_ptr, card_ptr target_card) const {
-        return bot_suggestion::evaluate_neutral(origin, target_card->owner);
+        return bot_suggestion::evaluate_soft_attack(origin, target_card->owner);
     }
 
     void handler_flint_westwood::on_play(card_ptr origin_card, player_ptr origin, card_ptr chosen_card, card_ptr target_card) const {

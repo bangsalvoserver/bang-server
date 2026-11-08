@@ -32,7 +32,7 @@ namespace banggame {
     }
 
     int equip_weapon::evaluate(card_ptr, player_ptr origin, player_ptr target) const {
-        return range == 0 ? bot_suggestion::evaluate_neutral(origin, target) : 0;
+        return range == 0 ? bot_suggestion::evaluate_soft_attack(origin, target) : 0;
     }
 
     void equip_weapon::on_enable(card_ptr origin_card, player_ptr target) const {

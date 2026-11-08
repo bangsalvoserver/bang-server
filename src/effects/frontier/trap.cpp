@@ -16,7 +16,7 @@ namespace banggame {
     }
 
     int equip_trap::evaluate(card_ptr, player_ptr origin, player_ptr target) const {
-        return bot_suggestion::evaluate_neutral(origin, target);
+        return bot_suggestion::evaluate_soft_attack(origin, target);
     }
 
     void equip_trap::on_enable(card_ptr target_card, player_ptr target) const {
@@ -52,7 +52,7 @@ namespace banggame {
         }
 
         int evaluate_pick(player_ptr target_player) const override {
-            return bot_suggestion::evaluate_neutral(target, target_player);
+            return bot_suggestion::evaluate_soft_attack(target, target_player);
         }
 
         game_string status_text(player_ptr owner) const override {

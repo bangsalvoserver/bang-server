@@ -24,7 +24,7 @@ namespace banggame {
     }
 
     int equip_ghost::evaluate(card_ptr, player_ptr origin, player_ptr target) const {
-        return bot_suggestion::evaluate_friend(origin, target);
+        return bot_suggestion::evaluate_help(origin, target);
     }
     
     void equip_ghost::on_enable(card_ptr target_card, player_ptr target) const {

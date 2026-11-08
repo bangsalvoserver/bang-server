@@ -298,7 +298,7 @@ namespace banggame::bot_suggestion {
         return score;
     }
 
-    int evaluate_neutral(const_player_ptr origin, const_player_ptr target) {
+    int evaluate_soft_attack(const_player_ptr origin, const_player_ptr target) {
         if (is_target_enemy(origin, target, action_type::neutral)) {
             return 4;
         } else if (is_target_friend(origin, target)) {
@@ -307,7 +307,7 @@ namespace banggame::bot_suggestion {
         return 0;
     }
 
-    int evaluate_friend(const_player_ptr origin, const_player_ptr target) {
+    int evaluate_help(const_player_ptr origin, const_player_ptr target) {
         if (is_target_friend(origin, target)) {
             return 4;
         } else if (is_target_enemy(origin, target, action_type::neutral)) {
@@ -331,8 +331,8 @@ namespace banggame::bot_suggestion {
         if (target_card->pocket == pocket_type::player_table && target_card->is_purple()) {
             if (player_ptr tracked_player = get_tracked_player(target_card)) {
                 return target_card->has_tag(tag_type::pardner_penalty)
-                    ? evaluate_friend(origin, tracked_player)
-                    : evaluate_neutral(origin, tracked_player);
+                    ? evaluate_help(origin, tracked_player)
+                    : evaluate_soft_attack(origin, tracked_player);
             }
             return 0;
         }

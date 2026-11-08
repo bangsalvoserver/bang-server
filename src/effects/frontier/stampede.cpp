@@ -17,7 +17,7 @@ namespace banggame {
     }
 
     int effect_stampede::evaluate(card_ptr, player_ptr origin, player_ptr target) const {
-        return bot_suggestion::evaluate_neutral(origin, target);
+        return bot_suggestion::evaluate_soft_attack(origin, target);
     }
 
     struct request_stampede : request_picking, interface_resolvable {

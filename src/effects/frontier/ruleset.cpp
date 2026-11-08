@@ -147,7 +147,7 @@ namespace banggame {
 
     int effect_track::evaluate(card_ptr origin_card, player_ptr origin, player_ptr target) const {
         if (origin_card->has_tag(tag_type::pardner_penalty)) {
-            return bot_suggestion::evaluate_neutral(origin, target);
+            return bot_suggestion::evaluate_soft_attack(origin, target);
         }
         return 0;
     }

@@ -40,7 +40,7 @@ namespace banggame {
     }
 
     int equip_lastwill::evaluate(card_ptr, player_ptr origin, player_ptr target) const {
-        return bot_suggestion::evaluate_friend(origin, target);
+        return bot_suggestion::evaluate_help(origin, target);
     }
 
     void equip_lastwill::on_enable(card_ptr origin_card, player_ptr origin) const {
@@ -56,7 +56,7 @@ namespace banggame {
     }
 
     int handler_lastwill::evaluate(card_ptr, player_ptr origin, const card_list &, player_ptr target) const {
-        return bot_suggestion::evaluate_friend(origin, target);
+        return bot_suggestion::evaluate_help(origin, target);
     }
 
     void handler_lastwill::on_play(card_ptr origin_card, player_ptr origin, const card_list &target_cards, player_ptr target) const {

@@ -11,7 +11,7 @@ namespace banggame {
     
     int handler_gift_card::evaluate(card_ptr, player_ptr origin, card_ptr, player_ptr target_player) const {
         if (!forced_response) {
-            return bot_suggestion::evaluate_friend(origin, target_player);
+            return bot_suggestion::evaluate_help(origin, target_player);
         }
         return 0;
     }

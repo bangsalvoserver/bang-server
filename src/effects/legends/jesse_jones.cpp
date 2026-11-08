@@ -57,7 +57,7 @@ namespace banggame {
     };
 
     int effect_jesse_jones_legend::evaluate(card_ptr, player_ptr origin, card_ptr target) const {
-        return bot_suggestion::evaluate_neutral(origin, target->owner);
+        return bot_suggestion::evaluate_soft_attack(origin, target->owner);
     }
 
     void effect_jesse_jones_legend::on_play(card_ptr origin_card, player_ptr origin, card_ptr target) const {

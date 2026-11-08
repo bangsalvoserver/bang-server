@@ -35,7 +35,7 @@ namespace banggame {
         }
 
         int evaluate_pick(player_ptr target_player) const override {
-            return bot_suggestion::evaluate_neutral(target, target_player);
+            return bot_suggestion::evaluate_soft_attack(target, target_player);
         }
 
         game_string status_text(player_ptr owner) const override {

@@ -16,7 +16,7 @@ namespace banggame {
     }
 
     int equip_bounty::evaluate(card_ptr, player_ptr origin, player_ptr target) const {
-        return bot_suggestion::evaluate_neutral(origin, target);
+        return bot_suggestion::evaluate_soft_attack(origin, target);
     }
     
     void equip_bounty::on_enable(card_ptr target_card, player_ptr p) const {

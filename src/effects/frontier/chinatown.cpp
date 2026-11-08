@@ -53,7 +53,7 @@ namespace banggame {
     }
 
     int effect_chinatown::evaluate(card_ptr, player_ptr origin, player_ptr target) const {
-        return bot_suggestion::evaluate_neutral(origin, target);
+        return bot_suggestion::evaluate_soft_attack(origin, target);
     }
 
     void effect_chinatown::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) const {
