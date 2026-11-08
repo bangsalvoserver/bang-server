@@ -10,9 +10,8 @@ bots:
     max_retries: 3
     bypass_retries: 2
     
-    # Rules are tiebreakers between actions with the same score:
-    # the earlier a rule matches, the higher the priority of the action.
-    # Actions are chosen by score first, then by rule priority, then at random.
+    # Actions are ordered by rule priority first, then by score, then at random.
+    # The earlier a rule matches, the higher the action's priority.
     response_rules:
     - pocket(pocket_type::player_character)
     - pocket(pocket_type::player_table)

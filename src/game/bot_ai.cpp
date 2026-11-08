@@ -62,9 +62,9 @@ namespace banggame {
         return ret;
     }
 
-    // A candidate action. The "greatest" candidate is the best one: highest score, then lowest
-    // rule priority index, then lowest random tiebreak. The tiebreak is drawn once per candidate
-    // so that the ordering is a strict total order and equally good actions are chosen uniformly.
+    // A candidate action. The "greatest" candidate is the best one: lowest rule priority index,
+    // then highest score, then lowest random tiebreak. The tiebreak is drawn once per generation
+    // to randomize the order of otherwise equally ranked candidates.
     struct candidate {
         int score;
         int priority;
@@ -74,14 +74,13 @@ namespace banggame {
         static constexpr size_t no_play = static_cast<size_t>(-1);
 
         auto operator<=>(const candidate &rhs) const {
-            if (auto cmp = score <=> rhs.score; cmp != 0) return cmp;
             if (auto cmp = rhs.priority <=> priority; cmp != 0) return cmp;
+            if (auto cmp = score <=> rhs.score; cmp != 0) return cmp;
             return rhs.tiebreak <=> tiebreak;
         }
     };
 
-    // Rules are used as tiebreakers: the priority is the index of the first matching rule,
-    // actions that match no rule come last.
+    // The priority is the index of the first matching rule; actions matching no rule come last.
     static int get_rule_priority(const bot_rule_list &rules, card_node node) {
         int priority = 0;
         for (const bot_rule &rule : rules) {
@@ -97,7 +96,7 @@ namespace banggame {
         auto timer = origin->m_game->top_request<request_timer>();
         bool add_empty = timer && timer->enabled();
 
-        // every action is generated and scored exactly once
+        // Generate and score each action once initially; failed actions are regenerated in later rounds.
         std::vector<scored_action> plays;
         std::vector<candidate> candidates;
         plays.reserve(play_cards.size());

@@ -528,7 +528,7 @@ A few things worth noticing:
 
 **Goal**: make sure bots play your new card at a sensible moment, without writing any AI logic — most of the time this is a **tagging decision**, not a code change.
 
-Bots score every legal `(card, targets)` combination (the sum of the `evaluate` scores of its targets, see Case 11) and play the best one. When several actions have the same score, a short, **ordered** list of generic predicates breaks the tie, and a random pick decides between actions the list can't tell apart:
+For each playable card, the bot generates a target combination and scores it (summing the `evaluate` scores of its targets, see Case 11). It chooses an action by **rule priority first**, then by score, then at random. A short, **ordered** list of generic predicates gives each action its priority. Failed attempts can be regenerated with new random targets:
 
 ```yaml
 # config/bot_info.yml
@@ -552,7 +552,7 @@ So for a typical new card, "driving" bot behavior means picking the right tag, n
   tags:
     - strong
 ```
-That alone routes it into the `tag_value(tag_type::strong)` tier — the highest priority in `in_play_rules` — ahead of ordinary hand/table plays, with zero AI code written. This is why the predicate list stays so short and generic: card authors steer bots through the same tags that already describe the card for other purposes (rules text, filters, UI), not through a parallel bot-specific configuration per card.
+That alone routes it into the `tag_value(tag_type::strong)` tier — the highest priority in `in_play_rules` — ahead of lower-priority actions, with zero AI code written. Within the same priority tier, its `evaluate` score decides which action comes first. This is why the predicate list stays so short and generic: card authors steer bots through the same tags that already describe the card for other purposes (rules text, filters, UI), not through a parallel bot-specific configuration per card.
 
 The list only needs a **new predicate** when the property you need genuinely isn't reducible to an existing tag/pocket/equip check. The existing set has a gap, for instance: nothing lets a rule ask about a card's *color*. Adding one follows the exact same shape as the built-in ones:
 ```cpp
@@ -570,7 +570,7 @@ bool rule_color::operator()(card_node node) const {
 ```
 which YAML can then reference exactly like any other rule, e.g. `color(card_color_type::brown)`, in either `in_play_rules` or `response_rules`. Note the `get_first_card(node)` call rather than a direct `node->card->color` check: it's the same helper every built-in predicate but `rule_equip` goes through, and it's what keeps a new rule judging the right card when the candidate play chains a modifier ahead of a terminal one (e.g. *Aim* + *Bang!*) — the first card actually played, not whatever the chain resolves to. In practice this is the rare path — the existing predicates, especially `tag_value`, cover almost everything a new card needs, because tags themselves are freely extensible from YAML with no C++ at all.
 
-**Why it works**: `execute_best_play` (`bot_ai.cpp`) orders candidates by score first. Among equal scores, an action's priority is the index of the first rule it matches (no match means last), and the final tie is broken by a random number drawn once per candidate, so equally good actions are picked uniformly. A card matching an earlier rule is therefore preferred only over cards with the *same* score: tags steer cards that have nothing to score (e.g. *Stagecoach*), while cards with targets are steered by `evaluate` (Case 11).
+**Why it works**: `execute_best_play` (`bot_ai.cpp`) orders candidates by rule priority first: the index of the first rule an action matches, with actions matching no rule last. Within a priority tier, the higher score wins; equal-priority, equal-score actions are ordered by a random tiebreak drawn once per candidate. Rules can therefore put an action ahead of another even when its score is lower. Scores still steer target choices and decide between actions in the same tier.
 
 ---
 
