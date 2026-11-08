@@ -5,6 +5,7 @@
 
 #include "game/game_table.h"
 #include "game/prompts.h"
+#include "game/bot_suggestion.h"
 
 #include "effects/base/predraw_check.h"
 
@@ -38,9 +39,12 @@ namespace banggame {
             if (target == target_player) {
                 return {"PROMPT_MOVE_BOMB_TO_SELF", origin_card};
             }
-            MAYBE_RETURN(prompts::bot_check_target_enemy(target, target_player));
             MAYBE_RETURN(prompts::prompt_target_immunity(origin_card, target, target_player));
             return {};
+        }
+
+        int evaluate_pick(player_ptr target_player) const override {
+            return bot_suggestion::evaluate_soft_attack(target, target_player);
         }
 
         game_string status_text(player_ptr owner) const override {
@@ -53,10 +57,13 @@ namespace banggame {
     };
 
     prompt_string equip_bomb::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) const {
-        MAYBE_RETURN(prompts::bot_check_target_enemy(origin, target));
         MAYBE_RETURN(prompts::prompt_target_self(origin_card, origin, target));
         MAYBE_RETURN(prompts::prompt_target_immunity(origin_card, origin, target));
         return {};
+    }
+
+    int equip_bomb::evaluate(card_ptr, player_ptr origin, player_ptr target) const {
+        return bot_suggestion::evaluate_soft_attack(origin, target);
     }
 
     void equip_bomb::on_enable(card_ptr target_card, player_ptr target) const {

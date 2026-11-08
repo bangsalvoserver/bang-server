@@ -6,11 +6,11 @@
 
 namespace banggame {
 
-    game_string effect_coffee::on_prompt(card_ptr origin_card, player_ptr origin) const {
-        if (origin->is_bot() && origin->m_hand.size() <= origin->max_cards_end_of_turn()) {
-            return "BOT_BAD_COFFEE";
+    int effect_coffee::evaluate(card_ptr, player_ptr origin) const {
+        if (origin->m_hand.size() <= origin->max_cards_end_of_turn()) {
+            return -5;
         }
-        return {};
+        return 0;
     }
     
     void effect_coffee::on_play(card_ptr origin_card, player_ptr origin) const {

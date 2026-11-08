@@ -9,7 +9,7 @@ namespace banggame {
         card_suit suit;
         effect_fishing(card_suit suit): suit{suit} {}
 
-        game_string on_prompt(card_ptr origin_card, player_ptr origin) const;
+        int evaluate(card_ptr origin_card, player_ptr origin) const;
         void on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const;
     };
 

@@ -11,9 +11,12 @@
 #include "game/game_table.h"
 #include "game/possible_to_play.h"
 #include "game/prompts.h"
+#include "game/bot_suggestion.h"
 #include "game/play_verify.h"
 
 #include "poker.h"
+
+#include <algorithm>
 
 namespace banggame {
 
@@ -21,15 +24,12 @@ namespace banggame {
         request_tornado(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags = {})
             : request_picking(origin_card, origin, target, flags) {}
         
-        prompt_string escape_prompt(player_ptr owner) const override {
-            if (owner->is_bot()) {
-                return "BOT_ESCAPE_TORNADO";
-            }
-            return {};
+        int evaluate_escape(player_ptr) const override {
+            return -5;
         }
 
-        prompt_string pick_prompt(card_ptr target_card) const override {
-            return prompts::bot_check_discard_card(target, target_card);
+        int evaluate_pick(card_ptr target_card) const override {
+            return bot_suggestion::evaluate_discard_card(target_card);
         }
         
         bool can_pick(card_ptr target_card) const override {
@@ -132,6 +132,19 @@ namespace banggame {
         MAYBE_RETURN(prompts::prompt_target_immunity(origin_card, origin, target, flags));
         return {};
     }
+
+    int effect_tornado2::evaluate(card_ptr, player_ptr origin, player_ptr target) const {
+        int cards_gained = std::min(2, static_cast<int>(target->get_prev_player()->m_hand.size()));
+        int cards_lost = std::min(2, static_cast<int>(target->m_hand.size()));
+
+        if (bot_suggestion::is_target_friend(origin, target)) {
+            return (cards_gained - cards_lost) * 5;
+        }
+        if (bot_suggestion::is_target_enemy(origin, target)) {
+            return (cards_gained - cards_lost) * -5;
+        }
+        return 0;
+    }
     
     void effect_tornado2::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) const {
         target->m_game->queue_request<request_tornado2>(origin_card, origin, target, flags);
@@ -141,11 +154,12 @@ namespace banggame {
         return origin->m_game->top_request<request_tornado2>(target_is{origin}) != nullptr;
     }
 
-    prompt_string effect_tornado2_response::on_prompt(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const {
+    int effect_tornado2_response::evaluate(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const {
+        int score = 0;
         for (card_ptr target_card : ctx.get_all<contexts::selected_card>()) {
-            MAYBE_RETURN(prompts::bot_check_discard_card(origin, target_card));
+            score += bot_suggestion::evaluate_discard_card(target_card);
         }
-        return {};
+        return score;
     }
 
     void effect_tornado2_response::on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const {

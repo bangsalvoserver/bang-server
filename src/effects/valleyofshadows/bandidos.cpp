@@ -4,6 +4,7 @@
 #include "game/prompts.h"
 #include "game/possible_to_play.h"
 #include "game/play_verify.h"
+#include "game/bot_suggestion.h"
 
 #include "cards/game_enums.h"
 
@@ -33,13 +34,13 @@ namespace banggame {
             target->damage(origin_card, origin, 1);
         }
 
-        prompt_string resolve_prompt() const override {
-            if (target->is_bot() && target->m_hp <= 2 && rn::any_of(target->m_hand, [&](card_ptr target_card) {
+        int evaluate_resolve() const override {
+            if (target->m_hp <= 2 && rn::any_of(target->m_hand, [&](card_ptr target_card) {
                 return !get_use_card_error(target, target_card);
             })) {
-                return "BOT_MUST_RESPOND_BANDIDOS";
+                return -5;
             }
-            return {};
+            return 0;
         }
 
         game_string status_text(player_ptr owner) const override {
@@ -52,7 +53,6 @@ namespace banggame {
     };
 
     prompt_string effect_bandidos::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) const {
-        MAYBE_RETURN(prompts::bot_check_kill_sheriff(origin, target));
         MAYBE_RETURN(prompts::prompt_target_immunity(origin_card, origin, target, flags));
         if (origin == target && !origin->is_ghost()) {
             int prompt_hp = target->is_bot() ? 2 : 1;
@@ -63,6 +63,10 @@ namespace banggame {
             }
         }
         return {};
+    }
+
+    int effect_bandidos::evaluate(card_ptr, player_ptr origin, player_ptr target) const {
+        return bot_suggestion::evaluate_attack(origin, target);
     }
 
     void effect_bandidos::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) const {
@@ -115,6 +119,10 @@ namespace banggame {
     prompt_string effect_bandidos2::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) const {
         MAYBE_RETURN(prompts::prompt_target_immunity(origin_card, origin, target, flags));
         return {};
+    }
+
+    int effect_bandidos2::evaluate(card_ptr origin_card, player_ptr origin, player_ptr target) const {
+        return bot_suggestion::evaluate_soft_attack(origin, target);
     }
 
     void effect_bandidos2::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) const {

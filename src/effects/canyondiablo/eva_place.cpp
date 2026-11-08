@@ -36,18 +36,15 @@ namespace banggame {
             return resolve_type::dismiss;
         }
 
-        prompt_string pick_prompt(card_ptr target_card) const override {
-            if (target->is_bot() && !drawn_card->sign.is_diamonds()) {
-                return "BOT_UNNECESSARY_REVEAL";
-            }
-            return {};
+        int evaluate_pick(card_ptr) const override {
+            return drawn_card->sign.is_diamonds() ? 5 : -5;
         }
 
-        prompt_string resolve_prompt() const override {
-            if (target->is_bot() && drawn_card->sign.is_diamonds()) {
-                return "BOT_CAN_REVEAL";
+        int evaluate_resolve() const override {
+            if (drawn_card->sign.is_diamonds()) {
+                return -5;
             }
-            return {};
+            return 0;
         }
 
         void on_resolve() override {

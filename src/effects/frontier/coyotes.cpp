@@ -7,7 +7,7 @@
 #include "cards/game_enums.h"
 
 #include "game/game_table.h"
-#include "game/prompts.h"
+#include "game/bot_suggestion.h"
 #include "game/play_verify.h"
 
 namespace banggame {
@@ -26,8 +26,8 @@ namespace banggame {
             }
         }
 
-        prompt_string pick_prompt(card_ptr target_card) const override {
-            return prompts::bot_check_discard_card(target, target_card);
+        int evaluate_pick(card_ptr target_card) const override {
+            return bot_suggestion::evaluate_discard_card(target_card);
         }
 
         bool can_pick(card_ptr target_card) const override {
@@ -41,11 +41,11 @@ namespace banggame {
             target->discard_used_card(target_card);
         }
 
-        prompt_string resolve_prompt() const override {
-            if (target->is_bot() && target->m_hp <= 2 && rn::any_of(target->m_hand, [&](card_ptr c) { return can_pick(c); })) {
-                return "BOT_MUST_RESPOND_COYOTES";
+        int evaluate_resolve() const override {
+            if (target->m_hp <= 2 && rn::any_of(target->m_hand, [&](card_ptr c) { return can_pick(c); })) {
+                return -5;
             }
-            return {};
+            return 0;
         }
 
         void on_resolve() override {

@@ -33,34 +33,6 @@ auto sample_elements(R &&range, size_t count, Rng &rng) {
     return sample_elements_r<rn::range_value_t<R>>(std::forward<R>(range), count, rng);
 }
 
-template<typename T, rn::input_range R, typename Rng>
-std::vector<T> sample_elements_streaming_r(R &&range, double probability, Rng &rng) {
-    std::vector<T> result;
-    
-    std::bernoulli_distribution dist(probability);
-
-    std::optional<T> fallback;
-    size_t count = 0;
-
-    for (auto &&elem : range) {
-        if (dist(rng)) result.push_back(elem);
-        std::uniform_int_distribution<size_t> fallback_dist(0, count);
-        if (fallback_dist(rng) == 0) fallback = elem;
-        ++count;
-    }
-
-    if (result.empty() && fallback.has_value()) {
-        result.emplace_back(std::move(*fallback));
-    }
-
-    return result;
-}
-
-template<rn::input_range R, typename Rng>
-auto sample_elements_streaming(R &&range, double probability, Rng &rng) {
-    return sample_elements_streaming_r<rn::range_value_t<R>>(std::forward<R>(range), probability, rng);
-}
-
 template<rn::input_range R, typename Rng>
 rn::range_value_t<R> random_element(R &&range, Rng &rng) {
     using value_t = rn::range_value_t<R>;
@@ -89,6 +61,54 @@ rn::range_value_t<R> random_element(R &&range, Rng &rng) {
 
         return chosen;
     }
+}
+
+// Returns a uniformly random element among those with the highest score,
+// together with that score. Single pass, no allocation.
+template<rn::input_range R, typename Rng, typename ScoreFn>
+std::pair<rn::range_value_t<R>, int> random_max_element(R &&range, ScoreFn &&score_fn, Rng &rng) {
+    using value_t = rn::range_value_t<R>;
+
+    std::optional<value_t> chosen;
+    int best = 0;
+    size_t ties = 0;
+
+    for (auto &&elem : range) {
+        int score = score_fn(elem);
+        if (!chosen || score > best) {
+            // new maximum: restart the tie counter
+            chosen = elem;
+            best = score;
+            ties = 1;
+        } else if (score == best) {
+            // reservoir sampling: the k-th element tied for the maximum
+            // replaces the current choice with probability 1/k
+            ++ties;
+            std::uniform_int_distribution<size_t> dist(0, ties - 1);
+            if (dist(rng) == 0) chosen = elem;
+        }
+    }
+
+    if (!chosen) throw std::runtime_error("Empty range in random_max_element");
+    return { std::move(*chosen), best };
+}
+
+template<rn::input_range R, typename ScoreFn, typename Rng>
+auto random_max_elements(R &&range, size_t count, ScoreFn &&score_fn, Rng &rng) {
+    using value_t = rn::range_value_t<R>;
+    std::vector<value_t> candidates = rn::to<std::vector>(std::forward<R>(range));
+    std::vector<value_t> selected;
+    selected.reserve(std::min(count, candidates.size()));
+
+    int total_score = 0;
+    while (count > 0 && !candidates.empty()) {
+        --count;
+        auto [chosen, score] = random_max_element(candidates, score_fn, rng);
+        selected.push_back(chosen);
+        total_score += score;
+        candidates.erase(rn::find(candidates, chosen));
+    }
+    return std::pair{ std::move(selected), total_score };
 }
 
 #endif

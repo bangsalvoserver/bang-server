@@ -11,6 +11,7 @@ namespace banggame {
         game_string get_error(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const;
         void add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) const;
         prompt_string on_prompt(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const;
+        int evaluate(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const;
         void on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const;
     };
 

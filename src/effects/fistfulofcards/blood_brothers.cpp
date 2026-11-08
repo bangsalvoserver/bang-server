@@ -27,9 +27,12 @@ namespace banggame {
     }
 
     game_string effect_blood_brothers::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) const {
-        MAYBE_RETURN(prompts::bot_check_target_friend(origin, target));
         MAYBE_RETURN(prompts::prompt_target_ghost(origin_card, origin, target));
         return {};
+    }
+
+    int effect_blood_brothers::evaluate(card_ptr, player_ptr origin, player_ptr target) const {
+        return bot_suggestion::evaluate_help(origin, target);
     }
 
     void effect_blood_brothers::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) const {

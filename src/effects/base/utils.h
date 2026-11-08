@@ -18,7 +18,7 @@ namespace banggame {
     struct effect_set_playing {
         void add_context(card_ptr origin_card, player_ptr origin, card_ptr target, effect_context &ctx) const;
         game_string get_error(card_ptr origin_card, player_ptr origin, card_ptr target, const effect_context &ctx) const;
-        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target) const;
+        int evaluate(card_ptr origin_card, player_ptr origin, card_ptr target) const;
     };
 
     DEFINE_EFFECT(set_playing, effect_set_playing)

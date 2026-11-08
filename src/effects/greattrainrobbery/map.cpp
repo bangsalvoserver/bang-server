@@ -41,11 +41,11 @@ namespace banggame {
             }
         }
 
-        prompt_string pick_prompt(card_ptr target_card) const override {
-            if (target->is_bot() && rn::all_of(target->m_game->m_selection, [](card_ptr c) { return c->has_tag(tag_type::strong); })) {
-                return "BOT_ALL_STRONG";
+        int evaluate_pick(card_ptr target_card) const override {
+            if (rn::all_of(target->m_game->m_selection, [](card_ptr c) { return c->has_tag(tag_type::strong); })) {
+                return -5;
             }
-            return selection_picker::pick_prompt(target_card);
+            return selection_picker::evaluate_pick(target_card);
         }
 
         void on_pick(card_ptr target_card) override {

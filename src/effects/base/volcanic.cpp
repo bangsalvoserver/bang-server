@@ -6,11 +6,11 @@
 
 namespace banggame {
 
-    prompt_string equip_volcanic::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) const {
-        if (origin->is_bot() && target->get_bangs_played() <= 0) {
-            return {1, "BOT_NO_BANGS_PLAYED"};
+    int equip_volcanic::evaluate(card_ptr, player_ptr, player_ptr target) const {
+        if (target->get_bangs_played() <= 0) {
+            return -5;
         }
-        return {};
+        return 0;
     }
     
     void equip_volcanic::on_enable(card_ptr target_card, player_ptr target) const {

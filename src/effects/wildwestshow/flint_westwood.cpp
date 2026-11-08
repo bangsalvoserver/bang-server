@@ -5,12 +5,12 @@
 
 #include "game/game_table.h"
 #include "game/prompts.h"
+#include "game/bot_suggestion.h"
 
 namespace banggame {
 
-    game_string handler_flint_westwood::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr chosen_card, card_ptr target_card) const {
-        MAYBE_RETURN(prompts::bot_check_target_enemy(origin, target_card->owner));
-        return {};
+    int handler_flint_westwood::evaluate(card_ptr, player_ptr origin, card_ptr, card_ptr target_card) const {
+        return bot_suggestion::evaluate_soft_attack(origin, target_card->owner);
     }
 
     void handler_flint_westwood::on_play(card_ptr origin_card, player_ptr origin, card_ptr chosen_card, card_ptr target_card) const {

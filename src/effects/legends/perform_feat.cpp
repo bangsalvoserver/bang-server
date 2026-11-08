@@ -79,9 +79,8 @@ namespace banggame {
         return origin->m_game->top_request<request_damage_legend>(target_is{origin}) != nullptr;
     }
 
-    game_string effect_damage_legend::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) const {
-        MAYBE_RETURN(prompts::bot_check_target_enemy(origin, target, bot_suggestion::action_type::damage));
-        return {};
+    int effect_damage_legend::evaluate(card_ptr, player_ptr origin, player_ptr target) const {
+        return bot_suggestion::evaluate_attack(origin, target);
     }
 
     void effect_damage_legend::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) const {

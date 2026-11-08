@@ -6,7 +6,7 @@
 
 #include "game/game_table.h"
 #include "game/game_options.h"
-#include "game/prompts.h"
+#include "game/bot_suggestion.h"
 #include "game/play_verify.h"
 
 namespace banggame {
@@ -72,8 +72,8 @@ namespace banggame {
         }
     }
 
-    prompt_string request_discard::pick_prompt(card_ptr target_card) const {
-        return prompts::bot_check_discard_card(target, target_card);
+    int request_discard::evaluate_pick(card_ptr target_card) const {
+        return bot_suggestion::evaluate_discard_card(target_card);
     }
 
     bool request_discard::can_pick(card_ptr target_card) const {
@@ -122,8 +122,8 @@ namespace banggame {
         }
     }
 
-    prompt_string request_discard_pass::pick_prompt(card_ptr target_card) const {
-        return prompts::bot_check_discard_card(target, target_card);
+    int request_discard_pass::evaluate_pick(card_ptr target_card) const {
+        return bot_suggestion::evaluate_discard_card(target_card);
     }
 
     bool request_discard_pass::can_pick(card_ptr target_card) const {

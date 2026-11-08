@@ -22,6 +22,7 @@ namespace banggame {
             return on_prompt(origin_card, origin, origin, flags);
         }
         prompt_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags = {}) const;
+        int evaluate(card_ptr origin_card, player_ptr origin, player_ptr target) const;
 
         void on_play(card_ptr origin_card, player_ptr origin, effect_flags flags = {}) const {
             on_play(origin_card, origin, origin, flags);

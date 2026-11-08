@@ -24,7 +24,6 @@ namespace banggame {
     }
 
     prompt_string effect_steal::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card, effect_flags flags) const {
-        MAYBE_RETURN(prompts::bot_check_target_card(origin, target_card));
         MAYBE_RETURN(prompts::prompt_target_immunity(origin_card, origin, target_card->owner, flags));
 
         if (origin == target_card->owner) {
@@ -35,6 +34,10 @@ namespace banggame {
             }
         }
         return {};
+    }
+
+    int effect_steal::evaluate(card_ptr, player_ptr origin, card_ptr target_card) const {
+        return bot_suggestion::evaluate_target_card(origin, target_card);
     }
 
     void effect_steal::on_resolve(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
@@ -102,11 +105,11 @@ namespace banggame {
             effect_steal{}.on_resolve(origin_card, origin, target_card);
         }
 
-        prompt_string escape_prompt(player_ptr owner) const override {
-            if (owner->is_bot() && target_card->has_tag(tag_type::penalty)) {
-                return "BOT_ESCAPE_STEAL_PENALTY";
+        int evaluate_escape(player_ptr) const override {
+            if (target_card->has_tag(tag_type::penalty)) {
+                return -5;
             }
-            return {};
+            return 0;
         }
 
         game_string status_text(player_ptr owner) const override {
@@ -145,9 +148,6 @@ namespace banggame {
     }
 
     game_string effect_discard::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card) const {
-        if (origin->is_bot() && target_card->has_tag(tag_type::strong)) {
-            return "BOT_DONT_DISCARD_STRONG";
-        }
         if (target_card->pocket == pocket_type::player_table
             && target_card->owner == origin
             && is_ghost_card(target_card))
@@ -155,6 +155,10 @@ namespace banggame {
             return "PROMPT_TARGET_SELF_GHOST_CARD";
         }
         return {};
+    }
+
+    int effect_discard::evaluate(card_ptr, player_ptr, card_ptr target_card) const {
+        return bot_suggestion::evaluate_discard_card(target_card);
     }
 
     void effect_discard::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card) const {
@@ -168,15 +172,20 @@ namespace banggame {
     }
 
     game_string effect_discard_hand::on_prompt(card_ptr origin_card, player_ptr origin) const {
-        if (origin->is_bot()) {
-            possible_to_play state{origin};
-            if (rn::any_of(origin->m_hand, [&](card_ptr c) { return state.check(c); })) {
-                return "BOT_CAN_PLAY_OTHER_CARDS";
+        if (!origin->is_bot()) {
+            if (int ncards = int(origin->m_hand.size())) {
+                return {"PROMPT_PASS_DISCARD", ncards};
             }
-        } else if (int ncards = int(origin->m_hand.size())) {
-            return {"PROMPT_PASS_DISCARD", ncards};
         }
         return {};
+    }
+
+    int effect_discard_hand::evaluate(card_ptr, player_ptr origin) const {
+        possible_to_play state{origin};
+        if (rn::any_of(origin->m_hand, [&](card_ptr c) { return state.check(c); })) {
+            return -5;
+        }
+        return 0;
     }
     
     void effect_discard_hand::on_play(card_ptr origin_card, player_ptr origin) const {
@@ -184,10 +193,13 @@ namespace banggame {
     }
 
     prompt_string effect_destroy::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card, effect_flags flags) const {
-        MAYBE_RETURN(prompts::bot_check_target_card(origin, target_card));
         MAYBE_RETURN(prompts::prompt_target_self_card(origin_card, origin, target_card));
         MAYBE_RETURN(prompts::prompt_target_immunity(origin_card, origin, target_card->owner, flags));
         return {};
+    }
+
+    int effect_destroy::evaluate(card_ptr, player_ptr origin, card_ptr target_card) const {
+        return bot_suggestion::evaluate_target_card(origin, target_card);
     }
 
     void effect_destroy::on_resolve(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
@@ -240,11 +252,11 @@ namespace banggame {
             effect_destroy{}.on_resolve(origin_card, origin, target_card);
         }
 
-        prompt_string escape_prompt(player_ptr owner) const override {
-            if (owner->is_bot() && target_card->has_tag(tag_type::penalty)) {
-                return "BOT_ESCAPE_DESTROY_PENALTY";
+        int evaluate_escape(player_ptr) const override {
+            if (target_card->has_tag(tag_type::penalty)) {
+                return -5;
             }
-            return {};
+            return 0;
         }
 
         game_string status_text(player_ptr owner) const override {

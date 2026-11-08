@@ -20,11 +20,17 @@ namespace banggame {
             }
         }
 
-        player_ptr random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
+        std::pair<player_ptr, int> random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
             if (auto targets = targeting_player::possible_targets(origin_card, origin, effect, ctx)) {
-                return random_element(targets, origin->m_game->bot_rng);
+                return random_max_element(
+                    possible_targets(origin_card, origin, effect, ctx),
+                    [&](player_ptr target) {
+                        return effect.evaluate(origin_card, origin, target, ctx);
+                    },
+                    origin->m_game->bot_rng
+                );
             } else {
-                return nullptr;
+                return { nullptr, 0 };
             }
         }
 

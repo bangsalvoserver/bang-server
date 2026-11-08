@@ -20,7 +20,17 @@ namespace banggame::bot_suggestion {
     bool is_target_enemy(const_player_ptr origin, const_player_ptr target, action_type type = action_type::neutral);
 
     bool is_target_friend(const_player_ptr origin, const_player_ptr target);
-    
+
+    int evaluate_attack(const_player_ptr origin, const_player_ptr target);
+
+    int evaluate_soft_attack(const_player_ptr origin, const_player_ptr target);
+
+    int evaluate_help(const_player_ptr origin, const_player_ptr target);
+
+    int evaluate_target_card(const_player_ptr origin, const_card_ptr target_card);
+
+    int evaluate_discard_card(const_card_ptr target_card);
+
 }
 
 #endif

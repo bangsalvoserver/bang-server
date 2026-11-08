@@ -24,8 +24,8 @@ namespace banggame {
         return get_play_card_error(origin, target, ctx);
     }
 
-    prompt_string effect_set_playing::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card) const {
-        return prompts::bot_check_discard_card(origin, target_card);
+    int effect_set_playing::evaluate(card_ptr origin_card, player_ptr origin, card_ptr target_card) const {
+        return bot_suggestion::evaluate_discard_card(target_card);
     }
     
     void effect_discard_playing::on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const {

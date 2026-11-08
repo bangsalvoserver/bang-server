@@ -38,10 +38,10 @@ namespace banggame {
                 });
         }
 
-        value_type random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
+        std::pair<value_type, int> random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
             auto cubes = target_cubes.random_target(origin_card, origin, effect, ctx);
-            auto target = random_element(target_player.possible_targets(origin_card, origin, effect, ctx), origin->m_game->bot_rng);
-            return { cubes, target };
+            auto [target, target_score] = target_player.random_target(origin_card, origin, effect, ctx);
+            return { value_type{ cubes, target }, target_score };
         }
 
         game_string get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const value_type &target) const {

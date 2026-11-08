@@ -7,6 +7,7 @@ namespace banggame {
 
     struct effect_train_robbery {
         prompt_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) const;
+        int evaluate(card_ptr origin_card, player_ptr origin, player_ptr target) const;
         void on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) const;
     };
 
@@ -21,14 +22,14 @@ namespace banggame {
     DEFINE_EFFECT(train_robbery_response, effect_train_robbery_response)
 
     struct effect_train_robbery_discard {
-        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const;
+        int evaluate(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const;
         void on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const;
     };
 
     DEFINE_EFFECT(train_robbery_discard, effect_train_robbery_discard)
 
     struct effect_train_robbery_bang {
-        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const;
+        int evaluate(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const;
         void on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const;
     };
 

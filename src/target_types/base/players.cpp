@@ -17,6 +17,22 @@ namespace banggame {
         });
     }
 
+    static effect_flags get_flags(rn::forward_range auto &&targets) {
+        effect_flags flags { effect_flag::multi_target, effect_flag::target_players };
+        if (get_single_element(targets)) {
+            flags.add(effect_flag::single_target);
+        }
+        return flags;
+    }
+
+    std::pair<std::nullptr_t, int> targeting_players::random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
+        int score = 0;
+        for (player_ptr target : get_player_targets_range(origin_card, origin, player_filter, ctx)) {
+            score += effect.evaluate(origin_card, origin, target, ctx);
+        }
+        return { nullptr, score };
+    }
+
     game_string targeting_players::get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, value_type) const {
         player_ptr skipped_player = ctx.get<contexts::skipped_player>();
         if (skipped_player && check_player_filter(origin_card, origin, player_filter, skipped_player, ctx)) {
@@ -26,14 +42,6 @@ namespace banggame {
             MAYBE_RETURN(effect.get_error(origin_card, origin, target, ctx));
         }
         return {};
-    }
-
-    static effect_flags get_flags(rn::forward_range auto &&targets) {
-        effect_flags flags { effect_flag::multi_target, effect_flag::target_players };
-        if (get_single_element(targets)) {
-            flags.add(effect_flag::single_target);
-        }
-        return flags;
     }
 
     prompt_string targeting_players::on_prompt(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, value_type) const {

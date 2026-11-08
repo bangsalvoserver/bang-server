@@ -4,6 +4,16 @@
 
 namespace banggame {
 
+    std::pair<card_ptr, int> targeting_card::random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
+        return random_max_element(
+            possible_targets(origin_card, origin, effect, ctx),
+            [&](card_ptr target_card) {
+                return effect.evaluate(origin_card, origin, target_card, ctx);
+            },
+            origin->m_game->bot_rng
+        );
+    }
+
     game_string targeting_card::get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, card_ptr target) const {
         if (target->owner) {
             MAYBE_RETURN(check_player_filter(origin_card, origin, player_filter, target->owner, ctx));
