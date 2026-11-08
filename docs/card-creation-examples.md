@@ -528,7 +528,7 @@ A few things worth noticing:
 
 **Goal**: make sure bots play your new card at a sensible moment, without writing any AI logic — most of the time this is a **tagging decision**, not a code change.
 
-Bots don't evaluate cards individually. `game::request_bot_play` (`game/bot_ai.cpp`) gathers every legal `(card, targets)` combination for the current player into a weighted pool, then `get_selected_node` picks one by walking a short, **ordered** list of generic predicates and taking the first one that matches anything still in the pool:
+Bots score every legal `(card, targets)` combination (the sum of the `evaluate` scores of its targets, see Case 11) and play the best one. When several actions have the same score, a short, **ordered** list of generic predicates breaks the tie, and a random pick decides between actions the list can't tell apart:
 
 ```yaml
 # config/bot_info.yml
@@ -570,7 +570,7 @@ bool rule_color::operator()(card_node node) const {
 ```
 which YAML can then reference exactly like any other rule, e.g. `color(card_color_type::brown)`, in either `in_play_rules` or `response_rules`. Note the `get_first_card(node)` call rather than a direct `node->card->color` check: it's the same helper every built-in predicate but `rule_equip` goes through, and it's what keeps a new rule judging the right card when the candidate play chains a modifier ahead of a terminal one (e.g. *Aim* + *Bang!*) — the first card actually played, not whatever the chain resolves to. In practice this is the rare path — the existing predicates, especially `tag_value`, cover almost everything a new card needs, because tags themselves are freely extensible from YAML with no C++ at all.
 
-**Why it works**: `get_selected_node` (`bot_ai.cpp`) doesn't score cards numerically — it walks the candidate pool by each rule *in order*, and for each rule does a single-pass reservoir sample: every matching candidate is counted as it's seen, with a `1/count` chance of replacing whichever match is currently held, so the end result is a uniform pick among all of that rule's matches without ever materializing a filtered copy of the pool. The first rule that matches *anything* wins; later rules are only consulted if the current one matched nothing. A card that matches an earlier rule is effectively in a higher priority tier than one that only matches a later rule or none at all (in which case the final fallback is a uniform pick over everything remaining). Tagging your card is enough because the rules test generic properties every card already has — you're not writing a special case, you're placing your card into a bucket that already has a priority.
+**Why it works**: `execute_best_play` (`bot_ai.cpp`) orders candidates by score first. Among equal scores, an action's priority is the index of the first rule it matches (no match means last), and the final tie is broken by a random number drawn once per candidate, so equally good actions are picked uniformly. A card matching an earlier rule is therefore preferred only over cards with the *same* score: tags steer cards that have nothing to score (e.g. *Stagecoach*), while cards with targets are steered by `evaluate` (Case 11).
 
 ---
 
