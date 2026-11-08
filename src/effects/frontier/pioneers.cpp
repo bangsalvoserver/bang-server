@@ -22,6 +22,10 @@ namespace banggame {
         return effect_equip_on{}.on_prompt(origin_card, origin, origin->get_next_player(), ctx);
     }
 
+    int effect_equip_on_next::evaluate(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const {
+        return effect_equip_on{}.evaluate(origin_card, origin, origin->get_next_player(), ctx);
+    }
+
     void effect_equip_on_next::on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const {
         effect_equip_on{}.on_play(origin_card, origin, origin->get_next_player(), ctx);
     }

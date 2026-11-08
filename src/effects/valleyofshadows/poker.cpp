@@ -130,6 +130,10 @@ namespace banggame {
         return {};
     }
 
+    int effect_poker::evaluate(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) const {
+        return bot_suggestion::evaluate_neutral(origin, target);
+    }
+
     void effect_poker::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) const {
         origin->m_game->queue_request<request_poker>(origin_card, origin, target, flags);
     }

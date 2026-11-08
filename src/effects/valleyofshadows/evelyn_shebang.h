@@ -8,6 +8,7 @@ namespace banggame {
     struct effect_evelyn_shebang {
         game_string get_error(card_ptr origin_card, player_ptr origin, player_ptr target) const;
         prompt_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) const;
+        int evaluate(card_ptr origin_card, player_ptr origin, player_ptr target) const;
         void on_play(card_ptr origin_card, player_ptr origin, player_ptr target) const;
     };
 

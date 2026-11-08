@@ -300,7 +300,7 @@ namespace banggame::bot_suggestion {
 
     int evaluate_neutral(const_player_ptr origin, const_player_ptr target) {
         if (is_target_enemy(origin, target, action_type::neutral)) {
-            return 5;
+            return 4;
         } else if (is_target_friend(origin, target)) {
             return -5;
         }
@@ -309,7 +309,7 @@ namespace banggame::bot_suggestion {
 
     int evaluate_friend(const_player_ptr origin, const_player_ptr target) {
         if (is_target_friend(origin, target)) {
-            return 5;
+            return 4;
         } else if (is_target_enemy(origin, target, action_type::neutral)) {
             return -5;
         }
@@ -321,10 +321,9 @@ namespace banggame::bot_suggestion {
         if (target->is_ghost()) {
             const bool ghost_card = target_card->pocket == pocket_type::player_table && is_ghost_card(target_card);
             if (is_target_enemy(origin, target)) {
-                return ghost_card ? 5 : -10;
-            }
-            if (is_target_friend(origin, target)) {
-                return ghost_card ? -10 : -5;
+                return ghost_card ? 20 : -10;
+            } else if (is_target_friend(origin, target)) {
+                return ghost_card ? -10 : -20;
             }
             return -5;
         }
@@ -338,17 +337,27 @@ namespace banggame::bot_suggestion {
             return 0;
         }
 
-        if (target_card->pocket == pocket_type::player_table && target_card->has_tag(tag_type::penalty)) {
-            return evaluate_friend(origin, target);
-        }
-        
-        int score = evaluate_neutral(origin, target);
-        if (target_card->pocket != pocket_type::player_hand) {
-            if (auto value = target_card->get_tag_value(tag_type::strong)) {
-                score += 5 + *value;
+        if (is_target_enemy(origin, target)) {
+            if (target_card->pocket == pocket_type::player_table) {
+                if (target_card->has_tag(tag_type::penalty)) {
+                    return 5;
+                } else if (auto value = target_card->get_tag_value(tag_type::strong)) {
+                    return 5 + *value;
+                }
             }
+            return 4;
+        } else if (is_target_friend(origin, target)) {
+            if (target_card->pocket == pocket_type::player_table) {
+                if (target_card->has_tag(tag_type::penalty)) {
+                    return 4;
+                } else if (auto value = target_card->get_tag_value(tag_type::strong)) {
+                    return -4 - *value;
+                }
+            }
+            return -5;
         }
-        return score;
+
+        return 0;
     }
 
     int evaluate_discard_card(const_card_ptr target_card) {

@@ -16,6 +16,8 @@
 
 #include "poker.h"
 
+#include <algorithm>
+
 namespace banggame {
 
     struct request_tornado : request_picking, interface_escapable {
@@ -129,6 +131,19 @@ namespace banggame {
     prompt_string effect_tornado2::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) const {
         MAYBE_RETURN(prompts::prompt_target_immunity(origin_card, origin, target, flags));
         return {};
+    }
+
+    int effect_tornado2::evaluate(card_ptr, player_ptr origin, player_ptr target, effect_flags) const {
+        int cards_gained = std::min(2, static_cast<int>(target->get_prev_player()->m_hand.size()));
+        int cards_lost = std::min(2, static_cast<int>(target->m_hand.size()));
+
+        if (bot_suggestion::is_target_friend(origin, target)) {
+            return (cards_gained - cards_lost) * 5;
+        }
+        if (bot_suggestion::is_target_enemy(origin, target)) {
+            return (cards_gained - cards_lost) * -5;
+        }
+        return 0;
     }
     
     void effect_tornado2::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) const {

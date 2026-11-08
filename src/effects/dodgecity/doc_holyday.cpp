@@ -15,6 +15,10 @@ namespace banggame {
         return effect_bang{}.on_prompt(origin_card, origin, target);
     }
 
+    int handler_doc_holyday::evaluate(card_ptr origin_card, player_ptr origin, const card_list &target_cards, player_ptr target) const {
+        return effect_bang{}.evaluate(origin_card, origin, target);
+    }
+
     void handler_doc_holyday::on_play(card_ptr origin_card, player_ptr origin, const card_list &target_cards, player_ptr target) const {
         if (!rn::all_of(target_cards, [&](card_ptr target_card) {
             return target->immune_to(target_card, origin, {}, true);

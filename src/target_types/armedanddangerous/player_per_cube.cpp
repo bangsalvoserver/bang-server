@@ -21,14 +21,21 @@ namespace banggame {
 
     std::pair<targeting_player_per_cube::value_type, int> targeting_player_per_cube::random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
         auto players = target_player.possible_targets(origin_card, origin, effect, ctx);
-        
-        size_t max_count = std::min<size_t>(count_cubes(origin), rn::distance(players) - static_cast<size_t>(extra_players));
-        size_t ncubes = std::uniform_int_distribution<size_t>{0, max_count}(origin->m_game->bot_rng);
-        
-        auto random_cubes = sample_elements(target_cubes.get_all_cubes(origin), ncubes, origin->m_game->bot_rng);
-        auto [random_players, score] = random_max_elements(players, ncubes + extra_players, [&, flags=get_flags({})](player_ptr target) {
+
+        auto evaluate_fun = [&, flags = get_flags({})](player_ptr target) {
             return effect.evaluate(origin_card, origin, target, flags, ctx);
-        }, origin->m_game->bot_rng);
+        };
+
+        const size_t max_count = std::min<size_t>(count_cubes(origin), rn::distance(players) - extra_players);
+
+        const size_t count_targets = rn::count_if(players, [&](player_ptr p) { return evaluate_fun(p) >= 0; });
+
+        const size_t ncubes = count_targets > extra_players
+            ? std::min(count_targets - extra_players, max_count)
+            : 0;
+
+        auto random_cubes = sample_elements(target_cubes.get_all_cubes(origin), ncubes, origin->m_game->bot_rng);
+        auto [random_players, score] = random_max_elements(players, ncubes + extra_players, evaluate_fun, origin->m_game->bot_rng);
         return { value_type{ std::move(random_cubes), std::move(random_players) }, score };
     }
 

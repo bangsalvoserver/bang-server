@@ -53,12 +53,12 @@ namespace banggame {
         return random_max_element(
             possible_targets(origin_card, origin, effect, ctx),
             [&](const player_list &targets) {
-                return rn::fold_left(
-                    targets | rv::transform([&, flags = get_flags(targets)](player_ptr target) {
-                        return effect.evaluate(origin_card, origin, target, flags, ctx);
-                    }),
-                    0, std::plus{}
-                );
+                const auto flags = get_flags(targets);
+                int score = 0;
+                for (player_ptr target : targets) {
+                    score += effect.evaluate(origin_card, origin, target, flags, ctx);
+                }
+                return score;
             },
             origin->m_game->bot_rng
         );
