@@ -53,10 +53,9 @@ namespace banggame {
         return random_max_element(
             possible_targets(origin_card, origin, effect, ctx),
             [&](const player_list &targets) {
-                const auto flags = get_flags(targets);
                 int score = 0;
                 for (player_ptr target : targets) {
-                    score += effect.evaluate(origin_card, origin, target, flags, ctx);
+                    score += effect.evaluate(origin_card, origin, target, ctx);
                 }
                 return score;
             },

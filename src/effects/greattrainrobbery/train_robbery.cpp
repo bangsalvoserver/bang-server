@@ -65,7 +65,7 @@ namespace banggame {
         return {};
     }
 
-    int effect_train_robbery::evaluate(card_ptr, player_ptr origin, player_ptr target, effect_flags) const {
+    int effect_train_robbery::evaluate(card_ptr, player_ptr origin, player_ptr target) const {
         if (!bot_suggestion::is_target_enemy(origin, target)) {
             return -5;
         } else if (rn::any_of(target->m_table, [](card_ptr c) { return c->has_tag(tag_type::jail); })) {

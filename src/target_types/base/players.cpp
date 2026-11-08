@@ -26,12 +26,9 @@ namespace banggame {
     }
 
     std::pair<std::nullptr_t, int> targeting_players::random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
-        auto targets = get_player_targets_range(origin_card, origin, player_filter, ctx);
-        effect_flags flags = get_flags(targets);
-
         int score = 0;
-        for (player_ptr target : targets) {
-            score += effect.evaluate(origin_card, origin, target, flags, ctx);
+        for (player_ptr target : get_player_targets_range(origin_card, origin, player_filter, ctx)) {
+            score += effect.evaluate(origin_card, origin, target, ctx);
         }
         return { nullptr, score };
     }

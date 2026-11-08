@@ -10,7 +10,7 @@ namespace banggame {
         return random_max_element(
             possible_targets(origin_card, origin, effect, ctx),
             [&](player_ptr target) {
-                return effect.evaluate(origin_card, origin, target, effect_flag::single_target, ctx);
+                return effect.evaluate(origin_card, origin, target, ctx);
             },
             origin->m_game->bot_rng
         );

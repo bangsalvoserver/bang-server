@@ -11,12 +11,12 @@ namespace banggame {
         auto bang_targets = targets | rv::filter([&](card_ptr target_card) { return target_card->is_bang_card(origin); });
         if (rn::begin(bang_targets) != rn::end(bang_targets)) {
             auto [bang_target, score] = random_max_element(bang_targets, [&](card_ptr target_card) {
-                return effect.evaluate(origin_card, origin, target_card, {}, ctx);
+                return effect.evaluate(origin_card, origin, target_card, ctx);
             }, origin->m_game->bot_rng);
             return { { bang_target }, score };
         }
         return random_max_elements(targets, ncards, [&](card_ptr target_card) {
-            return effect.evaluate(origin_card, origin, target_card, {}, ctx);
+            return effect.evaluate(origin_card, origin, target_card, ctx);
         }, origin->m_game->bot_rng);
     }
 

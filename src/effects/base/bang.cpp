@@ -75,7 +75,7 @@ namespace banggame {
         return effect_bang{}.on_prompt(ctx.get<contexts::playing_card>(), origin, target, flags, ctx);
     }
 
-    int effect_play_as_bang::evaluate(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx) const {
+    int effect_play_as_bang::evaluate(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) const {
         return effect_bang{}.evaluate(ctx.get<contexts::playing_card>(), origin, target);
     }
 
@@ -93,7 +93,7 @@ namespace banggame {
         return effect_bangcard{}.on_prompt(ctx.get<contexts::playing_card>(), origin, target, flags, ctx);
     }
 
-    int effect_play_as_bangcard::evaluate(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx) const {
+    int effect_play_as_bangcard::evaluate(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) const {
         return effect_bangcard{}.evaluate(ctx.get<contexts::playing_card>(), origin, target);
     }
 

@@ -22,8 +22,8 @@ namespace banggame {
     std::pair<targeting_player_per_cube::value_type, int> targeting_player_per_cube::random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
         auto players = target_player.possible_targets(origin_card, origin, effect, ctx);
 
-        auto evaluate_fun = [&, flags = get_flags({})](player_ptr target) {
-            return effect.evaluate(origin_card, origin, target, flags, ctx);
+        auto evaluate_fun = [&](player_ptr target) {
+            return effect.evaluate(origin_card, origin, target, ctx);
         };
 
         const size_t max_count = std::min<size_t>(count_cubes(origin), rn::distance(players) - extra_players);

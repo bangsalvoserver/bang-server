@@ -51,11 +51,9 @@ namespace banggame {
                 return {};
             },
 
-            .evaluate = [](const void *effect_value, card_ptr origin_card, player_ptr origin, effect_flags flags, const effect_context &ctx) -> int {
+            .evaluate = [](const void *effect_value, card_ptr origin_card, player_ptr origin, const effect_context &ctx) -> int {
                 const T &value = effect_cast<T>(effect_value);
-                TRY_RETURN(value.evaluate(origin_card, origin, flags, ctx));
                 TRY_RETURN(value.evaluate(origin_card, origin, ctx));
-                TRY_RETURN(value.evaluate(origin_card, origin, flags));
                 TRY_RETURN(value.evaluate(origin_card, origin));
                 return 0;
             },
@@ -89,11 +87,9 @@ namespace banggame {
                 return {};
             },
             
-            .evaluate_player = [](const void *effect_value, card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx) -> int {
+            .evaluate_player = [](const void *effect_value, card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) -> int {
                 const T &value = effect_cast<T>(effect_value);
-                TRY_RETURN(value.evaluate(origin_card, origin, target, flags, ctx));
                 TRY_RETURN(value.evaluate(origin_card, origin, target, ctx));
-                TRY_RETURN(value.evaluate(origin_card, origin, target, flags));
                 TRY_RETURN(value.evaluate(origin_card, origin, target));
                 return 0;
             },
@@ -127,11 +123,9 @@ namespace banggame {
                 return {};
             },
             
-            .evaluate_card = [](const void *effect_value, card_ptr origin_card, player_ptr origin, card_ptr target, effect_flags flags, const effect_context &ctx) -> int {
+            .evaluate_card = [](const void *effect_value, card_ptr origin_card, player_ptr origin, card_ptr target, const effect_context &ctx) -> int {
                 const T &value = effect_cast<T>(effect_value);
-                TRY_RETURN(value.evaluate(origin_card, origin, target, flags, ctx));
                 TRY_RETURN(value.evaluate(origin_card, origin, target, ctx));
-                TRY_RETURN(value.evaluate(origin_card, origin, target, flags));
                 TRY_RETURN(value.evaluate(origin_card, origin, target));
                 return 0;
             },

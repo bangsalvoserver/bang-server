@@ -121,7 +121,7 @@ namespace banggame {
         return {};
     }
 
-    int effect_bandidos2::evaluate(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) const {
+    int effect_bandidos2::evaluate(card_ptr origin_card, player_ptr origin, player_ptr target) const {
         return bot_suggestion::evaluate_neutral(origin, target);
     }
 

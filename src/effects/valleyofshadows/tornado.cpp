@@ -133,7 +133,7 @@ namespace banggame {
         return {};
     }
 
-    int effect_tornado2::evaluate(card_ptr, player_ptr origin, player_ptr target, effect_flags) const {
+    int effect_tornado2::evaluate(card_ptr, player_ptr origin, player_ptr target) const {
         int cards_gained = std::min(2, static_cast<int>(target->get_prev_player()->m_hand.size()));
         int cards_lost = std::min(2, static_cast<int>(target->m_hand.size()));
 
