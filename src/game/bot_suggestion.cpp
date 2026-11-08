@@ -307,8 +307,9 @@ namespace banggame::bot_suggestion {
             return 4;
         } else if (is_target_friend(origin, target)) {
             return -5;
+        } else {
+            return 0;
         }
-        return 0;
     }
 
     int evaluate_help(const_player_ptr origin, const_player_ptr target) {
@@ -316,8 +317,9 @@ namespace banggame::bot_suggestion {
             return 4;
         } else if (is_target_enemy(origin, target, action_type::neutral)) {
             return -5;
+        } else {
+            return -2;
         }
-        return 0;
     }
 
     int evaluate_target_card(const_player_ptr origin, const_card_ptr target_card) {
