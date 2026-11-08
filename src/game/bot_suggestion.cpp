@@ -279,6 +279,10 @@ namespace banggame::bot_suggestion {
         const player_role role = origin->get_base_role();
         const bool lethal = target->m_hp <= 1;
 
+        if (target->is_ghost()) {
+            return -2;
+        }
+
         if (target->is_sheriff()) {
             if (role == player_role::outlaw) {
                 if (target->m_hp <= 2) return 10;
@@ -340,7 +344,7 @@ namespace banggame::bot_suggestion {
         if (is_target_enemy(origin, target)) {
             if (target_card->pocket == pocket_type::player_table) {
                 if (target_card->has_tag(tag_type::penalty)) {
-                    return 5;
+                    return -5;
                 } else if (auto value = target_card->get_tag_value(tag_type::strong)) {
                     return 5 + *value;
                 }
