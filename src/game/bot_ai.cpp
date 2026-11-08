@@ -5,6 +5,8 @@
 #include "possible_to_play.h"
 #include "request_timer.h"
 
+#include "effects/base/equip.h"
+
 #include "net/bot_info.h"
 #include "net/logging.h"
 
@@ -47,7 +49,11 @@ namespace banggame {
             ret.action.targets.emplace_back(std::move(value.target));
             ret.score += value.score;
         }
-        if (args.effect_list != effect_list_type::equip_effects) {
+        if (args.effect_list == effect_list_type::equip_effects) {
+            if (!ctx.contains<contexts::equip_target>()) {
+                ret.score += effect_equip_on{}.evaluate(args.card, origin, origin, ctx);
+            }
+        } else {
             if (const mth_holder &mth = args.card->get_mth(args.effect_list)) {
                 ret.score += mth.evaluate(args.card, origin, ret.action.targets, ctx);
             }
