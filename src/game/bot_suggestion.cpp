@@ -276,14 +276,13 @@ namespace banggame::bot_suggestion {
     }
 
     int evaluate_attack(const_player_ptr origin, const_player_ptr target) {
-        const player_role role = origin->get_base_role();
         const bool lethal = target->m_hp <= 1;
 
         if (target->is_sheriff()) {
-            if (role == player_role::outlaw) {
+            if (origin->is_outlaw()) {
                 if (target->m_hp <= 2) return 10;
-            } else if (lethal && (role != player_role::renegade || origin->m_game->num_alive(true) > 2)) {
-                return -10;
+            } else if (lethal && (!origin->is_renegade() || origin->m_game->num_alive(true) > 2)) {
+                return -20;
             }
         }
 
@@ -299,19 +298,19 @@ namespace banggame::bot_suggestion {
     }
 
     int evaluate_soft_attack(const_player_ptr origin, const_player_ptr target) {
-        if (is_target_enemy(origin, target, action_type::neutral)) {
+        if (is_target_enemy(origin, target)) {
             return 4;
         } else if (is_target_friend(origin, target)) {
             return -5;
         } else {
-            return 0;
+            return -1;
         }
     }
 
     int evaluate_help(const_player_ptr origin, const_player_ptr target) {
         if (is_target_friend(origin, target)) {
             return 4;
-        } else if (is_target_enemy(origin, target, action_type::neutral)) {
+        } else if (is_target_enemy(origin, target)) {
             return -5;
         } else {
             return -2;
@@ -359,7 +358,7 @@ namespace banggame::bot_suggestion {
             return -5;
         }
 
-        return 0;
+        return -1;
     }
 
     int evaluate_discard_card(const_card_ptr target_card) {
