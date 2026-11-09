@@ -8,7 +8,7 @@ namespace banggame {
 
     int equip_volcanic::evaluate(card_ptr, player_ptr, player_ptr target) const {
         if (target->get_bangs_played() <= 0) {
-            return -5;
+            return -20;
         }
         return 0;
     }

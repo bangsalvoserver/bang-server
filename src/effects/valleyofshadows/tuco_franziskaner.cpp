@@ -16,7 +16,7 @@ namespace banggame {
 
         p->m_game->add_listener<event_type::evaluate_equip_card>(target_card, [=](player_ptr origin, card_ptr origin_card, player_ptr target, const effect_context &) {
             if (origin == p && origin == target && origin_card->is_blue()) {
-                return -5;
+                return -20;
             }
             return 0;
         });
