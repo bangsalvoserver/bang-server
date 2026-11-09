@@ -29,6 +29,7 @@ namespace banggame {
 
     std::pair<card_list, int> targeting_card_per_player::random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
         auto evaluate_fun = [&](card_ptr target_card) {
+            if (effect.on_prompt(origin_card, origin, target_card, {}, ctx)) return -2;
             return effect.evaluate(origin_card, origin, target_card, ctx);
         };
 

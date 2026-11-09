@@ -55,7 +55,8 @@ namespace banggame {
             [&](const player_list &targets) {
                 int score = 0;
                 for (player_ptr target : targets) {
-                    score += effect.evaluate(origin_card, origin, target, ctx);
+                    if (effect.on_prompt(origin_card, origin, target, {}, ctx)) score -= 2;
+                    else score += effect.evaluate(origin_card, origin, target, ctx);
                 }
                 return score;
             },

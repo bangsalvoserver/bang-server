@@ -48,7 +48,8 @@ namespace banggame {
     int effect_equip_on::evaluate(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) const {
         int score = origin->m_game->call_event(event_type::evaluate_equip_card{ origin, origin_card, target, ctx });
         for (const equip_holder &holder : origin_card->equips) {
-            score += holder.evaluate(origin_card, origin, target, ctx);
+            if (holder.on_prompt(origin_card, origin, target, ctx)) score -= 2;
+            else score += holder.evaluate(origin_card, origin, target, ctx);
         }
         return score;
     }

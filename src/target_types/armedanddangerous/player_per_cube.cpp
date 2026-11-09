@@ -23,6 +23,7 @@ namespace banggame {
         auto players = target_player.possible_targets(origin_card, origin, effect, ctx);
 
         auto evaluate_fun = [&](player_ptr target) {
+            if (effect.on_prompt(origin_card, origin, target, {}, ctx)) return -2;
             return effect.evaluate(origin_card, origin, target, ctx);
         };
 
