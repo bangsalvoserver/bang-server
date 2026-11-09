@@ -10,9 +10,11 @@ namespace banggame {
 
     prompt_string effect_pass_turn::on_prompt(card_ptr origin_card, player_ptr origin) const {
         MAYBE_RETURN(get_pass_turn_prompt(origin));
-        int diff = int(origin->m_hand.size()) - origin->max_cards_end_of_turn();
-        if (diff >= 1) {
-            return {"PROMPT_PASS_DISCARD", diff};
+        if (!origin->is_bot()) {
+            int diff = int(origin->m_hand.size()) - origin->max_cards_end_of_turn();
+            if (diff >= 1) {
+                return {"PROMPT_PASS_DISCARD", diff};
+            }
         }
         return {};
     }
