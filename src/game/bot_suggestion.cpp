@@ -279,10 +279,6 @@ namespace banggame::bot_suggestion {
         const player_role role = origin->get_base_role();
         const bool lethal = target->m_hp <= 1;
 
-        if (target->is_ghost()) {
-            return -2;
-        }
-
         if (target->is_sheriff()) {
             if (role == player_role::outlaw) {
                 if (target->m_hp <= 2) return 10;

@@ -18,9 +18,6 @@ namespace banggame {
     }
 
     int effect_heal::evaluate(card_ptr, player_ptr origin, player_ptr target) const {
-        if (target->m_hp == target->m_max_hp) {
-            return -2;
-        }
         int score = bot_suggestion::evaluate_help(origin, target);
         if (origin->is_deputy() && target->is_sheriff() && target->m_hp == 1) {
             score += 10;

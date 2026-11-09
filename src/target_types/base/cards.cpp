@@ -17,6 +17,7 @@ namespace banggame {
         return random_max_elements(
             target_card.possible_targets(origin_card, origin, effect, ctx), ncards,
             [&](card_ptr target) {
+                if (effect.on_prompt(origin_card, origin, target, {}, ctx)) return -2;
                 return effect.evaluate(origin_card, origin, target, ctx);
             }, origin->m_game->bot_rng
         );
