@@ -8,6 +8,8 @@ main_deck:
     color: blue
     responses:
       - barrel
+    tags:
+      - strong
   - &dynamite
     name: DYNAMITE
     signs:

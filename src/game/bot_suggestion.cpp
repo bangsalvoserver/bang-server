@@ -343,19 +343,19 @@ namespace banggame::bot_suggestion {
                 if (target_card->has_tag(tag_type::penalty)) {
                     return -5;
                 } else if (auto value = target_card->get_tag_value(tag_type::strong)) {
-                    return 5 + *value;
+                    return 8 + *value;
                 }
             }
-            return 4;
+            return 5;
         } else if (is_target_friend(origin, target)) {
             if (target_card->pocket == pocket_type::player_table) {
                 if (target_card->has_tag(tag_type::penalty)) {
-                    return 4;
+                    return 6;
                 } else if (auto value = target_card->get_tag_value(tag_type::strong)) {
-                    return -4 - *value;
+                    return -5 - *value;
                 }
             }
-            return -5;
+            return -4;
         }
 
         return -1;
