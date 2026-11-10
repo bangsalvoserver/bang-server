@@ -5,12 +5,12 @@
 
 namespace banggame {
 
-    struct handler_flint_westwood {
-        int evaluate(card_ptr origin_card, player_ptr origin, card_ptr chosen_card, card_ptr target_card) const;
-        void on_play(card_ptr origin_card, player_ptr origin, card_ptr chosen_card, card_ptr target_card) const;
+    struct effect_flint_westwood {
+        int evaluate(card_ptr origin_card, player_ptr origin, card_ptr target_card, const effect_context &ctx) const;
+        void on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card, const effect_context &ctx) const;
     };
 
-    DEFINE_MTH(flint_westwood, handler_flint_westwood)
+    DEFINE_EFFECT(flint_westwood, effect_flint_westwood)
 }
 
 #endif

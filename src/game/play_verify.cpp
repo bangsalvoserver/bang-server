@@ -111,10 +111,6 @@ namespace banggame {
         
         MAYBE_RETURN(verify_target_list_base(origin, origin_card, effects, targets, ctx));
 
-        if (const mth_holder &mth = origin_card->get_mth(type)) {
-            MAYBE_RETURN(mth.get_error(origin_card, origin, targets, ctx));
-        }
-
         if (ctx.get<contexts::repeat_card>() != origin_card) {
             MAYBE_RETURN(check_pocket(origin, origin_card));
         }
@@ -231,10 +227,6 @@ namespace banggame {
                 for (const auto &[target, effect] : rv::zip(selection.targets, selection.card->get_effect_list(selection.effect_list))) {
                     co_yield effect.on_prompt(selection.card, origin, target, ctx);
                 }
-    
-                if (const mth_holder &mth = selection.card->get_mth(selection.effect_list)) {
-                    co_yield mth.on_prompt(selection.card, origin, selection.targets, ctx);
-                }
             }
 
             if (type == effect_list_type::equip_effects) {
@@ -248,10 +240,6 @@ namespace banggame {
             } else {
                 for (const auto &[target, effect] : rv::zip(targets, origin_card->get_effect_list(type))) {
                     co_yield effect.on_prompt(origin_card, origin, target, ctx);
-                }
-    
-                if (const mth_holder &mth = origin_card->get_mth(type)) {
-                    co_yield mth.on_prompt(origin_card, origin, targets, ctx);
                 }
             }
         }());
@@ -316,10 +304,6 @@ namespace banggame {
 
         for (const auto &[target, effect] : rv::zip(targets, origin_card->get_effect_list(type))) {
             effect.on_play(origin_card, origin, target, ctx);
-        }
-
-        if (const mth_holder &mth = origin_card->get_mth(type)) {
-            mth.on_play(origin_card, origin, targets, ctx);
         }
     }
 

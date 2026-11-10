@@ -278,8 +278,7 @@ character:
     effects:
       - max_usages(1)
       - discard cards(2) self | hand
-      - none player alive reachable notself
-    mth_effect: doc_holyday(1,2)
+      - doc_holyday player alive reachable notself
     tags:
       - ranged_effect
   - name: ELENA_FUENTE

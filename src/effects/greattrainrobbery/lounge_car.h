@@ -14,17 +14,13 @@ namespace banggame {
 
     struct effect_lounge_car_response {
         bool can_play(card_ptr origin_card, player_ptr origin) const;
+        
+        int evaluate(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) const;
+        game_string get_error(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) const;
+        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) const;
     };
 
     DEFINE_EFFECT(lounge_car_response, effect_lounge_car_response)
-
-    struct handler_lounge_car {
-        game_string get_error(card_ptr origin_card, player_ptr origin, card_ptr target_card, player_ptr target) const;
-        int evaluate(card_ptr origin_card, player_ptr origin, card_ptr target_card, player_ptr target) const;
-        void on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card, player_ptr target) const;
-    };
-
-    DEFINE_MTH(lounge_car, handler_lounge_car)
 }
 
 #endif

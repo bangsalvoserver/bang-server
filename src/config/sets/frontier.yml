@@ -39,9 +39,8 @@ character:
     effects:
       - max_usages(1)
       - discard card self | hand
-      - none card self | table
-      - none card notself | table
-    mth_effect: switch_cards(2,3)
+      - gift_card card self | table
+      - switch_cards card notself | table
   - name: RAY_OWE
     image: 28_ray_owe
     equip:
@@ -263,7 +262,8 @@ main_deck:
     effects:
       - min_cubes(4)
       - none self_cubes(3)
-      - switch_self card notself | table
+      - gift_card
+      - switch_cards card notself | table
   - name: FISHING
     image: 28_pesca
     signs:

@@ -1,6 +1,7 @@
 #include "claus_the_saint.h"
 
 #include "effects/base/draw.h"
+#include "effects/base/gift_card.h"
 
 #include "cards/game_enums.h"
 
@@ -69,8 +70,10 @@ namespace banggame {
         return origin->m_game->top_request<request_claus_the_saint>(target_is{origin}) != nullptr;
     }
 
-    void effect_claus_the_saint_response::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) const {
+    void effect_claus_the_saint_response::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) const {
         auto req = origin->m_game->top_request<request_claus_the_saint>();
         req->remaining_targets.remove(target);
+
+        resolve_gift_card(origin_card, origin, ctx.get<contexts::gifted_card>(), target);
     }
 }

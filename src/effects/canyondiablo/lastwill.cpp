@@ -55,15 +55,18 @@ namespace banggame {
         return origin->m_game->top_request<request_lastwill>(target_is{origin}) != nullptr;
     }
 
-    int handler_lastwill::evaluate(card_ptr, player_ptr origin, const card_list &, player_ptr target) const {
-        return bot_suggestion::evaluate_help(origin, target);
+    int effect_lastwill::evaluate(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) const {
+        return effect_gift_card{}.evaluate(origin_card, origin, target, ctx);
     }
 
-    void handler_lastwill::on_play(card_ptr origin_card, player_ptr origin, const card_list &target_cards, player_ptr target) const {
+    void effect_lastwill::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) const {
+        bot_suggestion::signal_helpful_action(origin, target);
+
         auto req = origin->m_game->top_request<request_lastwill>();
         req->pop_request();
-        for (card_ptr chosen_card : target_cards) {
-            handler_gift_card{}.on_play(origin_card, origin, chosen_card, target);
+        
+        for (card_ptr chosen_card : ctx.get_all<contexts::gifted_card>()) {
+            resolve_gift_card(origin_card, origin, chosen_card, target);
         }
     }
 }

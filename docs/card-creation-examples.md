@@ -381,7 +381,7 @@ Neither file references the other, and neither lives in the same expansion (Slab
 **The general recipe**, for any effect you want a new card to plug into:
 1. Check whether the effect you want to interact with already fires a "modifier event" between constructing its request and queuing it (search the effect's header for an `event_type::apply_*_modifier`-style struct — `bang.h`, for instance, also documents `check_bang_target` for veto-style checks, and `on_missed` for reacting *after* a Bang! gets cancelled).
 2. If it does, just `add_listener<that_event>(...)` in your new card's `on_enable` (permanent equip/character ability) or `on_play` (one-shot card, removing the listener immediately after use, as *Aim* does).
-3. If the effect you want to extend doesn't expose such a hook yet, and you're not just adding an expansion card but changing a base mechanic, you'd need to add the event to the base effect yourself (see Case 13 for exactly what that involves) — but this is uncommon, since the built-in effects that are meant to be extensible (`Bang!`, `Duel`, damage, draw checks...) already expose one.
+3. If the effect you want to extend doesn't expose such a hook yet, and you're not just adding an expansion card but changing a base mechanic, you'd need to add the event to the base effect yourself (see Case 12 for exactly what that involves) — but this is uncommon, since the built-in effects that are meant to be extensible (`Bang!`, `Duel`, damage, draw checks...) already expose one.
 4. Nothing here needs a frontend change: the client never sees `bang_strength`/`bang_damage` directly — it only reacts to the resulting `game_update`s (damage dealt, a `request_status` asking for a Missed!, etc.), so stacking is entirely a backend-side concern.
 
 ---
@@ -466,65 +466,7 @@ A few things worth noticing:
 
 ---
 
-## Case 9 — An effect that needs several different targets at once (a new *multi-target handler*)
-
-**Goal**: a brown card, **Marksman**: "discard 2 cards from your hand, then deal 1 damage to a player within distance 2 — plus 1 extra damage for every Heart among the discarded cards." The two target groups (2 hand cards, 1 player) are easy to express as ordinary effects on their own — but the *damage amount* depends on which specific cards were discarded, which is exactly the situation an `mth` (multi-target handler) is for: no single independent effect entry can see across both groups, so the two need to be delivered to one function together.
-
-```yaml
-- name: MARKSMAN
-  signs:
-    - K clubs
-  image: 01_marksman
-  color: brown
-  effects:
-    - discard cards(2) self | hand
-    - none player alive range_2
-  mth_effect: marksman(0,1)
-```
-
-The two target groups are declared exactly like they would be on any other multi-effect card — `discard cards(2) self | hand` is a real, independently-filtered effect (the cards actually get discarded on its own `on_play`); `none player alive range_2` uses the placeholder `none` effect purely to get a validated, filtered player target with no behavior of its own. `mth_effect: marksman(0,1)` then says: take slots 0 and 1 of the flat target list (there's no leading gate like *Doc Holyday*'s `max_usages(1)` here, so indices start at 0) and hand them both to one handler:
-
-```cpp
-// effects/base/marksman.h
-#ifndef __BASE_MARKSMAN_H__
-#define __BASE_MARKSMAN_H__
-
-#include "cards/card_effect.h"
-
-namespace banggame {
-
-    struct handler_marksman {
-        void on_play(card_ptr origin_card, player_ptr origin, const card_list &discarded, player_ptr target) const;
-    };
-
-    DEFINE_MTH(marksman, handler_marksman)
-}
-
-#endif
-```
-
-```cpp
-// effects/base/marksman.cpp
-#include "marksman.h"
-#include "game/game_table.h"
-
-namespace banggame {
-    void handler_marksman::on_play(card_ptr origin_card, player_ptr origin, const card_list &discarded, player_ptr target) const {
-        int amount = 1 + rn::count_if(discarded, [](card_ptr c) { return c->sign.is_hearts(); });
-        target->damage(origin_card, origin, amount);
-    }
-}
-```
-
-A few things worth noticing:
-- `handler_marksman` only implements `on_play` — `get_error` and `on_prompt` are just as optional here as they were for the modifier above; without a custom `get_error`, the handler imposes no extra joint constraint beyond what each slot's own filter already checked, and without `on_prompt`, the client falls back to whatever generic confirmation text the individual slots would produce.
-- `const card_list &discarded` and `player_ptr target` are ordinary, strongly-typed C++ parameters — `mth_unwrapper` reads those exact types straight off `&handler_marksman::on_play`'s own signature and reconstructs them from the flat, type-erased target list at the positions given by `(0,1)`. Nothing about the indices or the reconstruction is hand-written elsewhere.
-- This *had* to be an `mth` rather than two ordinary effects, because the damage amount reads the content of the discard group while acting on the player group. A simpler version of Marksman that just dealt a flat 1 damage regardless of what was discarded wouldn't need `mth` at all — that's just two independent effects, like *Sid Ketchum*'s discard-then-heal (Case 2). The moment one group's *content* has to influence what happens to another group, that's the signal an `mth` handler is actually earning its keep, rather than just being reached for out of habit.
-- Once again, no frontend change is needed: the client walks Marksman's two target slots exactly like it would any other multi-effect card, unaware that a combined handler exists behind them (see the frontend doc's note on `mth` having no client-side counterpart at all).
-
----
-
-## Case 10 — Steering which card a bot picks (`bot_rules`)
+## Case 9 — Steering which card a bot picks (`bot_rules`)
 
 **Goal**: make sure bots play your new card at a sensible moment, without writing any AI logic — most of the time this is a **tagging decision**, not a code change.
 
@@ -574,7 +516,7 @@ which YAML can then reference exactly like any other rule, e.g. `color(card_colo
 
 ---
 
-## Case 11 — Steering bot decisions with `evaluate`
+## Case 10 — Steering bot decisions with `evaluate`
 
 **Goal**: keep a choice legal for every player while guiding bots toward the choices that fit the game state.
 
@@ -597,13 +539,13 @@ struct effect_comrades_aid {
 };
 ```
 
-Use the appropriate evaluation hook for the decision being made: `evaluate` on effects/equips/MTH handlers, `evaluate_pick` on a pending card or player pick, `evaluate_resolve` for resolving a request, `evaluate_escape` for escaping, and `evaluate_redraw` for redraw decisions. Pick and resolve request interfaces default to `0`, so only override them when that request has a preference. Prefer shared helpers such as `bot_suggestion::evaluate_attack`, `evaluate_soft_attack`, and `evaluate_help` when their semantics fit.
+Use the appropriate evaluation hook for the decision being made: `evaluate` on effects/equips/handlers, `evaluate_pick` on a pending card or player pick, `evaluate_resolve` for resolving a request, `evaluate_escape` for escaping, and `evaluate_redraw` for redraw decisions. Pick and resolve request interfaces default to `0`, so only override them when that request has a preference. Prefer shared helpers such as `bot_suggestion::evaluate_attack`, `evaluate_soft_attack`, and `evaluate_help` when their semantics fit.
 
 Keep `on_prompt` for human-facing warnings or confirmations, such as target immunity. A prompt can still cause the bot's verifier to retry a candidate, so bot-only preference prompts should be migrated to `evaluate` rather than added to new effects.
 
 ---
 
-## Case 12 — Scoring targets for bots
+## Case 11 — Scoring targets for bots
 
 Target handlers use `random_max_element` to select among legal targets with the highest score. Effects provide that score through `evaluate`: `bot_suggestion::evaluate_attack` accounts for damage and lethal HP, while `bot_suggestion::evaluate_soft_attack` uses `action_type::neutral` and ignores HP. For effects that hit several players, `targeting_players::random_target` sums the evaluation for each affected player. Equal-scoring target choices remain random.
 
@@ -611,11 +553,11 @@ For example, `effect_bang::evaluate` delegates to `evaluate_attack`, so the bot 
 
 ---
 
-## Case 13 — Defining a brand-new event type
+## Case 12 — Defining a brand-new event type
 
 **Goal**: every hook used in Cases 3, 4, and 7 — `count_range_mod`, `on_hit`, `apply_bang_modifier` — already existed before those cards were written. This case is the other side of that: what do you actually do when the event you need *doesn't* exist yet, because you're starting a new mechanic from scratch rather than plugging into `Bang!`?
 
-The genuinely good news here is that **event types need no registration macro at all** — unlike effects, targets, modifiers, and MTH handlers, there's no `DEFINE_EVENT`. Any plain aggregate struct (public fields, no user-declared constructor — ordinary C++ aggregate rules) is automatically usable as an event:
+The genuinely good news here is that **event types need no registration macro at all** — unlike effects, targets, modifiers, and handlers, there's no `DEFINE_EVENT`. Any plain aggregate struct (public fields, no user-declared constructor — ordinary C++ aggregate rules) is automatically usable as an event:
 ```cpp
 template<typename T>
 concept event = requires (const T &value) { reflect::to<std::tuple>(value); };
@@ -677,9 +619,9 @@ A few things worth being precise about:
 
 ---
 
-## Case 14 — Letting a modifier reach into the card it precedes, via `effect_context`
+## Case 13 — Letting a modifier reach into the card it precedes, via `effect_context`
 
-**Goal**: `mth` (Case 9) combines several target groups *within one card's own effect list*. This case is the other direction: a **modifier** (Case 8) that needs to change how the **terminal card** behaves — two entirely separate cards, registered independently, that only interact because they happen to be played together in one chain. (The full mechanism behind `effect_context` — how context types are declared, and the `serialize_context` opt-in that controls whether one reaches the client — is covered in the server module doc; this is the worked example.)
+**Goal**: **modifier** (Case 8) that needs to change how the **terminal card** behaves — two entirely separate cards, registered independently, that only interact because they happen to be played together in one chain. (The full mechanism behind `effect_context` — how context types are declared, and the `serialize_context` opt-in that controls whether one reaches the client — is covered in the server module doc; this is the worked example.)
 
 The real card is *Bell Tower* (Armed & Dangerous): "ignore distances for the ranged card that follows." Its YAML:
 ```yaml
@@ -735,14 +677,14 @@ static bool check_distance(const_player_ptr origin, const_player_ptr target, con
 | Requires a target shape not expressible with `player`/`players`/`card`/`cards` | A new `target_type` **+ frontend update** (Case 6) |
 | Changes how *another* card's effect resolves (strength, damage, cancellation...) | Hook the target effect's existing modifier event, e.g. `apply_bang_modifier` (Case 7) |
 | Can't be played on its own — it must be followed immediately by a specific kind of card | A new `modifier_vtable` via `DEFINE_MODIFIER` (Case 8) |
-| Needs several differently-filtered targets delivered to *one* combined function, especially when one group's content affects what happens to another | A new `mth_vtable` via `DEFINE_MTH` (Case 9) |
-| Should be prioritized (or deprioritized) by bots relative to other legal plays | The right `tags:` entry, matched against `config/bot_info.yml`'s existing rules (Case 10) |
-| Is legal for anyone, but a bot should prefer or avoid a specific target/decision | An `evaluate` or request-specific `evaluate_*` score (Case 11) |
-| Same as above, but the effect hits several targets at once | Score each affected target; multi-target handlers combine the per-target scores (Case 12) |
-| Starts a mechanic other cards should be able to hook into, and no existing event fits | A new plain aggregate struct under `event_type::`, no macro needed (Case 13) |
-| Is a modifier that needs to change how the terminal card it precedes behaves | A new `effect_context` type, read back by whatever shared code needs to respect it (Case 14) |
+| Needs several differently-filtered targets delivered to *one* combined function, especially when one group's content affects what happens to another | A new  |
+| Should be prioritized (or deprioritized) by bots relative to other legal plays | The right `tags:` entry, matched against `config/bot_info.yml`'s existing rules (Case 9) |
+| Is legal for anyone, but a bot should prefer or avoid a specific target/decision | An `evaluate` or request-specific `evaluate_*` score (Case 10) |
+| Same as above, but the effect hits several targets at once | Score each affected target; multi-target handlers combine the per-target scores (Case 11) |
+| Starts a mechanic other cards should be able to hook into, and no existing event fits | A new plain aggregate struct under `event_type::`, no macro needed (Case 12) |
+| Is a modifier that needs to change how the terminal card it precedes behaves | A new `effect_context` type, read back by whatever shared code needs to respect it (Case 13) |
 
-In every case involving C++, the final step is always the same: **register the implementation with the appropriate macro** (`DEFINE_EFFECT`/`DEFINE_EQUIP`/`DEFINE_MODIFIER`/`DEFINE_MTH`/`DEFINE_TARGETING`), include the new file from its folder's collector header (`effects/<expansion>/effects.h` or `target_types/<expansion>/target_types.h`) so it's reachable from the generated `bang_cards.cpp`, reference it by name from the YAML, and — if anything user-visible changes (a new target, a new log message) — update the corresponding translations in `Locale/*/Cards.tsx` / `GameStrings.tsx` on the `bangweb` side. The one exception is Case 13 itself: a new event type is just a struct declaration, nothing to register anywhere.
+In every case involving C++, the final step is always the same: **register the implementation with the appropriate macro** (`DEFINE_EFFECT`/`DEFINE_EQUIP`/`DEFINE_MODIFIER`/`DEFINE_TARGETING`), include the new file from its folder's collector header (`effects/<expansion>/effects.h` or `target_types/<expansion>/target_types.h`) so it's reachable from the generated `bang_cards.cpp`, reference it by name from the YAML, and — if anything user-visible changes (a new target, a new log message) — update the corresponding translations in `Locale/*/Cards.tsx` / `GameStrings.tsx` on the `bangweb` side. The one exception is Case 12 itself: a new event type is just a struct declaration, nothing to register anywhere.
 
 ---
 
@@ -756,12 +698,12 @@ Your list (YAML definition, effect struct, `.h`/`.cpp` file, `effects.h` + `CMak
 **2. YAML definition** (`config/sets/<expansion>.yml`)
 - [ ] `name`, `signs` (or omit for characters/equip-once cards), `image`, `color`, correct deck section (`main_deck`/`character`/`hidden`/etc. — this also decides which "expansion strategy" `parse_bang_cards.py` applies, e.g. one entry per sign vs. a fixed `count`).
 - [ ] `effects`/`responses`/`equip`/`equip_effects` referencing the effect name(s) you'll implement (or reusing existing ones — Cases 1-2).
-- [ ] `modifier`/`modifier_response` if Case 8 applies; `mth_effect`/`mth_response` if Case 9 applies.
+- [ ] `modifier`/`modifier_response` if Case 8 applies.
 - [ ] `tags:` — see point 5 below; this is usually the most consequential line in the whole file, not an afterthought.
 
 **3. Server C++ implementation**
-- [ ] New `.h`/`.cpp` under `effects/<expansion>/` (or `target_types/<expansion>/` for a new target type), with the struct registered via `DEFINE_EFFECT`/`DEFINE_EQUIP`/`DEFINE_MODIFIER`/`DEFINE_MTH`/`DEFINE_TARGETING`/`DEFINE_RULESET` as appropriate.
-- [ ] Every handler method (`can_play`, `get_error`, `on_prompt`, `add_context`, `on_play`, `on_enable`, `on_disable`, `valid_with_*`, ...) is declared **`const`**, in the header and in the out-of-line definition. A non-const method is silently ignored by `vtable_build.h` for effects, equips, modifiers and mth handlers (the card compiles but that hook never runs), and is a compile error for the mandatory `targeting` methods. See the architecture doc, section 4. (`ruleset::on_apply` is the exception.)
+- [ ] New `.h`/`.cpp` under `effects/<expansion>/` (or `target_types/<expansion>/` for a new target type), with the struct registered via `DEFINE_EFFECT`/`DEFINE_EQUIP`/`DEFINE_MODIFIER`/`DEFINE_TARGETING`/`DEFINE_RULESET` as appropriate.
+- [ ] Every handler method (`can_play`, `get_error`, `on_prompt`, `add_context`, `on_play`, `on_enable`, `on_disable`, `valid_with_*`, ...) is declared **`const`**, in the header and in the out-of-line definition. A non-const method is silently ignored by `vtable_build.h` for effects, equips, and modifiers (the card compiles but that hook never runs), and is a compile error for the mandatory `targeting` methods. See the architecture doc, section 4. (`ruleset::on_apply` is the exception.)
 - [ ] A `request_base` subclass (`game/request_queue.h`) only if the card starts a multi-step interaction rather than resolving immediately (Case 5) — most cards don't need one.
 - [ ] For an equip card with an ongoing passive: `on_enable`, and `on_disable` if the default cleanup (automatic listener removal via `event_card_key` when the card leaves play) isn't enough — e.g. if `on_enable` did more than register a listener (changed some other persistent state) and that also needs explicit reverting.
 - [ ] File added to the folder's `CMakeLists.txt` (`target_sources`), and included from that folder's collector header (`effects/<expansion>/effects.h` or `target_types/<expansion>/target_types.h`) — this second step is what actually gets the vtable *built*, not just declared (see the module doc's explanation of the `vtable_build.h` two-phase macro trick if a card ever compiles but links with an undefined-symbol error).
@@ -776,9 +718,9 @@ If your new effect registers an event listener or queues a request, it's joining
 - [ ] If your card is meant to be dodgeable the way a Bang! is, add the check explicitly: a hard block via `target->immune_to(origin_card, origin, flags)` (as `request_bang::on_update` does), and/or a softer, prompt-based warning via `prompts::prompt_target_immunity(origin_card, origin, target, flags)` in `on_prompt` for human-facing warnings; bot preferences belong in `evaluate` (Cases 11-12).
 
 **6. Bot behavior** (Cases 10-12)
-- [ ] Tag it so it lands in the right `in_play_rules`/`response_rules` tier (Case 10) — only add a new `DEFINE_BOT_RULE` if the property genuinely isn't reducible to an existing tag/pocket/equip check.
-- [ ] If a bot should prefer or avoid a legal target or pick, add an `evaluate` or request-specific `evaluate_*` method (Case 11). Do not encode bot preferences as prompts or rule errors.
-- [ ] For a `players`-style multi-target effect, make sure the handler evaluates each affected player and combines their scores consistently (Case 12).
+- [ ] Tag it so it lands in the right `in_play_rules`/`response_rules` tier (Case 9) — only add a new `DEFINE_BOT_RULE` if the property genuinely isn't reducible to an existing tag/pocket/equip check.
+- [ ] If a bot should prefer or avoid a legal target or pick, add an `evaluate` or request-specific `evaluate_*` method (Case 10). Do not encode bot preferences as prompts or rule errors.
+- [ ] For a `players`-style multi-target effect, make sure the handler evaluates each affected player and combines their scores consistently (Case 11).
 
 **7. Frontend / localization** (`bangweb`) — the server compiles and runs fine without any of this; it just won't be legible to a real client
 - [ ] Card image asset in `public/cards/` matching the YAML's `image:` key.

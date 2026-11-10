@@ -13,7 +13,7 @@ namespace banggame {
 
     struct effect_claus_the_saint_response {
         bool can_play(card_ptr origin_card, player_ptr origin) const;
-        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target) const;
+        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) const;
     };
 
     DEFINE_EFFECT(claus_the_saint_response, effect_claus_the_saint_response)

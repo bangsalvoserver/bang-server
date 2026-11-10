@@ -2,6 +2,7 @@
 
 #include "effects/base/escapable.h"
 #include "effects/base/equip.h"
+#include "effects/base/gift_card.h"
 
 #include "effects/dodgecity/ruleset.h"
 
@@ -63,26 +64,28 @@ namespace banggame {
         }
     };
 
-    game_string handler_switch_cards::get_error(card_ptr origin_card, player_ptr origin, card_ptr chosen_card, card_ptr target_card) const {
+    game_string effect_switch_cards::get_error(card_ptr origin_card, player_ptr origin, card_ptr target_card, const effect_context &ctx) const {
+        card_ptr chosen_card = ctx.get<contexts::gifted_card>();
+
         player_ptr target = target_card->owner;
         MAYBE_RETURN(get_equip_error(target_card, origin));
         MAYBE_RETURN(get_equip_error(chosen_card, target));
         return {};
     }
 
-    prompt_string handler_switch_cards::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr chosen_card, card_ptr target_card, const effect_context &ctx) const {
-        MAYBE_RETURN(effect_equip_on{}.on_prompt(target_card, origin, origin, ctx));
-        return {};
-    }
-
-    int handler_switch_cards::evaluate(card_ptr origin_card, player_ptr origin, card_ptr chosen_card, card_ptr target_card, const effect_context &ctx) const {
+    int effect_switch_cards::evaluate(card_ptr origin_card, player_ptr origin, card_ptr target_card, const effect_context &ctx) const {
         return bot_suggestion::evaluate_target_card(origin, target_card)
             + effect_equip_on{}.evaluate(target_card, origin, origin, ctx);
     }
 
-    void handler_switch_cards::on_play(card_ptr origin_card, player_ptr origin, card_ptr chosen_card, card_ptr target_card) const {
-        bot_suggestion::signal_remove_card(origin, target_card);
-        
-        origin->m_game->queue_request<request_switch_cards>(origin_card, origin, chosen_card, target_card);
+    prompt_string effect_switch_cards::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card, const effect_context &ctx) const {
+        return effect_equip_on{}.on_prompt(target_card, origin, origin, ctx);
     }
+
+    void effect_switch_cards::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card, const effect_context &ctx) const {
+        bot_suggestion::signal_remove_card(origin, target_card);
+    
+        origin->m_game->queue_request<request_switch_cards>(origin_card, origin, ctx.get<contexts::gifted_card>(), target_card);
+    }
+    
 }

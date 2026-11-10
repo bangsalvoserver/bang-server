@@ -9,11 +9,11 @@
 
 namespace banggame {
 
-    int handler_flint_westwood::evaluate(card_ptr, player_ptr origin, card_ptr, card_ptr target_card) const {
+    int effect_flint_westwood::evaluate(card_ptr, player_ptr origin, card_ptr target_card, const effect_context &ctx) const {
         return bot_suggestion::evaluate_soft_attack(origin, target_card->owner);
     }
 
-    void handler_flint_westwood::on_play(card_ptr origin_card, player_ptr origin, card_ptr chosen_card, card_ptr target_card) const {
+    void effect_flint_westwood::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card, const effect_context &ctx) const {
         auto target = target_card->owner;
         
         for (int i=0; i<2; ++i) {
@@ -38,9 +38,9 @@ namespace banggame {
             }, 40);
         }
 
-        origin->m_game->queue_action([=]{
+        origin->m_game->queue_action([=, chosen_card = ctx.get<contexts::gifted_card>()]{
             if (origin->alive() && target->alive()) {
-                handler_gift_card{false, true}.on_play(origin_card, origin, chosen_card, target);
+                resolve_gift_card(origin_card, origin, chosen_card, target);
             }
         }, 40);
     }

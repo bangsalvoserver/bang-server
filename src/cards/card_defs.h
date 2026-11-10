@@ -122,7 +122,6 @@ namespace banggame {
     };
 
     using target_list = std::vector<play_card_target>;
-    using targets_view = std::span<const play_card_target>;
 
     struct scored_target {
         play_card_target target;
@@ -194,20 +193,6 @@ namespace banggame {
 
         void add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) const;
         game_string get_error(card_ptr origin_card, player_ptr origin, card_ptr target_card, const effect_context &ctx) const;
-    };
-
-    struct mth_holder {
-        const mth_vtable *type;
-        const void *effect_value;
-
-        explicit operator bool () const {
-            return type != nullptr;
-        }
-
-        game_string get_error(card_ptr origin_card, player_ptr origin, targets_view targets, const effect_context &ctx) const;
-        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, targets_view targets, const effect_context &ctx) const;
-        int evaluate(card_ptr origin_card, player_ptr origin, targets_view targets, const effect_context &ctx) const;
-        void on_play(card_ptr origin_card, player_ptr origin, targets_view targets, const effect_context &ctx) const;
     };
 
     using effect_list = std::span<const effect_holder>;
