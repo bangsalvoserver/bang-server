@@ -3,6 +3,8 @@
 #include "game_table.h"
 
 #include "effects/base/card_choice.h"
+#include "effects/base/draw.h"
+#include "effects/base/resolve.h"
 
 #include "cards/filter_enums.h"
 
@@ -57,7 +59,25 @@ namespace banggame {
         return false;
     }
 
-    bool rule_do_nothing::operator()(card_node node) const {
-        return node == nullptr;
+    bool rule_do_something::operator()(card_node node) const {
+        return node != nullptr;
+    }
+
+    bool condition_drawing_or_dismissable::operator()(player_ptr origin) const {
+        if (auto req = origin->m_game->top_request<request_draw>(target_is{origin})) {
+            return true;
+        }
+        if (auto req = origin->m_game->top_request<interface_resolvable>(target_is{origin})) {
+            return req->get_resolve_type() == resolve_type::dismiss;
+        }
+        return false;
+    }
+
+    bool condition_response::operator()(player_ptr origin) const {
+        return origin->m_game->pending_requests();
+    }
+
+    bool condition_in_play::operator()(player_ptr origin) const {
+        return !origin->m_game->pending_requests();
     }
 }

@@ -22,6 +22,14 @@ namespace banggame {
         return !origin->m_game->m_discards.empty()
             && !origin->m_game->check_flags(game_flag::phase_one_draw_discard);
     }
+
+    int effect_draw_discard::evaluate(card_ptr origin_card, player_ptr origin) const {
+        card_ptr drawn_card = origin->m_game->m_discards.back();
+        if (auto value = drawn_card->get_tag_value(tag_type::strong)) {
+            return 5 + *value;
+        }
+        return 0;
+    }
     
     void effect_draw_discard::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) const {
         card_ptr drawn_card = target->m_game->m_discards.back();

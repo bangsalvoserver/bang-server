@@ -72,16 +72,21 @@ namespace banggame {
     };
 
     // The priority is the index of the first matching rule; actions matching no rule come last.
-    static int get_rule_priority(const bot_rule_list &rules, card_node node) {
+    static int get_rule_priority(player_ptr origin, card_node node) {
         int priority = 0;
-        for (const bot_rule &rule : rules) {
-            if (rule(node)) break;
-            ++priority;
+        for (const bot_conditional_rules &rules : bot_info.settings.rules) {
+            if (rules.condition(origin)) {
+                for (const bot_rule &rule : rules.rules) {
+                    if (rule(node)) break;
+                    ++priority;
+                }
+                break;
+            }
         }
         return priority;
     }
 
-    static request_state execute_best_play(player_ptr origin, const bot_rule_list &bot_rules, const playable_cards_list &play_cards) {
+    static request_state execute_best_play(player_ptr origin, const playable_cards_list &play_cards) {
         auto &rng = origin->m_game->bot_rng;
 
         auto timer = origin->m_game->top_request<request_timer>();
@@ -97,7 +102,7 @@ namespace banggame {
             auto &play = plays.emplace_back(generate_random_play(origin, info));
             candidates.push_back(candidate {
                 .score = play.score,
-                .priority = get_rule_priority(bot_rules, &info),
+                .priority = get_rule_priority(origin, &info),
                 .tiebreak = static_cast<uint32_t>(rng()),
                 .index = plays.size() - 1
             });
@@ -107,7 +112,7 @@ namespace banggame {
         if (add_empty) {
             candidates.push_back(candidate {
                 .score = 0,
-                .priority = get_rule_priority(bot_rules, nullptr),
+                .priority = get_rule_priority(origin, nullptr),
                 .tiebreak = static_cast<uint32_t>(rng()),
                 .index = candidate::no_play
             });
@@ -170,7 +175,7 @@ namespace banggame {
                     }
                 } else {       
                     playable_cards_list play_cards = generate_playable_cards_list(origin, effect_list_type::responses);
-                    if (!play_cards.empty() && std::holds_alternative<request_states::next>(execute_best_play(origin, bot_info.settings.response_rules, play_cards))) {
+                    if (!play_cards.empty() && std::holds_alternative<request_states::next>(execute_best_play(origin, play_cards))) {
                         return request_states::next{};
                     }
                 }
@@ -181,7 +186,7 @@ namespace banggame {
                     }
                 } else {       
                     playable_cards_list play_cards = generate_playable_cards_list(origin, effect_list_type::effects);
-                    if (!play_cards.empty() && std::holds_alternative<request_states::next>(execute_best_play(origin, bot_info.settings.in_play_rules, play_cards))) {
+                    if (!play_cards.empty() && std::holds_alternative<request_states::next>(execute_best_play(origin, play_cards))) {
                         return request_states::next{};
                     }
                 }
@@ -194,13 +199,13 @@ namespace banggame {
             if (pending_requests()) {
                 for (player_ptr p : all_bots) {
                     playable_cards_list play_cards = generate_playable_cards_list(p, effect_list_type::responses);
-                    if (!play_cards.empty() && std::holds_alternative<request_states::next>(execute_best_play(p, bot_info.settings.response_rules, play_cards))) {
+                    if (!play_cards.empty() && std::holds_alternative<request_states::next>(execute_best_play(p, play_cards))) {
                         return request_states::next{};
                     }
                 }
             } else if (m_playing && m_playing->is_bot()) {
                 playable_cards_list play_cards = generate_playable_cards_list(m_playing, effect_list_type::effects);
-                if (!play_cards.empty() && std::holds_alternative<request_states::next>(execute_best_play(m_playing, bot_info.settings.in_play_rules, play_cards))) {
+                if (!play_cards.empty() && std::holds_alternative<request_states::next>(execute_best_play(m_playing, play_cards))) {
                     return request_states::next{};
                 }
             }

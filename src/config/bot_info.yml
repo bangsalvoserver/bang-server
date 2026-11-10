@@ -10,22 +10,30 @@ bots:
     max_retries: 3
     bypass_retries: 2
     
-    # Actions are ordered by rule priority first, then by score, then at random.
-    # The earlier a rule matches, the higher the action's priority.
-    response_rules:
-    - pocket(pocket_type::player_character)
-    - pocket(pocket_type::player_table)
-    - pocket(pocket_type::player_hand)
-    - tag_value_not(tag_type::resolve, 1)
-    - do_nothing
+    # Conditional rule groups are checked in order; only the first matching group is used.
+    # Add a condition type in game/bot_rules.h to support another player state.
+    # Within that group's rules, actions are ordered by first matching rule,
+    # then by score, then at random. Actions matching no rule come last.
+    rules:
+    - condition: drawing_or_dismissable
+      rules:
+      - do_something
     
-    in_play_rules:
-    - tag_value(tag_type::strong)
-    - equip
-    - pocket(pocket_type::player_table)
-    - pocket(pocket_type::player_hand)
-    - pocket(pocket_type::player_character)
-    - tag_value_not(tag_type::pass_turn)
+    - condition: response
+      rules:
+      - pocket(pocket_type::player_character)
+      - pocket(pocket_type::player_table)
+      - pocket(pocket_type::player_hand)
+      - do_something
+    
+    - condition: in_play
+      rules:
+      - tag_value(tag_type::strong)
+      - equip
+      - pocket(pocket_type::player_table)
+      - pocket(pocket_type::player_hand)
+      - pocket(pocket_type::player_character)
+      - tag_value_not(tag_type::pass_turn)
   
   names:
   - Salvo

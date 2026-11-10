@@ -473,17 +473,19 @@ A few things worth noticing:
 For each playable card, the bot generates a target combination and scores it (summing the `evaluate` scores of its targets, see Case 11). It chooses an action by **rule priority first**, then by score, then at random. A short, **ordered** list of generic predicates gives each action its priority. Failed attempts can be regenerated with new random targets:
 
 ```yaml
-# config/bot_info.yml
+# src/config/bot_info.yml
 settings:
-  in_play_rules:
-    - tag_value(tag_type::strong)         # anything tagged "strong"
-    - equip                               # then: any equip card
-    - pocket(pocket_type::player_table)    # then: prefer playing from the table
-    - pocket(pocket_type::player_hand)     # then: then from hand
-    - pocket(pocket_type::player_character) # then: then a character ability
-    - tag_value_not(tag_type::pass_turn)   # then: anything that isn't just "pass"
+  rules:
+    - condition: in_play
+      rules:
+        - tag_value(tag_type::strong)          # anything tagged "strong"
+        - equip                                # then: any equip card
+        - pocket(pocket_type::player_table)    # then: prefer playing from the table
+        - pocket(pocket_type::player_hand)     # then: from hand
+        - pocket(pocket_type::player_character) # then: a character ability
+        - tag_value_not(tag_type::pass_turn)   # then: anything that isn't just "pass"
 ```
-Each entry is a tiny predicate struct (`game/bot_rules.h`/`.cpp`) over a candidate card — `pocket`, `pocket_not`, `equip`, `tag_value`, `tag_value_not`, `do_nothing` — matched against generic, already-existing properties of the card (which pocket it's in, whether it's an equip, whether it carries a given tag, optionally with a specific value). Nothing here is per-card: it's one short global list, generated once from this YAML into a single `bot_info` object (`config/parse_bots.py`), consulted for every bot decision in the game.
+`settings.rules` is an ordered list of conditional groups. Each group has a `condition` on the bot's current player state and an ordered list of card predicates. The bot uses the first matching group's rules; the index of the first matching predicate determines an action's priority (no match comes last). Built-in conditions are `in_play` and `response`, but `DEFINE_BOT_CONDITION` in `game/bot_rules.h` makes the condition set extensible. Built-in card predicates (`pocket`, `pocket_not`, `equip`, `tag_value`, `tag_value_not`, `do_something`) match generic card properties. The YAML is compiled by `config/parse_bots.py` into the `bot_info` object, then consulted for each bot decision.
 
 So for a typical new card, "driving" bot behavior means picking the right tag, not touching this list at all. If your new card is a big, important one-shot play — say a brown card, **Last Stand**, that should be prioritized the way other high-impact plays are — just tag it the same way they are:
 ```yaml
@@ -494,7 +496,7 @@ So for a typical new card, "driving" bot behavior means picking the right tag, n
   tags:
     - strong
 ```
-That alone routes it into the `tag_value(tag_type::strong)` tier — the highest priority in `in_play_rules` — ahead of lower-priority actions, with zero AI code written. Within the same priority tier, its `evaluate` score decides which action comes first. This is why the predicate list stays so short and generic: card authors steer bots through the same tags that already describe the card for other purposes (rules text, filters, UI), not through a parallel bot-specific configuration per card.
+That alone routes it into the `tag_value(tag_type::strong)` tier — the highest priority in the `in_play` group's rules — ahead of lower-priority actions, with zero AI code written. Within the same priority tier, its `evaluate` score decides which action comes first. This is why the predicate list stays so short and generic: card authors steer bots through the same tags that already describe the card for other purposes (rules text, filters, UI), not through a parallel bot-specific configuration per card.
 
 The list only needs a **new predicate** when the property you need genuinely isn't reducible to an existing tag/pocket/equip check. The existing set has a gap, for instance: nothing lets a rule ask about a card's *color*. Adding one follows the exact same shape as the built-in ones:
 ```cpp
@@ -510,7 +512,7 @@ bool rule_color::operator()(card_node node) const {
     return false;
 }
 ```
-which YAML can then reference exactly like any other rule, e.g. `color(card_color_type::brown)`, in either `in_play_rules` or `response_rules`. Note the `get_first_card(node)` call rather than a direct `node->card->color` check: it's the same helper every built-in predicate but `rule_equip` goes through, and it's what keeps a new rule judging the right card when the candidate play chains a modifier ahead of a terminal one (e.g. *Aim* + *Bang!*) — the first card actually played, not whatever the chain resolves to. In practice this is the rare path — the existing predicates, especially `tag_value`, cover almost everything a new card needs, because tags themselves are freely extensible from YAML with no C++ at all.
+which YAML can then reference exactly like any other rule, e.g. `color(card_color_type::brown)`, inside any group's `rules` list, whether its condition is `in_play`, `response`, or a newly defined condition. Note the `get_first_card(node)` call rather than a direct `node->card->color` check: it's the same helper every built-in predicate but `rule_equip` goes through, and it's what keeps a new rule judging the right card when the candidate play chains a modifier ahead of a terminal one (e.g. *Aim* + *Bang!*) — the first card actually played, not whatever the chain resolves to. In practice this is the rare path — the existing predicates, especially `tag_value`, cover almost everything a new card needs, because tags themselves are freely extensible from YAML with no C++ at all.
 
 **Why it works**: `execute_best_play` (`bot_ai.cpp`) orders candidates by rule priority first: the index of the first rule an action matches, with actions matching no rule last. Within a priority tier, the higher score wins; equal-priority, equal-score actions are ordered by a random tiebreak drawn once per candidate. Rules can therefore put an action ahead of another even when its score is lower. Scores still steer target choices and decide between actions in the same tier.
 
@@ -718,7 +720,7 @@ If your new effect registers an event listener or queues a request, it's joining
 - [ ] If your card is meant to be dodgeable the way a Bang! is, add the check explicitly: a hard block via `target->immune_to(origin_card, origin, flags)` (as `request_bang::on_update` does), and/or a softer, prompt-based warning via `prompts::prompt_target_immunity(origin_card, origin, target, flags)` in `on_prompt` for human-facing warnings; bot preferences belong in `evaluate` (Cases 11-12).
 
 **6. Bot behavior** (Cases 10-12)
-- [ ] Tag it so it lands in the right `in_play_rules`/`response_rules` tier (Case 9) — only add a new `DEFINE_BOT_RULE` if the property genuinely isn't reducible to an existing tag/pocket/equip check.
+- [ ] Tag it so it lands in the right bot rule tier for the applicable condition group (Case 9) — only add a new `DEFINE_BOT_RULE` if the property genuinely isn't reducible to an existing tag/pocket/equip check.
 - [ ] If a bot should prefer or avoid a legal target or pick, add an `evaluate` or request-specific `evaluate_*` method (Case 10). Do not encode bot preferences as prompts or rule errors.
 - [ ] For a `players`-style multi-target effect, make sure the handler evaluates each affected player and combines their scores consistently (Case 11).
 
