@@ -32,11 +32,11 @@ namespace banggame {
     };
 
     game_string equip_lastwill::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) const {
+        MAYBE_RETURN(prompts::prompt_target_ghost(origin_card, origin, target));
         if (target->is_sheriff()) {
             return {"PROMPT_CARD_NO_EFFECT", origin_card};
-        } else {
-            return {};
         }
+        return {};
     }
 
     int equip_lastwill::evaluate(card_ptr, player_ptr origin, player_ptr target) const {

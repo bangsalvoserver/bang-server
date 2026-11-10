@@ -13,9 +13,8 @@ namespace banggame {
         MAYBE_RETURN(prompts::prompt_target_self(origin_card, origin, target));
         if (target->is_sheriff()) {
             return {"PROMPT_CARD_NO_EFFECT", origin_card};
-        } else {
-            return {};
         }
+        return {};
     }
 
     int equip_wanted::evaluate(card_ptr, player_ptr origin, player_ptr target) const {
