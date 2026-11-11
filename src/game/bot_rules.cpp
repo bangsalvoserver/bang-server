@@ -7,6 +7,7 @@
 #include "effects/base/resolve.h"
 
 #include "cards/filter_enums.h"
+#include "cards/game_enums.h"
 
 namespace banggame {
 
@@ -71,6 +72,17 @@ namespace banggame {
             return req->get_resolve_type() == resolve_type::dismiss;
         }
         return false;
+    }
+
+    bool condition_sheriff_first_turn::operator()(player_ptr origin) const {
+        return origin->is_sheriff()
+            && !origin->m_game->pending_requests()
+            && origin->m_hand.size() <= origin->max_cards_end_of_turn()
+            && rn::all_of(origin->m_game->m_players, [&](player_ptr target) {
+                return origin == target || !target->alive() || !target->m_player_flags.check_any({
+                    player_flag::role_revealed, player_flag::positive_karma, player_flag::negative_karma
+                });
+            });
     }
 
     bool condition_response::operator()(player_ptr origin) const {

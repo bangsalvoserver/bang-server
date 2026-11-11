@@ -41,6 +41,7 @@ namespace banggame {
     #define BOT_CONDITION(name) bot_condition_map<#name>::type
 
     DEFINE_BOT_CONDITION(drawing_or_dismissable, condition_drawing_or_dismissable)
+    DEFINE_BOT_CONDITION(sheriff_first_turn, condition_sheriff_first_turn)
     DEFINE_BOT_CONDITION(response, condition_response)
     DEFINE_BOT_CONDITION(in_play, condition_in_play)
 }

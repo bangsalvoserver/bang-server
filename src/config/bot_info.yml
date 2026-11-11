@@ -25,6 +25,11 @@ bots:
       - pocket(pocket_type::player_table)
       - pocket(pocket_type::player_hand)
       - do_something
+
+    - condition: sheriff_first_turn
+      rules:
+      - equip
+      - tag_value(tag_type::pass_turn)
     
     - condition: in_play
       rules:
