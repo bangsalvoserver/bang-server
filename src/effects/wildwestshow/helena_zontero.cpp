@@ -72,7 +72,7 @@ namespace banggame {
             if (sign.modified || sign.is_black()) {
                 return -5;
             }
-            return 0;
+            return 5;
         }
         
         void resolve() override {

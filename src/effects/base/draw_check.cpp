@@ -88,7 +88,7 @@ namespace banggame {
         } else {
             return -5;
         }
-        return 0;
+        return 5;
     }
 
     void request_check_base::resolve() {
