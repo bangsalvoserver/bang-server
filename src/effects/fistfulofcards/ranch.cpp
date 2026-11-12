@@ -28,7 +28,7 @@ namespace banggame {
         }
     };
 
-    void equip_ranch::on_enable(card_ptr target_card, player_ptr target) {
+    void equip_ranch::on_enable(card_ptr target_card, player_ptr target) const {
         target->m_game->add_listener<event_type::on_turn_start>(target_card, [=](player_ptr origin) {
             origin->m_game->queue_action([=]{
                 origin->m_game->queue_request<request_ranch>(target_card, origin);
@@ -36,11 +36,11 @@ namespace banggame {
         });
     }
 
-    bool effect_ranch::can_play(card_ptr origin_card, player_ptr origin) {
+    bool effect_ranch::can_play(card_ptr origin_card, player_ptr origin) const {
         return origin->m_game->top_request<request_ranch>(target_is{origin}) != nullptr;
     }
 
-    void effect_ranch::on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
+    void effect_ranch::on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const {
         auto req = origin->m_game->top_request<request_ranch>();
         req->pop_request();
         

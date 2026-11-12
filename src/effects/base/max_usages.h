@@ -16,8 +16,8 @@ namespace banggame {
     struct effect_max_usages {
         int max_usages;
         
-        game_string get_error(card_ptr origin_card, player_ptr origin);
-        void on_play(card_ptr origin_card, player_ptr origin);
+        game_string get_error(card_ptr origin_card, player_ptr origin) const;
+        void on_play(card_ptr origin_card, player_ptr origin) const;
     };
 
     DEFINE_EFFECT(max_usages, effect_max_usages)

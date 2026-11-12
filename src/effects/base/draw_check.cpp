@@ -36,14 +36,12 @@ namespace banggame {
         }
     }
 
-    prompt_string request_check_base::pick_prompt(card_ptr target_card) const {
-        if (target->is_bot()) {
-            auto result = get_result(target_card);
-            if (!result.lucky && !result.indifferent) {
-                return "BOT_BAD_DRAW";
-            }
+    int request_check_base::evaluate_pick(card_ptr target_card) const {
+        auto result = get_result(target_card);
+        if (!result.indifferent && !result.lucky) {
+            return -5;
         }
-        return {};
+        return 0;
     }
 
     void request_check_base::on_pick(card_ptr target_card) {
@@ -77,30 +75,27 @@ namespace banggame {
         drawn_card = nullptr;
     }
 
-    prompt_string request_check_base::redraw_prompt(card_ptr target_card, player_ptr owner) const {
-        if (owner->is_bot()) {
-            draw_check_result result = get_result(drawn_card);
-            if (result.indifferent) {
-                return "BOT_DONT_REDRAW_INDIFFERENT";
-            } else if (result.defensive_redraw) {
-                if (result.lucky || !bot_suggestion::is_target_friend(owner, target)) {
-                    return "BOT_DONT_REDRAW_DEFENSIVE";
-                }
-            } else if (bot_suggestion::is_target_enemy(owner, target)) {
-                if (!result.lucky) return "BOT_DONT_REDRAW_ENEMY";
-            } else if (bot_suggestion::is_target_friend(owner, target)) {
-                if (result.lucky) return "BOT_DONT_REDRAW_FRIEND";
-            } else {
-                return "BOT_DONT_REDRAW_NEUTRAL";
-            }
+    int request_check_base::evaluate_redraw(card_ptr, player_ptr owner) const {
+        draw_check_result result = get_result(drawn_card);
+        if (result.indifferent) {
+            return -5;
+        } else if (result.defensive_redraw) {
+            if (result.lucky || !bot_suggestion::is_target_friend(owner, target)) return -5;
+        } else if (bot_suggestion::is_target_enemy(owner, target)) {
+            if (!result.lucky) return -5;
+        } else if (bot_suggestion::is_target_friend(owner, target)) {
+            if (result.lucky) return -5;
+        } else {
+            return -5;
         }
-        return {};
+        return 5;
     }
 
     void request_check_base::resolve() {
         pop_request();
         modified_sign sign = get_modified_sign(drawn_card);
         bool lucky = do_get_result(sign).lucky;
+        target->m_game->call_event(event_type::on_draw_check_luck{ target, lucky });
         if (!target->m_game->m_selection.empty()) {
             while (!target->m_game->m_selection.empty()) {
                 card_ptr c = target->m_game->m_selection.front();

@@ -17,8 +17,8 @@ namespace banggame {
     };
 
     struct effect_can_play_card {
-        bool can_play(card_ptr origin_card, player_ptr origin);
-        void on_play(card_ptr origin_card, player_ptr origin);
+        bool can_play(card_ptr origin_card, player_ptr origin) const;
+        void on_play(card_ptr origin_card, player_ptr origin) const;
     };
 
     DEFINE_EFFECT(can_play_card, effect_can_play_card)

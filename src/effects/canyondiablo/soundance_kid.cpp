@@ -7,7 +7,7 @@
 
 namespace banggame {
 
-    void equip_soundance_kid::on_enable(card_ptr target_card, player_ptr p) {
+    void equip_soundance_kid::on_enable(card_ptr target_card, player_ptr p) const {
         p->m_game->add_listener<event_type::on_hit>({target_card, 5}, [=](card_ptr origin_card, player_ptr origin, player_ptr target, int damage, effect_flags flags) {
             if (origin == p && flags.check(effect_flag::is_bang)) {
                 target_card->flash_card();

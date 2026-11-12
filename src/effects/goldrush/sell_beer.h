@@ -6,9 +6,9 @@
 namespace banggame {
 
     struct effect_sell_beer {
-        void add_context(card_ptr origin_card, player_ptr origin, card_ptr target, effect_context &ctx);
-        game_string get_error(card_ptr origin_card, player_ptr origin, card_ptr target, const effect_context &ctx);
-        void on_play(card_ptr origin_card, player_ptr origin, card_ptr target);
+        void add_context(card_ptr origin_card, player_ptr origin, card_ptr target, effect_context &ctx) const;
+        game_string get_error(card_ptr origin_card, player_ptr origin, card_ptr target, const effect_context &ctx) const;
+        void on_play(card_ptr origin_card, player_ptr origin, card_ptr target) const;
     };
 
     DEFINE_EFFECT(sell_beer, effect_sell_beer)

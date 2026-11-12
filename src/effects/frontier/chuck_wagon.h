@@ -9,7 +9,7 @@ namespace banggame {
         int max_count;
         equip_chuck_wagon(int max_count): max_count{max_count} {}
 
-        void on_enable(card_ptr target_card, player_ptr target);
+        void on_enable(card_ptr target_card, player_ptr target) const;
     };
 
     DEFINE_EQUIP(chuck_wagon, equip_chuck_wagon)

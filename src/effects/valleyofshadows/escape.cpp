@@ -8,12 +8,16 @@
 
 namespace banggame {
 
-    prompt_string effect_escape_base::on_prompt(card_ptr origin_card, player_ptr origin) {
+    prompt_string effect_escape_base::on_prompt(card_ptr origin_card, player_ptr origin) const {
         auto req = origin->m_game->top_request<interface_escapable>();
         return req->escape_prompt(origin);
     }
 
-    void effect_escape_base::on_play(card_ptr origin_card, player_ptr origin) {
+    int effect_escape_base::evaluate(card_ptr, player_ptr origin) const {
+        return origin->m_game->top_request<interface_escapable>()->evaluate_escape(origin);
+    }
+
+    void effect_escape_base::on_play(card_ptr origin_card, player_ptr origin) const {
         auto req = origin->m_game->top_request();
         dynamic_cast<interface_escapable *>(req.get())->add_card(origin_card);
         req->pop_request();
@@ -25,7 +29,7 @@ namespace banggame {
             && !flags.check(effect_flag::is_bang);
     }
     
-    bool effect_escape::can_play(card_ptr origin_card, player_ptr origin) {
+    bool effect_escape::can_play(card_ptr origin_card, player_ptr origin) const {
         if (auto req = origin->m_game->top_request<interface_escapable>([&](const request_base &base) {
             return base.target == origin && effect_escape::can_escape(base.origin, base.origin_card, base.flags);
         })) {
@@ -44,7 +48,7 @@ namespace banggame {
             && !flags.check(effect_flag::multi_target);
     }
     
-    bool effect_escape2::can_play(card_ptr origin_card, player_ptr origin) {
+    bool effect_escape2::can_play(card_ptr origin_card, player_ptr origin) const {
         if (auto req = origin->m_game->top_request<interface_escapable>([&](const request_base &base) {
             return base.target == origin && effect_escape2::can_escape(base.origin, base.origin_card, base.flags);
         })) {

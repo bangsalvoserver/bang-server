@@ -9,7 +9,7 @@
 
 namespace banggame {
 
-    void effect_buntlinespecial::on_play(card_ptr origin_card, player_ptr origin) {
+    void effect_buntlinespecial::on_play(card_ptr origin_card, player_ptr origin) const {
         event_card_key key{origin_card, 1};
         origin->m_game->add_listener<event_type::apply_bang_modifier>(key, [=](player_ptr e_origin, shared_request_bang) {
             if (origin == e_origin) {

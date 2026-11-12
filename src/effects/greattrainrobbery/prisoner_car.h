@@ -6,7 +6,7 @@
 namespace banggame {
     
     struct equip_prisoner_car : event_equip {
-        void on_enable(card_ptr origin_card, player_ptr origin);
+        void on_enable(card_ptr origin_card, player_ptr origin) const;
     };
 
     DEFINE_EQUIP(prisoner_car, equip_prisoner_car)

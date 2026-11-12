@@ -4,6 +4,7 @@
 #include "messages.h"
 
 #include "utils/range_utils.h"
+#include "utils/random_element.h"
 
 namespace banggame {
 
@@ -36,7 +37,7 @@ namespace banggame {
     server_messages::lobby_user_update lobby_bot::make_user_update() const {
         return {
             .user_id = user_id,
-            .username = username,
+            .username = std::format("BOT {}", username),
             .propic = propic
         };
     }
@@ -95,6 +96,32 @@ namespace banggame {
             connected_user_ids.push_back(user_id);
             return {user, true};
         }
+    }
+
+    template<rn::forward_range R, typename Proj, typename Rng>
+    decltype(auto) random_least_used(R &&values, const std::vector<lobby_bot> &bots, Proj proj, Rng &rng) {
+        auto use_count = [&](const auto &value) {
+            return rn::count(bots, value, proj);
+        };
+        auto min_count = rn::min(values | rv::transform(use_count));
+
+        return random_element(values | rv::filter([&](const auto &value) {
+            return use_count(value) == min_count;
+        }), rng);
+    }
+
+    int game_lobby::add_bot() {
+        int bot_id = (bots.empty() ? 0 : bots.back().user_id) - 1;
+
+        std::string_view bot_name = random_least_used(bot_info.names, bots, &lobby_bot::username, m_mgr->session_rng);
+
+        image_pixels_hash bot_propic = random_least_used(bot_info.propics
+            | rv::transform([](image_pixels_hash image) { return image; }),
+            bots, &lobby_bot::propic, m_mgr->session_rng);
+
+        auto &bot = bots.emplace_back(bot_id, bot_name, bot_propic);
+        broadcast_message(bot.make_user_update());
+        return bot_id;
     }
 
     std::string game_lobby::crop_lobby_name(const std::string &name) {

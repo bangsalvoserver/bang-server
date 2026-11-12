@@ -6,8 +6,8 @@
 namespace banggame {
 
     struct effect_most_wanted {
-        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags);
-        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags);
+        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) const;
+        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) const;
     };
 
     DEFINE_EFFECT(most_wanted, effect_most_wanted)

@@ -8,7 +8,7 @@
 
 namespace banggame {
 
-    void equip_leland::on_enable(card_ptr origin_card, player_ptr origin) {
+    void equip_leland::on_enable(card_ptr origin_card, player_ptr origin) const {
         origin->m_game->add_listener<event_type::on_locomotive_effect>(origin_card, [=](player_ptr target, shared_locomotive_context ctx) {
             origin->m_game->queue_action([=]{
                 for (player_ptr p : target->m_game->range_alive_players(target)) {

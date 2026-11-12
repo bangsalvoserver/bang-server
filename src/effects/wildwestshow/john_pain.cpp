@@ -11,7 +11,7 @@ namespace banggame {
         return target->m_game->call_event(event_type::check_card_taker{ target, card_taker_type::draw_check_select });
     }
     
-    void equip_john_pain::on_enable(card_ptr target_card, player_ptr player_end) {
+    void equip_john_pain::on_enable(card_ptr target_card, player_ptr player_end) const {
         player_end->m_game->add_listener<event_type::check_card_taker>(target_card, [=](player_ptr e_target, card_taker_type type) -> card_ptr {
             if (type == card_taker_type::draw_check_select && e_target == player_end) {
                 return target_card;

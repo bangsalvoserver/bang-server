@@ -29,7 +29,7 @@ namespace banggame {
         pocket_type pocket = pocket_type::none;
         player_set visibility;
         
-        bool inactive = false;
+        card_flags flags;
         token_map tokens;
 
         bool is_equip_card() const;

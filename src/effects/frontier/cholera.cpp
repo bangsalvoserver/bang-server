@@ -7,16 +7,20 @@
 
 #include "game/game_table.h"
 #include "game/prompts.h"
+#include "game/bot_suggestion.h"
 
 namespace banggame {
     
-    game_string equip_cholera::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {
-        MAYBE_RETURN(prompts::bot_check_target_enemy(origin, target));
+    game_string equip_cholera::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) const {
         MAYBE_RETURN(prompts::prompt_target_self(origin_card, origin, target));
         return {};
     }
 
-    void equip_cholera::on_enable(card_ptr target_card, player_ptr target) {
+    int equip_cholera::evaluate(card_ptr, player_ptr origin, player_ptr target) const {
+        return bot_suggestion::evaluate_soft_attack(origin, target);
+    }
+
+    void equip_cholera::on_enable(card_ptr target_card, player_ptr target) const {
         target->m_game->add_listener<event_type::on_turn_end>({ target_card, 25 }, [=](player_ptr origin, bool skipped) {
             if (origin == target) {
                 target->m_game->queue_request<request_check>(target, target_card,

@@ -8,15 +8,15 @@
 
 namespace banggame {
 
-    bool modifier_bandolier::valid_with_card(card_ptr origin_card, player_ptr origin, card_ptr playing_card) {
+    bool modifier_bandolier::valid_with_card(card_ptr origin_card, player_ptr origin, card_ptr playing_card) const {
         return playing_card->has_tag(tag_type::banglimit);
     }
 
-    void modifier_bandolier::add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) {
+    void modifier_bandolier::add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) const {
         ctx.add(contexts::disable_banglimit{});
     }
 
-    game_string effect_bandolier::on_prompt(card_ptr origin_card, player_ptr origin) {
+    game_string effect_bandolier::on_prompt(card_ptr origin_card, player_ptr origin) const {
         if (origin->get_bangs_played() <= 0) {
             return {"PROMPT_NO_BANGS_PLAYED", origin_card};
         } else {

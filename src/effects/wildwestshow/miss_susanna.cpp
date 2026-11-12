@@ -10,7 +10,7 @@
 
 namespace banggame {
 
-    void equip_miss_susanna::on_enable(card_ptr target_card, player_ptr target) {
+    void equip_miss_susanna::on_enable(card_ptr target_card, player_ptr target) const {
         target->m_game->add_listener<event_type::prompt_pass_turn>(target_card, [=, max_count=max_count](player_ptr origin) -> game_string {
             int count = get_count_played_cards(origin);
             if (count < max_count) {

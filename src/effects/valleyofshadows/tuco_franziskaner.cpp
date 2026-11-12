@@ -7,18 +7,18 @@
 
 namespace banggame {
 
-    void equip_tuco_franziskaner::on_enable(card_ptr target_card, player_ptr p) {
+    void equip_tuco_franziskaner::on_enable(card_ptr target_card, player_ptr p) const {
         p->m_game->add_listener<event_type::init_request_draw>({target_card, 1}, [p](player_ptr origin, shared_request_draw req) {
             if (p == origin && rn::none_of(p->m_table, &card::is_blue)) {
                 req->num_cards_to_draw += 2;
             }
         });
 
-        p->m_game->add_listener<event_type::get_equip_prompt>(target_card, [=](player_ptr origin, card_ptr origin_card, player_ptr target, const effect_context &ctx) -> game_string {
-            if (origin == p && origin == target && origin->is_bot() && origin_card->is_blue()) {
-                return "BOT_DONT_EQUIP_BLUE";
+        p->m_game->add_listener<event_type::evaluate_equip_card>(target_card, [=](player_ptr origin, card_ptr origin_card, player_ptr target, const effect_context &) {
+            if (origin == p && origin == target && origin_card->is_blue()) {
+                return -20;
             }
-            return {};
+            return 0;
         });
     }
 }

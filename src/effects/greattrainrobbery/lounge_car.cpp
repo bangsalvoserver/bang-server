@@ -3,6 +3,7 @@
 #include "ruleset.h"
 
 #include "effects/base/equip.h"
+#include "effects/base/gift_card.h"
 
 #include "cards/filter_enums.h"
 
@@ -54,43 +55,47 @@ namespace banggame {
         }
     };
 
-    game_string effect_lounge_car::on_prompt(card_ptr origin_card, player_ptr origin) {
+    game_string effect_lounge_car::on_prompt(card_ptr origin_card, player_ptr origin) const {
         if (origin->m_game->m_train_deck.empty()) {
             return {"PROMPT_CARD_NO_EFFECT", origin_card};
         }
         return {};
     }
 
-    void effect_lounge_car::on_play(card_ptr origin_card, player_ptr origin) {
+    void effect_lounge_car::on_play(card_ptr origin_card, player_ptr origin) const {
         origin->m_game->queue_request<request_lounge_car>(origin_card, origin);
     }
 
-    bool effect_lounge_car_response::can_play(card_ptr origin_card, player_ptr origin) {
+    bool effect_lounge_car_response::can_play(card_ptr origin_card, player_ptr origin) const {
         return origin->m_game->top_request<request_lounge_car>(target_is{origin}) != nullptr;
     }
 
-    game_string handler_lounge_car::get_error(card_ptr origin_card, player_ptr origin, card_ptr target_card, player_ptr target_player) {
+    int effect_lounge_car_response::evaluate(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) const {
+        card_ptr target_card = ctx.get<contexts::gifted_card>();
+
+        return target_card->has_tag(tag_type::penalty)
+            ? bot_suggestion::evaluate_soft_attack(origin, target)
+            : bot_suggestion::evaluate_help(origin, target);
+    }
+
+    game_string effect_lounge_car_response::get_error(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) const {   
+        card_ptr target_card = ctx.get<contexts::gifted_card>();
+        
         for (card_ptr selection_card : origin->m_game->m_selection) {
-            MAYBE_RETURN(get_equip_error(selection_card, selection_card == target_card ? target_player : origin));
+            MAYBE_RETURN(get_equip_error(selection_card, selection_card == target_card ? target : origin));
         }
         return {};
     }
 
-    game_string handler_lounge_car::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card, player_ptr target_player) {
-        if (target_card->has_tag(tag_type::penalty)) {
-            MAYBE_RETURN(prompts::bot_check_target_enemy(origin, target_player));
-        } else {
-            MAYBE_RETURN(prompts::bot_check_target_friend(origin, target_player));
-        }
-        return {};
-    }
+    void effect_lounge_car_response::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) const {   
+        card_ptr target_card = ctx.get<contexts::gifted_card>();
 
-    void handler_lounge_car::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card, player_ptr target_player) {
         if (target_card->has_tag(tag_type::penalty)) {
-            bot_suggestion::signal_hostile_action(origin, target_player);
+            bot_suggestion::signal_hostile_action(origin, target);
         } else {
-            bot_suggestion::signal_helpful_action(origin, target_player);
+            bot_suggestion::signal_helpful_action(origin, target);
         }
-        origin->m_game->top_request<request_lounge_car>()->on_resolve(target_card, target_player);
+
+        origin->m_game->top_request<request_lounge_car>()->on_resolve(target_card, target);
     }
 }

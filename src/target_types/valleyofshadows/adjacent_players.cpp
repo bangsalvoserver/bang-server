@@ -20,7 +20,15 @@ namespace banggame {
         return {};
     }
 
-    std::generator<player_list> targeting_adjacent_players::possible_targets(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) {
+    static effect_flags get_flags(const player_list &targets) {
+        effect_flags flags = effect_flag::multi_target;
+        if (targets.size() == 1) {
+            flags.add(effect_flag::single_target);
+        }
+        return flags;
+    }
+
+    std::generator<player_list> targeting_adjacent_players::possible_targets(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
         for (player_ptr first_target : origin->m_game->range_all_players(origin)) {
             if (!check_player_filter(origin_card, origin, target_player.player_filter, first_target, ctx)
                 && !effect.get_error(origin_card, origin, first_target, ctx)
@@ -41,7 +49,22 @@ namespace banggame {
         }
     }
 
-    game_string targeting_adjacent_players::get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const player_list &targets) {
+    std::pair<player_list, int> targeting_adjacent_players::random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
+        return random_max_element(
+            possible_targets(origin_card, origin, effect, ctx),
+            [&](const player_list &targets) {
+                int score = 0;
+                for (player_ptr target : targets) {
+                    if (effect.on_prompt(origin_card, origin, target, {}, ctx)) score -= 2;
+                    else score += effect.evaluate(origin_card, origin, target, ctx);
+                }
+                return score;
+            },
+            origin->m_game->bot_rng
+        );
+    }
+
+    game_string targeting_adjacent_players::get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const player_list &targets) const {
         if (targets.empty() || targets.size() > 2) {
             return "ERROR_INVALID_TARGETS";
         }
@@ -61,15 +84,7 @@ namespace banggame {
         return {};
     }
 
-    static effect_flags get_flags(const player_list &targets) {
-        effect_flags flags = effect_flag::multi_target;
-        if (targets.size() == 1) {
-            flags.add(effect_flag::single_target);
-        }
-        return flags;
-    }
-
-    prompt_string targeting_adjacent_players::on_prompt(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const player_list &targets) {
+    prompt_string targeting_adjacent_players::on_prompt(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const player_list &targets) const {
         if (targets.size() == 1 && origin->m_game->num_alive() > 2) {
             return {"PROMPT_SINGLE_TARGET", origin_card};
         }
@@ -79,13 +94,13 @@ namespace banggame {
         }));
     }
 
-    void targeting_adjacent_players::add_context(card_ptr origin_card, player_ptr origin, const effect_holder &effect, effect_context &ctx, const player_list &targets) {
+    void targeting_adjacent_players::add_context(card_ptr origin_card, player_ptr origin, const effect_holder &effect, effect_context &ctx, const player_list &targets) const {
         for (player_ptr target : targets) {
             target_player.add_context(origin_card, origin, effect, ctx, target);
         }
     }
 
-    void targeting_adjacent_players::on_play(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const player_list &targets) {
+    void targeting_adjacent_players::on_play(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const player_list &targets) const {
         effect_flags flags = get_flags(targets);
         for (player_ptr target : targets) {
             effect.on_play(origin_card, origin, target, flags, ctx);

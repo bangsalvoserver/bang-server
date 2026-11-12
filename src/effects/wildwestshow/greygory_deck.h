@@ -9,7 +9,7 @@ namespace banggame {
         bool allow_expansions;
         equip_greygory_deck(bool allow_expansions = false): allow_expansions{allow_expansions} {}
 
-        void on_enable(card_ptr target_card, player_ptr target);
+        void on_enable(card_ptr target_card, player_ptr target) const;
     };
 
     DEFINE_EQUIP(greygory_deck, equip_greygory_deck)
@@ -18,7 +18,7 @@ namespace banggame {
         bool allow_expansions;
         effect_greygory_deck(bool allow_expansions = false): allow_expansions{allow_expansions} {}
 
-        void on_play(card_ptr origin_card, player_ptr origin);
+        void on_play(card_ptr origin_card, player_ptr origin) const;
     };
 
     DEFINE_EFFECT(greygory_deck, effect_greygory_deck)

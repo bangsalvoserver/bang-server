@@ -21,6 +21,7 @@ namespace banggame {
         card_ptr result = target_card->m_game->call_event(event_type::get_card_copy{ target_card });
         if (!result) {
             result = target_card->m_game->add_card(*target_card);
+            result->flags.add(card_flag::copied);
             target_card->m_game->add_listener<event_type::get_card_copy>(nullptr, [=](card_ptr e_target_card) -> card_ptr {
                 if (e_target_card == target_card) {
                     return result;
@@ -87,7 +88,7 @@ namespace banggame {
         }
     };
 
-    void equip_vera_custer::on_enable(card_ptr origin_card, player_ptr origin) {
+    void equip_vera_custer::on_enable(card_ptr origin_card, player_ptr origin) const {
         origin->m_game->add_listener<event_type::check_character_modifier>({origin_card, 0}, [=](player_ptr target, card_set &handlers) {
             if (origin == target && !handlers.contains(origin_card)
                 && !target->check_player_flags(player_flag::extra_turn)
@@ -100,7 +101,7 @@ namespace banggame {
         });
     }
 
-    void equip_vera_custer::on_disable(card_ptr origin_card, player_ptr origin) {
+    void equip_vera_custer::on_disable(card_ptr origin_card, player_ptr origin) const {
         origin->m_game->remove_listeners(event_card_key{ origin_card, 0 });
     }
 

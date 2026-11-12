@@ -2,11 +2,11 @@
 
 namespace banggame {
 
-    void targeting_cube_slot::add_context(card_ptr origin_card, player_ptr origin, const effect_holder &effect, effect_context &ctx, card_ptr target) {
+    void targeting_cube_slot::add_context(card_ptr origin_card, player_ptr origin, const effect_holder &effect, effect_context &ctx, card_ptr target) const {
         effect.add_context(origin_card, origin, target, ctx);
     }
 
-    game_string targeting_cube_slot::get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, card_ptr target) {
+    game_string targeting_cube_slot::get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, card_ptr target) const {
         if (!target->owner) return "ERROR_CARD_HAS_NO_OWNER";
 
         MAYBE_RETURN(check_player_filter(origin_card, origin, player_filter, target->owner, ctx));

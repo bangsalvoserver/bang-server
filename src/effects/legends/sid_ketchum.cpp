@@ -19,7 +19,7 @@ namespace banggame {
         }
     };
 
-    void equip_sid_ketchum_legend::on_enable(card_ptr target_card, player_ptr target) {
+    void equip_sid_ketchum_legend::on_enable(card_ptr target_card, player_ptr target) const {
         target->m_game->add_listener<event_type::on_heal>(target_card, [=](card_ptr origin_card, player_ptr origin, player_ptr e_target, bool amount) {
             if (e_target == target && target->m_game->m_playing == target) {
                 target->m_game->queue_request<request_sid_ketchum_legend>(target_card, target, target);
@@ -27,11 +27,11 @@ namespace banggame {
         });
     }
 
-    bool effect_sid_ketchum_legend_free_bang::can_play(card_ptr origin_card, player_ptr origin) {
+    bool effect_sid_ketchum_legend_free_bang::can_play(card_ptr origin_card, player_ptr origin) const {
         return origin->m_game->top_request<request_sid_ketchum_legend>(target_is{origin}) != nullptr;
     }
 
-    void effect_sid_ketchum_legend_free_bang::on_play(card_ptr origin_card, player_ptr origin) {
+    void effect_sid_ketchum_legend_free_bang::on_play(card_ptr origin_card, player_ptr origin) const {
         auto req = origin->m_game->top_request<request_sid_ketchum_legend>();
         req->pop_request();
     }

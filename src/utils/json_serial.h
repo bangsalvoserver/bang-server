@@ -522,7 +522,7 @@ namespace json {
             json key(rapidjson::StringRef(name.data(), name.size()));
             if (auto it = value.FindMember(key); it != value.MemberEnd()) {
                 reflect::get<I>(result) = deserialize<value_type>(it->value, ctx);
-            } else {
+            } else if constexpr (!requires { typename T::default_missing_fields; }) {
                 throw deserialize_error(std::format("Cannot deserialize {}: missing field {}", reflect::type_name<T>(), name));
             }
         });

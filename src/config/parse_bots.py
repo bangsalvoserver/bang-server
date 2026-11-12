@@ -26,6 +26,19 @@ class ImagePixels:
             self.width = w
             self.height = h
     
+def parse_bot_condition(value):
+    match = re.match(
+        r'^\s*(\w+)' # condition_name
+        r'(?:\s*\((.+)\))?\s*$', # condition_args
+        value
+    )
+    if not match:
+        raise RuntimeError(f'Invalid condition string: {value}')
+    
+    rule_name = match.group(1)
+    rule_args = match.group(2)
+    return CppStatic(f'BOT_CONDITION({rule_name})', (CppLiteral(rule_args),) if rule_args else ())
+
 def parse_bot_rule(value):
     match = re.match(
         r'^\s*(\w+)' # rule_name
@@ -39,14 +52,17 @@ def parse_bot_rule(value):
     rule_args = match.group(2)
     return CppStatic(f'BOT_RULE({rule_name})', (CppLiteral(rule_args),) if rule_args else ())
 
+def parse_conditional_bot_rule(value):
+    return CppObject(
+        condition = parse_bot_condition(value['condition']),
+        rules = CppStatic('bot_rule', [parse_bot_rule(rule) for rule in value['rules']])
+    )
+
 def parse_settings(settings):
     return CppObject(
-        max_random_tries = settings['max_random_tries'],
-        bypass_empty_index = settings['bypass_empty_index'],
-        bypass_unconditional_index = settings['bypass_unconditional_index'],
-        repeat_card_nodes = settings['repeat_card_nodes'],
-        response_rules = CppStatic('bot_rule', [parse_bot_rule(value) for value in settings['response_rules']]),
-        in_play_rules = CppStatic('bot_rule', [parse_bot_rule(value) for value in settings['in_play_rules']])
+        max_retries = settings['max_retries'],
+        bypass_retries = settings['bypass_retries'],
+        rules = CppStatic('bot_conditional_rules', [parse_conditional_bot_rule(value) for value in settings['rules']]),
     )
 
 def parse_file(data):

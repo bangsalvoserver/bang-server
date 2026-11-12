@@ -13,14 +13,14 @@ namespace banggame {
     void drop_all_fame_tokens(card_ptr target_card);
 
     struct ruleset_legends {
-        void on_apply(game_ptr game);
-        bool is_valid_with(const expansion_set &set);
+        void on_apply(game_ptr game) const;
+        bool is_valid_with(const expansion_set &set) const;
     };
 
     DEFINE_RULESET(legends, ruleset_legends)
 
     struct ruleset_legends_basemod {
-        void on_apply(game_ptr game);
+        void on_apply(game_ptr game) const;
     };
 
     DEFINE_RULESET(legends_basemod, ruleset_legends_basemod)

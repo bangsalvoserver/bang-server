@@ -22,7 +22,7 @@ namespace banggame {
         }
     };
 
-    void equip_hawken::on_enable(card_ptr target_card, player_ptr target) {
+    void equip_hawken::on_enable(card_ptr target_card, player_ptr target) const {
         target->m_game->add_listener<event_type::on_hit>({target_card, 3}, [=](card_ptr origin_card, player_ptr origin, player_ptr e_target, int damage, effect_flags flags) {
             if (origin == target && e_target != target && flags.check(effect_flag::is_bang)) {
                 target->m_game->queue_request<request_hawken>(target_card, e_target, target, effect_flags{}, 0);
@@ -30,7 +30,7 @@ namespace banggame {
         });
     }
 
-    void equip_hawken::on_disable(card_ptr target_card, player_ptr target) {
+    void equip_hawken::on_disable(card_ptr target_card, player_ptr target) const {
         target->m_game->remove_listeners({target_card, 3});
     }
 
@@ -40,14 +40,14 @@ namespace banggame {
             && is_self_equippable(target_card);
     }
 
-    bool effect_hawken::can_play(card_ptr origin_card, player_ptr origin) {
+    bool effect_hawken::can_play(card_ptr origin_card, player_ptr origin) const {
         if (auto req = origin->m_game->top_request<request_hawken>(target_is{origin})) {
             return rn::any_of(req->origin->m_table, is_valid_hawken_card);
         }
         return false;
     }
 
-    void effect_hawken::on_play(card_ptr origin_card, player_ptr origin) {
+    void effect_hawken::on_play(card_ptr origin_card, player_ptr origin) const {
         auto req = origin->m_game->top_request<request_hawken>();
         req->pop_request();
 

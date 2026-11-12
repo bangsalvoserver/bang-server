@@ -12,15 +12,15 @@ namespace banggame {
         escape_timer,
         escape_no_timer
     };
-    
+
     class interface_escapable {
     public:
         virtual ~interface_escapable() = default;
-        
+
         size_t num_cards_used() const {
             return m_cards_used.size();
         }
-        
+
         void add_card(card_ptr c) {
             m_cards_used.add(c);
         }
@@ -33,13 +33,17 @@ namespace banggame {
             return {};
         }
 
+        virtual int evaluate_escape(player_ptr owner) const {
+            return 0;
+        }
+
     private:
         card_set m_cards_used;
     };
 
     struct request_escapable : request_resolvable_timer, interface_escapable {
         using request_resolvable_timer::request_resolvable_timer;
-    
+
         escape_type get_escape_type() const;
 
         void on_update() override;

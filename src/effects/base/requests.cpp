@@ -6,19 +6,28 @@
 
 #include "game/game_table.h"
 #include "game/game_options.h"
-#include "game/prompts.h"
+#include "game/bot_suggestion.h"
+#include "game/play_verify.h"
 
 namespace banggame {
 
     bool request_characterchoice::can_pick(card_ptr target_card) const {
-        return target_card->pocket == pocket_type::player_hand && target_card->owner == target;
+        if (target->m_hand.empty()) {
+            return target_card->pocket == pocket_type::selection;
+        } else {
+            return target_card->pocket == pocket_type::player_hand && target_card->owner == target;
+        }
     }
 
     void request_characterchoice::on_pick(card_ptr target_card) {
         pop_request();
 
-        target_card->move_to(pocket_type::player_character, target);
-        target->m_game->remove_cards(target->m_hand);
+        if (target_card->pocket == pocket_type::selection) {
+            target_card->move_to(pocket_type::player_character, target, card_visibility::shown);
+        } else {
+            target_card->move_to(pocket_type::player_character, target);
+            target->m_game->remove_cards(target->m_hand);
+        }
 
         target->m_game->queue_action([target=target]{
             card_ptr character = target->get_character();
@@ -63,13 +72,13 @@ namespace banggame {
         }
     }
 
-    prompt_string request_discard::pick_prompt(card_ptr target_card) const {
-        return prompts::bot_check_discard_card(target, target_card);
+    int request_discard::evaluate_pick(card_ptr target_card) const {
+        return bot_suggestion::evaluate_discard_card(target_card);
     }
 
     bool request_discard::can_pick(card_ptr target_card) const {
         return target_card->pocket == pocket_type::player_hand && target_card->owner == target
-            && !target->m_game->is_usage_disabled(target_card);
+            && !get_use_card_error(target, target_card);
     }
     
     void request_discard::on_pick(card_ptr target_card) {
@@ -113,8 +122,8 @@ namespace banggame {
         }
     }
 
-    prompt_string request_discard_pass::pick_prompt(card_ptr target_card) const {
-        return prompts::bot_check_discard_card(target, target_card);
+    int request_discard_pass::evaluate_pick(card_ptr target_card) const {
+        return bot_suggestion::evaluate_discard_card(target_card);
     }
 
     bool request_discard_pass::can_pick(card_ptr target_card) const {

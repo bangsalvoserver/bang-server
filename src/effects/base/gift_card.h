@@ -5,19 +5,30 @@
 
 namespace banggame {
 
-    struct handler_gift_card {
+    struct effect_gift_card {
         bool used;
-        bool forced_response;
+        
+        effect_gift_card(bool used = false) : used{used} {}
 
-        handler_gift_card(bool used = false, bool forced_response = false)
-            : used{used}
-            , forced_response{forced_response} {}
+        void add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) const {
+            add_context(origin_card, origin, origin_card, ctx);
+        }
+        void add_context(card_ptr origin_card, player_ptr origin, card_ptr target_card, effect_context &ctx) const;
 
-        game_string on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card, player_ptr target);
-        void on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card, player_ptr target);
+        int evaluate(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) const;
+        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) const;
     };
 
-    DEFINE_MTH(gift_card, handler_gift_card)
+    DEFINE_EFFECT(gift_card, effect_gift_card)
+
+    void resolve_gift_card(card_ptr origin_card, player_ptr origin, card_ptr target_card, player_ptr target, bool used = false);
+    
+    namespace contexts {
+        struct gifted_card {
+            card_ptr value;
+        };
+    }
+
 }
 
 #endif

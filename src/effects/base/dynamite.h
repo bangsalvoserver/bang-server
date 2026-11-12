@@ -6,10 +6,16 @@
 namespace banggame {
 
     struct equip_dynamite : event_equip {
-        void on_enable(card_ptr target_card, player_ptr target);
+        void on_enable(card_ptr target_card, player_ptr target) const;
     };
 
     DEFINE_EQUIP(dynamite, equip_dynamite)
+
+    namespace event_type {
+        struct on_dynamite_explode {
+            player_ptr target;
+        };
+    }
 }
 
 #endif

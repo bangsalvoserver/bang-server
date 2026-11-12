@@ -122,7 +122,11 @@ namespace banggame {
     };
 
     using target_list = std::vector<play_card_target>;
-    using targets_view = std::span<const play_card_target>;
+
+    struct scored_target {
+        play_card_target target;
+        int score;
+    };
 
     struct effect_holder {
         const effect_vtable *type;
@@ -137,7 +141,7 @@ namespace banggame {
         bool can_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const;
 
         std::generator<play_card_target> possible_targets(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const;
-        play_card_target random_target(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const;
+        scored_target random_target(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const;
 
         game_string get_error(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const;
         game_string get_error(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) const;
@@ -148,6 +152,10 @@ namespace banggame {
         prompt_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx) const;
         prompt_string on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target, effect_flags flags, const effect_context &ctx) const;
         prompt_string on_prompt(card_ptr origin_card, player_ptr origin, const play_card_target &target, const effect_context &ctx) const;
+
+        int evaluate(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const;
+        int evaluate(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) const;
+        int evaluate(card_ptr origin_card, player_ptr origin, card_ptr target, const effect_context &ctx) const;
 
         void add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) const;
         void add_context(card_ptr origin_card, player_ptr origin, player_ptr target, effect_context &ctx) const;
@@ -169,6 +177,7 @@ namespace banggame {
         }
 
         prompt_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) const;
+        int evaluate(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) const;
         void on_enable(card_ptr target_card, player_ptr target) const;
         void on_disable(card_ptr target_card, player_ptr target) const;
         bool is_nodisable() const;
@@ -184,19 +193,6 @@ namespace banggame {
 
         void add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) const;
         game_string get_error(card_ptr origin_card, player_ptr origin, card_ptr target_card, const effect_context &ctx) const;
-    };
-
-    struct mth_holder {
-        const mth_vtable *type;
-        const void *effect_value;
-
-        explicit operator bool () const {
-            return type != nullptr;
-        }
-
-        game_string get_error(card_ptr origin_card, player_ptr origin, targets_view targets, const effect_context &ctx) const;
-        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, targets_view targets, const effect_context &ctx) const;
-        void on_play(card_ptr origin_card, player_ptr origin, targets_view targets, const effect_context &ctx) const;
     };
 
     using effect_list = std::span<const effect_holder>;

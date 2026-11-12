@@ -6,7 +6,7 @@
 namespace banggame {
 
     struct equip_big_spencer : event_equip {
-        void on_enable(card_ptr target_card, player_ptr target);
+        void on_enable(card_ptr target_card, player_ptr target) const;
     };
 
     DEFINE_EQUIP(big_spencer, equip_big_spencer)
@@ -15,7 +15,7 @@ namespace banggame {
         int ncards;
         equip_initial_cards(int ncards): ncards{ncards} {}
 
-        void on_enable(card_ptr target_card, player_ptr target);
+        void on_enable(card_ptr target_card, player_ptr target) const;
     };
 
     DEFINE_EQUIP(initial_cards, equip_initial_cards)

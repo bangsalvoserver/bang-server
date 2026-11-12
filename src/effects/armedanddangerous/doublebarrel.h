@@ -7,8 +7,8 @@
 namespace banggame {
 
     struct effect_doublebarrel {
-        void on_play(card_ptr origin_card, player_ptr origin);
-        game_string on_prompt(card_ptr origin_card, player_ptr origin, const effect_context &ctx);
+        void on_play(card_ptr origin_card, player_ptr origin) const;
+        game_string on_prompt(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const;
     };
 
     DEFINE_EFFECT(doublebarrel, effect_doublebarrel)

@@ -6,7 +6,7 @@
 
 namespace banggame {
 
-    void equip_gunbelt::on_enable(card_ptr target_card, player_ptr target) {
+    void equip_gunbelt::on_enable(card_ptr target_card, player_ptr target) const {
         target->m_game->add_listener<event_type::apply_maxcards_modifier>({target_card, 20 - ncards}, [=, ncards=ncards](const_player_ptr p, int &value) {
             if (p == target) {
                 value = ncards;

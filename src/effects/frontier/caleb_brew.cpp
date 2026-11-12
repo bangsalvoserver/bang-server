@@ -23,7 +23,7 @@ namespace banggame {
         }
     };
 
-    void equip_caleb_brew::on_enable(card_ptr target_card, player_ptr target) {
+    void equip_caleb_brew::on_enable(card_ptr target_card, player_ptr target) const {
         target->m_game->add_listener<event_type::on_heal>(target_card, [=](card_ptr origin_card, player_ptr origin, player_ptr e_target, bool amount) {
             if (e_target == target && origin_card != target_card) {
                 target->m_game->queue_request<request_caleb_brew>(target_card, target, amount);
@@ -31,11 +31,11 @@ namespace banggame {
         });
     }
 
-    bool effect_caleb_brew::can_play(card_ptr origin_card, player_ptr origin) {
+    bool effect_caleb_brew::can_play(card_ptr origin_card, player_ptr origin) const {
         return origin->m_game->top_request<request_caleb_brew>(target_is{origin}) != nullptr;
     }
 
-    void effect_caleb_brew::on_play(card_ptr origin_card, player_ptr origin) {
+    void effect_caleb_brew::on_play(card_ptr origin_card, player_ptr origin) const {
         auto req = origin->m_game->top_request<request_caleb_brew>();
         --req->amount;
     }

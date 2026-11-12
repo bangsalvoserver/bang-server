@@ -54,7 +54,7 @@ namespace banggame {
         }
     };
 
-    void equip_newidentity::on_enable(card_ptr origin_card, player_ptr origin) {
+    void equip_newidentity::on_enable(card_ptr origin_card, player_ptr origin) const {
         origin->m_game->add_listener<event_type::on_turn_switch>({origin_card, -1}, [=, selected_cards = card_set{}](player_ptr target) mutable {
             if (auto possible_cards = origin->m_game->m_characters | rv::filter([&](card_ptr c) {
                 return c->pocket == pocket_type::none && c->owner == nullptr && !selected_cards.contains(c);

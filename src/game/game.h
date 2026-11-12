@@ -1,7 +1,10 @@
 #ifndef __GAME_H__
 #define __GAME_H__
 
+#include <map>
+
 #include "game_table.h"
+#include "game_stats.h"
 
 #include "net/game_interface.h"
 
@@ -9,7 +12,13 @@ namespace banggame {
 
     struct game : game_interface, game_table {
         using game_table::game_table;
-    
+
+        game_tracking m_tracking;
+
+        game_report get_game_report() const override {
+            return m_tracking.get_game_report(this);
+        }
+
         void tick() override {
             game_table::tick();
         }
@@ -37,7 +46,7 @@ namespace banggame {
             clear_request_status();
         }
         request_state send_request_status_ready() override;
-        request_state request_bot_play(bool instant) override;
+        request_state request_bot_play(player_ptr origin, bool instant) override;
     };
 
 }

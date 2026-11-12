@@ -1,6 +1,7 @@
 #include "claus_the_saint.h"
 
 #include "effects/base/draw.h"
+#include "effects/base/gift_card.h"
 
 #include "cards/game_enums.h"
 
@@ -51,7 +52,7 @@ namespace banggame {
         }
     };
     
-    void equip_claus_the_saint::on_enable(card_ptr target_card, player_ptr target) {
+    void equip_claus_the_saint::on_enable(card_ptr target_card, player_ptr target) const {
         target->m_game->add_listener<event_type::init_request_draw>(target_card, [=](player_ptr origin, shared_request_draw req_draw) {
             if (origin == target) {
                 req_draw->handlers.push_back(target_card);
@@ -65,12 +66,14 @@ namespace banggame {
         });
     }
 
-    bool effect_claus_the_saint_response::can_play(card_ptr origin_card, player_ptr origin) {
+    bool effect_claus_the_saint_response::can_play(card_ptr origin_card, player_ptr origin) const {
         return origin->m_game->top_request<request_claus_the_saint>(target_is{origin}) != nullptr;
     }
 
-    void effect_claus_the_saint_response::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) {
+    void effect_claus_the_saint_response::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) const {
         auto req = origin->m_game->top_request<request_claus_the_saint>();
         req->remaining_targets.remove(target);
+
+        resolve_gift_card(origin_card, origin, ctx.get<contexts::gifted_card>(), target);
     }
 }

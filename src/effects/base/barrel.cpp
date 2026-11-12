@@ -6,11 +6,11 @@
 
 namespace banggame {
 
-    bool effect_barrel::can_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
+    bool effect_barrel::can_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const {
         return effect_missed{}.can_play(origin_card, origin, ctx);
     }
     
-    void effect_barrel::on_play(card_ptr origin_card, player_ptr target) {
+    void effect_barrel::on_play(card_ptr origin_card, player_ptr target) const {
         if (auto req = target->m_game->top_request<interface_missable>()) {
             req->add_card(origin_card);
             target->m_game->queue_request<request_check>(target, origin_card, [=](card_sign sign) {

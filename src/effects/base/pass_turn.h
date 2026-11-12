@@ -18,9 +18,9 @@ namespace banggame {
     }
 
     struct effect_pass_turn {
-        game_string get_error(card_ptr origin_card, player_ptr origin, const effect_context &ctx);
-        prompt_string on_prompt(card_ptr origin_card, player_ptr origin);
-        void on_play(card_ptr origin_card, player_ptr origin);
+        game_string get_error(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const;
+        prompt_string on_prompt(card_ptr origin_card, player_ptr origin) const;
+        void on_play(card_ptr origin_card, player_ptr origin) const;
     };
 
     DEFINE_EFFECT(pass_turn, effect_pass_turn)

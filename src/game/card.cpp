@@ -133,9 +133,9 @@ namespace banggame {
     }
 
     void card::set_inactive(bool new_inactive) {
-        if (new_inactive != inactive) {
+        if (new_inactive != flags.check(card_flag::inactive)) {
             m_game->add_update(game_updates::tap_card{ this, new_inactive });
-            inactive = new_inactive;
+            flags.toggle(card_flag::inactive);
         }
     }
 

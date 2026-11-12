@@ -8,7 +8,7 @@
 namespace banggame {
 
     struct equip_quick_death : feat_equip {
-        void on_enable(card_ptr target_card, player_ptr target);
+        void on_enable(card_ptr target_card, player_ptr target) const;
     };
 
     DEFINE_EQUIP(quick_death, equip_quick_death)

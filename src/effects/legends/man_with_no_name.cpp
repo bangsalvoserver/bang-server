@@ -6,7 +6,7 @@
 
 namespace banggame {
 
-    void equip_man_with_no_name::on_enable(card_ptr origin_card, player_ptr target) {
+    void equip_man_with_no_name::on_enable(card_ptr origin_card, player_ptr target) const {
         target->m_game->add_listener<event_type::on_hit>(origin_card, [=](card_ptr e_origin_card, player_ptr origin, player_ptr e_target, int damage, effect_flags flags) {
             if (e_target == target->m_game->m_playing) {
                 queue_request_perform_feat(origin_card, e_target);

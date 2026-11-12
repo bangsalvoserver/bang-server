@@ -5,7 +5,7 @@
 #include "cards/game_events.h"
 
 #include "game/game_table.h"
-#include "game/prompts.h"
+#include "game/bot_suggestion.h"
 
 namespace banggame {
 
@@ -13,13 +13,13 @@ namespace banggame {
         return target_card->pocket == pocket_type::player_hand && target_card->owner == target;
     }
 
-    prompt_string request_youl_grinner::pick_prompt(card_ptr target_card) const {
-        return prompts::bot_check_discard_card(target, target_card);
+    int request_youl_grinner::evaluate_pick(card_ptr target_card) const {
+        return bot_suggestion::evaluate_discard_card(target_card);
     }
 
     void request_youl_grinner::on_pick(card_ptr target_card) {
         pop_request();
-        handler_gift_card{true, true}.on_play(origin_card, target, target_card, origin);
+        resolve_gift_card(origin_card, target, target_card, origin, true);
     }
 
     game_string request_youl_grinner::status_text(player_ptr owner) const {
@@ -30,7 +30,7 @@ namespace banggame {
         }
     }
 
-    void equip_youl_grinner::on_enable(card_ptr target_card, player_ptr target) {
+    void equip_youl_grinner::on_enable(card_ptr target_card, player_ptr target) const {
         target->m_game->add_listener<event_type::on_turn_start>({target_card, -2}, [=](player_ptr origin) {
             if (target == origin) {
                 for (player_ptr p : target->m_game->range_other_players(target)) {

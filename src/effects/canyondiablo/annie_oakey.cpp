@@ -36,7 +36,7 @@ namespace banggame {
         }
     };
     
-    void equip_annie_oakey::on_enable(card_ptr target_card, player_ptr target) {
+    void equip_annie_oakey::on_enable(card_ptr target_card, player_ptr target) const {
         target->m_game->add_listener<event_type::init_request_draw>(target_card, [=](player_ptr origin, shared_request_draw req_draw) {
             if (origin == target) {
                 req_draw->handlers.push_back(target_card);
@@ -50,11 +50,11 @@ namespace banggame {
         });
     }
 
-    bool effect_annie_oakey::can_play(card_ptr origin_card, player_ptr target) {
+    bool effect_annie_oakey::can_play(card_ptr origin_card, player_ptr target) const {
         return target->m_game->top_request<request_annie_oakey>(target_is{target}) != nullptr;
     }
 
-    void effect_annie_oakey::on_play(card_ptr origin_card, player_ptr target) {
+    void effect_annie_oakey::on_play(card_ptr origin_card, player_ptr target) const {
         shared_request_draw req_draw = target->m_game->top_request<request_annie_oakey>()->req_draw;
 
         card_ptr drawn_card = req_draw->phase_one_drawn_card();

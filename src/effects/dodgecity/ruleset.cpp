@@ -1,12 +1,13 @@
 #include "ruleset.h"
 
 #include "cards/game_events.h"
+#include "cards/game_enums.h"
 
 #include "game/game_table.h"
 
 namespace banggame {
 
-    void ruleset_dodgecity::on_apply(game_ptr game) {
+    void ruleset_dodgecity::on_apply(game_ptr game) const {
         event_card_key key{nullptr, 25};
 
         game->add_listener<event_type::on_auto_discard>(nullptr, [](player_ptr origin, card_ptr origin_card, const effect_context &ctx) {
@@ -34,7 +35,7 @@ namespace banggame {
         });
 
         game->add_listener<event_type::check_play_card>(nullptr, [](player_ptr origin, card_ptr target_card, const effect_context &ctx) -> game_string {
-            if (target_card->is_green() && target_card->inactive) {
+            if (target_card->is_green() && target_card->flags.check(card_flag::inactive)) {
                 return {"ERROR_CARD_INACTIVE", target_card};
             }
             return {};

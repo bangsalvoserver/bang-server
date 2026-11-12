@@ -70,7 +70,7 @@ namespace banggame {
         init_stations_and_train(origin);
     }
 
-    void ruleset_greattrainrobbery::on_apply(game_ptr game) {
+    void ruleset_greattrainrobbery::on_apply(game_ptr game) const {
         game->add_listener<event_type::on_game_setup>({nullptr, 1}, init_stations_and_train);
 
         game->add_listener<event_type::check_equip_card>(nullptr, [](player_ptr origin, card_ptr origin_card, player_ptr target, const effect_context &ctx) -> game_string {

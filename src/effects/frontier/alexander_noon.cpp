@@ -27,7 +27,7 @@ namespace banggame {
         }
     };
 
-    void equip_alexander_noon::on_enable(card_ptr target_card, player_ptr target) {
+    void equip_alexander_noon::on_enable(card_ptr target_card, player_ptr target) const {
         target->m_game->add_listener<event_type::on_draw_check_start>({ target_card, -1 }, [=](player_ptr origin, shared_request_check req) {
             if (req->target == target && !req->drawn_card && !req->handlers.contains(target_card)) {
                 req->handlers.add(target_card);
@@ -53,14 +53,12 @@ namespace banggame {
             return target_card->pocket == pocket_type::player_hand && target_card->owner == target;
         }
 
-        prompt_string pick_prompt(card_ptr target_card) const override {
-            if (target->is_bot()) {
-                auto result = req->get_result(target_card);
-                if (result.indifferent || !result.lucky) {
-                    return "BOT_BAD_DRAW";
-                }
+        int evaluate_pick(card_ptr target_card) const override {
+            auto result = req->get_result(target_card);
+            if (!result.indifferent && result.lucky) {
+                return 5;
             }
-            return {};
+            return 0;
         }
 
         void on_pick(card_ptr target_card) override {
@@ -78,11 +76,11 @@ namespace banggame {
         }
     };
 
-    bool effect_alexander_noon::can_play(card_ptr origin_card, player_ptr origin) {
+    bool effect_alexander_noon::can_play(card_ptr origin_card, player_ptr origin) const {
         return origin->m_game->top_request<request_alexander_noon>(target_is{origin}) != nullptr;
     }
 
-    void effect_alexander_noon::on_play(card_ptr origin_card, player_ptr origin) {
+    void effect_alexander_noon::on_play(card_ptr origin_card, player_ptr origin) const {
         auto req = origin->m_game->top_request<request_alexander_noon>();
         req->pop_request();
         origin->m_game->queue_request<request_alexander_noon_draw>(origin_card, origin, std::move(req->req));

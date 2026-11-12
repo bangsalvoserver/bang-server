@@ -6,7 +6,7 @@
 namespace banggame {
 
     struct effect_next_stop {
-        void on_play(card_ptr origin_card, player_ptr origin);
+        void on_play(card_ptr origin_card, player_ptr origin) const;
     };
 
     DEFINE_EFFECT(next_stop, effect_next_stop)

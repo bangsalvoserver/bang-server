@@ -19,20 +19,35 @@ namespace banggame {
         );
     }
 
-    card_list targeting_card_per_player::random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) {
-        card_list ret;
+    static effect_flags get_flags(const card_list &target) {
+        effect_flags flags { effect_flag::multi_target, effect_flag::target_players };
+        if (target.size() == 1) {
+            flags.add(effect_flag::single_target);
+        }
+        return flags;
+    }
+
+    std::pair<card_list, int> targeting_card_per_player::random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
+        auto evaluate_fun = [&](card_ptr target_card) {
+            if (effect.on_prompt(origin_card, origin, target_card, {}, ctx)) return -2;
+            return effect.evaluate(origin_card, origin, target_card, ctx);
+        };
+
+        std::pair<card_list, int> ret;
         player_ptr skipped_player = ctx.get<contexts::skipped_player>();
         for (player_ptr target : origin->m_game->range_all_players(origin)) {
             if (target != skipped_player && !check_player_filter(origin_card, origin, player_filter, target, ctx)) {
                 if (auto targets = cards_target_set(origin, origin_card, card_filter, target, ctx)) {
-                    ret.push_back(random_element(targets, origin->m_game->bot_rng));
+                    auto [target, score] = random_max_element(targets, evaluate_fun, origin->m_game->bot_rng);
+                    ret.first.push_back(target);
+                    ret.second += score;
                 }
             }
         }
         return ret;
     }
 
-    game_string targeting_card_per_player::get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &target_cards) {
+    game_string targeting_card_per_player::get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &target_cards) const {
         player_ptr skipped_player = ctx.get<contexts::skipped_player>();
         if (skipped_player && check_player_filter(origin_card, origin, player_filter, skipped_player, ctx)) {
             return {"ERROR_CANNOT_SKIP_PLAYER", skipped_player};
@@ -53,15 +68,7 @@ namespace banggame {
         }
     }
 
-    static effect_flags get_flags(const card_list &target) {
-        effect_flags flags { effect_flag::multi_target, effect_flag::target_players };
-        if (target.size() == 1) {
-            flags.add(effect_flag::single_target);
-        }
-        return flags;
-    }
-
-    prompt_string targeting_card_per_player::on_prompt(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &target_cards) {
+    prompt_string targeting_card_per_player::on_prompt(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &target_cards) const {
         if (target_cards.empty()) {
             return {"PROMPT_CARD_NO_EFFECT", origin_card};
         }
@@ -71,13 +78,13 @@ namespace banggame {
         }));
     }
 
-    void targeting_card_per_player::add_context(card_ptr origin_card, player_ptr origin, const effect_holder &effect, effect_context &ctx, const card_list &target_cards) {
+    void targeting_card_per_player::add_context(card_ptr origin_card, player_ptr origin, const effect_holder &effect, effect_context &ctx, const card_list &target_cards) const {
         for (card_ptr target_card : target_cards) {
             effect.add_context(origin_card, origin, target_card, ctx);
         }
     }
 
-    void targeting_card_per_player::on_play(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &target_cards) {
+    void targeting_card_per_player::on_play(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &target_cards) const {
         effect_flags flags = get_flags(target_cards);
         for (card_ptr target_card : target_cards) {
             if (target_card->pocket == pocket_type::player_hand) {

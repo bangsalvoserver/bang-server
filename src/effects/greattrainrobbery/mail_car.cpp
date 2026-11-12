@@ -40,11 +40,11 @@ namespace banggame {
         }
     };
 
-    void effect_mail_car::on_play(card_ptr origin_card, player_ptr origin) {
+    void effect_mail_car::on_play(card_ptr origin_card, player_ptr origin) const {
         origin->m_game->queue_request<request_mail_car>(origin_card, origin);
     }
 
-    bool effect_mail_car_response::can_play(card_ptr origin_card, player_ptr origin) {
+    bool effect_mail_car_response::can_play(card_ptr origin_card, player_ptr origin) const {
         return origin->m_game->top_request<request_mail_car>(target_is{origin}) != nullptr;
     }
 }

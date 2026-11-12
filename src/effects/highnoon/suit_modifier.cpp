@@ -6,7 +6,7 @@
 
 namespace banggame {
     
-    void equip_suit_modifier::on_enable(card_ptr target_card, player_ptr target) {
+    void equip_suit_modifier::on_enable(card_ptr target_card, player_ptr target) const {
         target->m_game->add_listener<event_type::get_suit_modifier>(target_card, [suit=suit]{
             return suit;
         });

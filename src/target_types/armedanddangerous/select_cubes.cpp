@@ -8,15 +8,15 @@
 
 namespace banggame {
 
-    std::generator<card_list> targeting_select_cubes::possible_targets(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) {
+    std::generator<card_list> targeting_select_cubes::possible_targets(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
         return utils::combinations(rn::to<card_list>(get_all_cubes(origin)), ncubes);
     }
 
-    card_list targeting_select_cubes::random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) {
+    card_list targeting_select_cubes::random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
         return sample_elements(get_all_cubes(origin), ncubes, origin->m_game->bot_rng);
     }
 
-    game_string targeting_select_cubes::get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &target_cards) {
+    game_string targeting_select_cubes::get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &target_cards) const {
         if (target_cards.size() != ncubes) {
             return "ERROR_INVALID_TARGETS";
         }
@@ -28,15 +28,15 @@ namespace banggame {
         return {};
     }
 
-    prompt_string targeting_select_cubes::on_prompt(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &target_cards) {
+    prompt_string targeting_select_cubes::on_prompt(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &target_cards) const {
         return origin->m_game->call_event(event_type::get_select_cubes_prompt{ origin, ctx });
     }
 
-    void targeting_select_cubes::add_context(card_ptr origin_card, player_ptr origin, const effect_holder &effect, effect_context &ctx, const card_list &target_cards) {
+    void targeting_select_cubes::add_context(card_ptr origin_card, player_ptr origin, const effect_holder &effect, effect_context &ctx, const card_list &target_cards) const {
         ctx.add(contexts::selected_cubes{ origin_card, target_cards });
     }
 
-    void targeting_select_cubes::on_play(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &target_cards) {
+    void targeting_select_cubes::on_play(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &target_cards) const {
         using cube_count_pair = std::pair<card_ptr, int>;
         std::vector<cube_count_pair> card_cube_count;
 

@@ -6,8 +6,8 @@
 namespace banggame {
 
     struct equip_ray_owe {
-        void on_enable(card_ptr target_card, player_ptr target);
-        void on_disable(card_ptr target_card, player_ptr target);
+        void on_enable(card_ptr target_card, player_ptr target) const;
+        void on_disable(card_ptr target_card, player_ptr target) const;
     };
 
     DEFINE_EQUIP(ray_owe, equip_ray_owe)

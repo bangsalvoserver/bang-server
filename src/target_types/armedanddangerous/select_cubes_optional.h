@@ -10,24 +10,24 @@ namespace banggame {
     struct targeting_select_cubes_optional : targeting_select_cubes {
         using targeting_select_cubes::targeting_select_cubes;
         
-        bool is_possible(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) {
+        bool is_possible(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
             return true;
         }
 
-        card_list random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) {
+        card_list random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
             if (count_cubes(origin) >= ncubes) {
                 return targeting_select_cubes::random_target(origin_card, origin, effect, ctx);
             }
             return {};
         }
 
-        void add_context(card_ptr origin_card, player_ptr origin, const effect_holder &effect, effect_context &ctx, const card_list &target) {
+        void add_context(card_ptr origin_card, player_ptr origin, const effect_holder &effect, effect_context &ctx, const card_list &target) const {
             if (!target.empty()) {
                 targeting_select_cubes::add_context(origin_card, origin, effect, ctx, target);
             }
         }
 
-        game_string get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &target) {
+        game_string get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &target) const {
             if (!target.empty()) {
                 return targeting_select_cubes::get_error(origin_card, origin, effect, ctx, target);
             }

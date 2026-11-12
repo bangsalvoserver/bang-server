@@ -17,7 +17,7 @@ namespace banggame {
         };
     }
     
-    void equip_coffin::on_enable(card_ptr target_card, player_ptr target) {
+    void equip_coffin::on_enable(card_ptr target_card, player_ptr target) const {
         if (target->m_game->call_event(event_type::check_coffin{ target_card, target })) {
             equip_add_flag{player_flag::keep_alive}.on_enable(target_card, target);
             target->add_player_flags(player_flag::coffin);
@@ -43,7 +43,7 @@ namespace banggame {
         });
     }
 
-    void equip_coffin::on_disable(card_ptr target_card, player_ptr target) {
+    void equip_coffin::on_disable(card_ptr target_card, player_ptr target) const {
         target->m_game->remove_listeners({ target_card, -10 });
         target->m_game->remove_listeners({ target_card, 2 });
 
@@ -51,7 +51,7 @@ namespace banggame {
         equip_add_flag{player_flag::keep_alive}.on_disable(target_card, target);
     }
 
-    void equip_coffin_nodisable::on_disable(card_ptr target_card, player_ptr target) {
+    void equip_coffin_nodisable::on_disable(card_ptr target_card, player_ptr target) const {
         target->m_game->remove_listeners({ target_card, 50 });
     }
 }

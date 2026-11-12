@@ -8,7 +8,7 @@ namespace banggame {
     struct targeting_random_if_hand_card : targeting_card {
         using targeting_card::targeting_card;
         
-        auto possible_targets(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) {
+        auto possible_targets(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
             return get_all_targetable_cards(origin)
                 | rv::filter([=, &ctx, this, seen_players=player_set{}](card_ptr target_card) mutable {
                     if (target_card->pocket == pocket_type::player_hand) {
@@ -21,8 +21,19 @@ namespace banggame {
                     return !get_error(origin_card, origin, effect, ctx, target_card);
                 });
         }
+
+        std::pair<card_ptr, int> random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
+            return random_max_element(
+                possible_targets(origin_card, origin, effect, ctx),
+                [&](card_ptr target_card) {
+                    if (effect.on_prompt(origin_card, origin, target_card, effect_flag::single_target, ctx)) return -2;
+                    return effect.evaluate(origin_card, origin, target_card, ctx);
+                },
+                origin->m_game->bot_rng
+            );
+        }
         
-        void on_play(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, card_ptr target) {
+        void on_play(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, card_ptr target) const {
             if (target->pocket == pocket_type::player_hand) {
                 target = target->owner->random_hand_card();
             }

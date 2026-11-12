@@ -6,14 +6,18 @@
 #include "game/game_table.h"
 #include "game/game_options.h"
 #include "game/prompts.h"
+#include "game/bot_suggestion.h"
 
 namespace banggame {
 
-    prompt_string effect_stampede::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
-        MAYBE_RETURN(prompts::bot_check_target_enemy(origin, target));
+    prompt_string effect_stampede::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) const {
         MAYBE_RETURN(prompts::prompt_target_immunity(origin_card, origin, target, flags));
         MAYBE_RETURN(prompts::prompt_target_self(origin_card, origin, target));
         return {};
+    }
+
+    int effect_stampede::evaluate(card_ptr, player_ptr origin, player_ptr target) const {
+        return bot_suggestion::evaluate_soft_attack(origin, target);
     }
 
     struct request_stampede : request_picking, interface_resolvable {
@@ -57,7 +61,7 @@ namespace banggame {
         }
     };
 
-    void effect_stampede::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) {
+    void effect_stampede::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) const {
         origin->m_game->queue_request<request_stampede>(origin_card, origin, target);
     }
 }

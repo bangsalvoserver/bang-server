@@ -6,13 +6,13 @@
 namespace banggame {
 
     struct equip_kit_carlson_legend : event_equip {
-        void on_enable(card_ptr target_card, player_ptr target);
+        void on_enable(card_ptr target_card, player_ptr target) const;
     };
 
     DEFINE_EQUIP(kit_carlson_legend, equip_kit_carlson_legend)
 
     struct effect_kit_carlson_legend_response {
-        bool can_play(card_ptr origin_card, player_ptr origin);
+        bool can_play(card_ptr origin_card, player_ptr origin) const;
     };
 
     DEFINE_EFFECT(kit_carlson_legend_response, effect_kit_carlson_legend_response)
