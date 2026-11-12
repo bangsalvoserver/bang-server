@@ -1,6 +1,6 @@
 # Practical examples: how to create a new card in bang-server
 
-This guide builds on the two architecture documents already produced, showing **concrete use cases** for adding a card, in increasing order of complexity. For each case I indicate: what needs to change, where, and why — using real patterns already present in the codebase (`base.yml` and `src/effects/base/`) as reference.
+This guide shows **concrete use cases** for adding a card, in increasing order of complexity. For each case is indicatet: what needs to change, where, and why — using real patterns already present in the codebase (`base.yml` and `src/effects/base/`) as reference.
 
 General rule to keep in mind: **if the effect/target you need already exists** (even by combining several), all you need is YAML — zero C++, zero recompilation of logic. C++ is only needed when the card introduces **new behavior** that can't be expressed with the existing building blocks.
 
@@ -278,7 +278,7 @@ Then reference it by name in YAML exactly like any other target — `distinct_su
     - discard distinct_suits(0, true) self | hand
 ```
 
-Unlike Cases 3-5 (where updating the backend is enough), a new target type **almost always also requires a frontend change** — the client has no generic fallback for a target type it doesn't recognize, so skipping this step means the card is simply unplayable from the UI even though the server would accept it. Concretely, for `distinct_suits` above, three files need something added (see the frontend doc's §4.3 deep-dive on `TargetDispatch.ts` for how the pieces below actually fit together), and the same "reuse, override one thing" shape carries over to this side too — the real `max_cards` entries in `CardTarget.ts`/`TargetDispatch.ts` are the direct model, not something to write from a blank page:
+Unlike Cases 3-5 (where updating the backend is enough), a new target type **also requires a frontend change** — the client has no generic fallback for a target type it doesn't recognize, so skipping this step means the card is simply unplayable from the UI even though the server would accept it. Concretely, for `distinct_suits` above, three files need something added (see the frontend doc's §4.3 deep-dive on `TargetDispatch.ts` for how the pieces below actually fit together), and the same "reuse, override one thing" shape carries over to this side too — the real `max_cards` entries in `CardTarget.ts`/`TargetDispatch.ts` are the direct model, not something to write from a blank page:
 
 1. **`bangweb/src/Scenes/Game/Model/CardTarget.ts`** — a new entry in `CardTargetTypes`, identical in shape to the real `max_cards` entry, since the underlying value (a growing list of cards plus a running cap) is exactly the same kind of thing:
 ```ts
@@ -679,10 +679,8 @@ static bool check_distance(const_player_ptr origin, const_player_ptr target, con
 | Requires a target shape not expressible with `player`/`players`/`card`/`cards` | A new `target_type` **+ frontend update** (Case 6) |
 | Changes how *another* card's effect resolves (strength, damage, cancellation...) | Hook the target effect's existing modifier event, e.g. `apply_bang_modifier` (Case 7) |
 | Can't be played on its own — it must be followed immediately by a specific kind of card | A new `modifier_vtable` via `DEFINE_MODIFIER` (Case 8) |
-| Needs several differently-filtered targets delivered to *one* combined function, especially when one group's content affects what happens to another | A new  |
 | Should be prioritized (or deprioritized) by bots relative to other legal plays | The right `tags:` entry, matched against `config/bot_info.yml`'s existing rules (Case 9) |
 | Is legal for anyone, but a bot should prefer or avoid a specific target/decision | An `evaluate` or request-specific `evaluate_*` score (Case 10) |
-| Same as above, but the effect hits several targets at once | Score each affected target; multi-target handlers combine the per-target scores (Case 11) |
 | Starts a mechanic other cards should be able to hook into, and no existing event fits | A new plain aggregate struct under `event_type::`, no macro needed (Case 12) |
 | Is a modifier that needs to change how the terminal card it precedes behaves | A new `effect_context` type, read back by whatever shared code needs to respect it (Case 13) |
 
@@ -727,7 +725,7 @@ If your new effect registers an event listener or queues a request, it's joining
 **7. Frontend / localization** (`bangweb`) — the server compiles and runs fine without any of this; it just won't be legible to a real client
 - [ ] Card image asset in `public/cards/` matching the YAML's `image:` key.
 - [ ] Name + description entry in `Locale/<every language>/Cards.tsx`.
-- [ ] Any *new* string identifier your effect introduces — `ERROR_*`/`LOG_*`/`PROMPT_*`/`STATUS_*`/`BOT_*` passed to a `game_string`/`prompt_string` constructor — needs a matching entry in `Locale/<every language>/GameStrings.tsx`, or it'll render as a raw, untranslated key client-side. `scripts/find_game_string.sh` (a `clang-query`-based scan over the whole `src/` tree) exists specifically to enumerate every such identifier in use, which is useful for checking you haven't missed one.
+- [ ] Any *new* string identifier your effect introduces — `ERROR_*`/`LOG_*`/`PROMPT_*`/`STATUS_*` passed to a `game_string`/`prompt_string` constructor — needs a matching entry in `Locale/<every language>/GameStrings.tsx`, or it'll render as a raw, untranslated key client-side. `scripts/find_game_string.sh` (a `clang-query`-based scan over the whole `src/` tree) exists specifically to enumerate every such identifier in use, which is useful for checking you haven't missed one.
 - [ ] Only if Case 6 applied: the corresponding entry in `CardTarget.ts`'s `CardTargetTypes` and validation logic in `TargetDispatch.ts`.
 - [ ] A new expansion-level tag/rule (not a single card) also needs the `ExpansionType` union and lobby checkbox described in the expansion-addition guide.
 
