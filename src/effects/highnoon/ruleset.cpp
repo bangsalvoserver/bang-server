@@ -68,7 +68,7 @@ namespace banggame {
         }
     };
 
-    void ruleset_highnoon::on_apply(game_ptr game) {
+    void ruleset_highnoon::on_apply(game_ptr game) const {
         game->add_listener<event_type::on_game_setup>({nullptr, 5}, [](player_ptr origin) {
             origin->m_game->queue_request<request_choose_scenario>(origin);
         });

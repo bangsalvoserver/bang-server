@@ -10,6 +10,7 @@
 
 #include "game/game_table.h"
 #include "game/prompts.h"
+#include "game/bot_suggestion.h"
 
 namespace banggame {
 
@@ -33,9 +34,8 @@ namespace banggame {
             apply_pardner_token(origin_card, target, target_player);
         }
 
-        prompt_string pick_prompt(player_ptr target_player) const override {
-            MAYBE_RETURN(prompts::bot_check_target_enemy(target, target_player));
-            return {};
+        int evaluate_pick(player_ptr target_player) const override {
+            return bot_suggestion::evaluate_soft_attack(target, target_player);
         }
 
         game_string status_text(player_ptr owner) const override {
@@ -47,7 +47,7 @@ namespace banggame {
         }
     };
 
-    void equip_steve_tengo::on_enable(card_ptr target_card, player_ptr target) {
+    void equip_steve_tengo::on_enable(card_ptr target_card, player_ptr target) const {
         target->m_game->add_listener<event_type::on_turn_start>({ target_card, -6 }, [=](player_ptr origin) {
             if (origin == target) {
                 target->m_game->queue_request<request_track_player>(target_card, nullptr, target);
@@ -62,12 +62,12 @@ namespace banggame {
         });
     }
 
-    void equip_steve_tengo::on_disable(card_ptr target_card, player_ptr target) {
+    void equip_steve_tengo::on_disable(card_ptr target_card, player_ptr target) const {
         target->m_game->remove_listeners({ target_card, -6 });
         target->m_game->remove_listeners({ target_card, 5 });
     }
 
-    void equip_steve_tengo_nodisable::on_disable(card_ptr target_card, player_ptr target) {
+    void equip_steve_tengo_nodisable::on_disable(card_ptr target_card, player_ptr target) const {
         remove_pardner_token(target_card, target);
     }
 }

@@ -23,8 +23,6 @@ namespace banggame {
 
         modifier_holder modifier;
         modifier_holder modifier_response;
-        mth_holder mth_effect;
-        mth_holder mth_response;
         
         card_color_type color;
         card_sign sign;
@@ -34,14 +32,6 @@ namespace banggame {
                 case effect_list_type::effects: return effects;
                 case effect_list_type::responses: return responses;
                 case effect_list_type::equip_effects: return equip_effects;
-                default: throw game_error("Invalid effect_list_type");
-            }
-        }
-
-        const mth_holder &get_mth(effect_list_type type) const {
-            switch (type) {
-                case effect_list_type::effects: return mth_effect;
-                case effect_list_type::responses: return mth_response;
                 default: throw game_error("Invalid effect_list_type");
             }
         }

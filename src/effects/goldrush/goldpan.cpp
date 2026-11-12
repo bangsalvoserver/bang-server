@@ -6,14 +6,14 @@
 
 namespace banggame {
 
-    game_string effect_pay_gold::get_error(card_ptr origin_card, player_ptr origin) {
+    game_string effect_pay_gold::get_error(card_ptr origin_card, player_ptr origin) const {
         if (origin->get_gold() < amount) {
             return "ERROR_NOT_ENOUGH_GOLD";
         }
         return {};
     }
 
-    void effect_pay_gold::on_play(card_ptr origin_card, player_ptr origin) {
+    void effect_pay_gold::on_play(card_ptr origin_card, player_ptr origin) const {
         origin->add_gold(-amount);
     }
 
@@ -23,7 +23,7 @@ namespace banggame {
         }
     }
 
-    void equip_goldpan::on_enable(card_ptr target_card, player_ptr target) {
+    void equip_goldpan::on_enable(card_ptr target_card, player_ptr target) const {
         target->m_game->add_listener<event_type::on_turn_end>(target_card, [=](player_ptr e_origin, bool skipped) {
             if (e_origin == target) {
                 drop_all_gold(target_card);
@@ -31,12 +31,12 @@ namespace banggame {
         });
     }
 
-    void equip_goldpan::on_disable(card_ptr target_card, player_ptr target) {
+    void equip_goldpan::on_disable(card_ptr target_card, player_ptr target) const {
         target->m_game->remove_listeners(target_card);
         drop_all_gold(target_card);
     }
 
-    game_string effect_goldpan::get_error(card_ptr origin_card, player_ptr origin) {
+    game_string effect_goldpan::get_error(card_ptr origin_card, player_ptr origin) const {
         if (origin->get_gold() < 1) {
             return "ERROR_NOT_ENOUGH_GOLD";
         }
@@ -46,7 +46,7 @@ namespace banggame {
         return {};
     }
 
-    void effect_goldpan::on_play(card_ptr origin_card, player_ptr origin) {
+    void effect_goldpan::on_play(card_ptr origin_card, player_ptr origin) const {
         origin->m_game->move_tokens(card_token_type::gold, token_positions::player{origin}, token_positions::card{origin_card}, 1);
     }
 }

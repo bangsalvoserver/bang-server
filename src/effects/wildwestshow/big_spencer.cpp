@@ -7,7 +7,7 @@
 
 namespace banggame {
 
-    void equip_big_spencer::on_enable(card_ptr target_card, player_ptr target) {
+    void equip_big_spencer::on_enable(card_ptr target_card, player_ptr target) const {
         target->m_game->add_listener<event_type::check_play_card>(target_card, [=](player_ptr origin, card_ptr origin_card, const effect_context &ctx) -> game_string {
             if (origin == target
                 && origin_card->pocket == pocket_type::player_hand
@@ -19,7 +19,7 @@ namespace banggame {
         });
     }
 
-    void equip_initial_cards::on_enable(card_ptr target_card, player_ptr target) {
+    void equip_initial_cards::on_enable(card_ptr target_card, player_ptr target) const {
         target->m_game->add_listener<event_type::count_initial_cards>(target_card, [=, ncards=ncards](const_player_ptr origin) -> std::optional<int> {
             if (origin == target) {
                 return ncards;

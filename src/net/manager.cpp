@@ -2,6 +2,7 @@
 
 #include "bot_info.h"
 #include "tracking.h"
+#include "game_stats_db.h"
 #include "server_options.h"
 
 #include "utils/random_element.h"
@@ -109,6 +110,18 @@ void game_manager::tick() {
                 });
 
                 if (lobby.m_game->is_game_over()) {
+                    game_report report = lobby.m_game->get_game_report();
+                    report.game_id = lobby.game_id;
+                    report.lobby_name = lobby.name;
+                    for (player_game_report &p : report.players) {
+                        if (auto bot_it = rn::find(lobby.bots, p.user_id, &lobby_bot::user_id); bot_it != lobby.bots.end()) {
+                            p.username = bot_it->make_user_update().username;
+                        } else {
+                            p.username = lobby.find_user(p.user_id).session->username;
+                        }
+                    }
+                    game_stats::save_game(report);
+
                     lobby.state = lobby_state::finished;
                     broadcast_lobby_update(lobby);
                 }
@@ -300,7 +313,7 @@ void game_manager::handle_join_lobby(session_ptr session, game_lobby &lobby) {
     }
     
     if (lobby.m_game) {
-        send_message(session->client, server_messages::game_started{});
+        send_message(session->client, server_messages::game_started{ lobby.game_id });
 
         lobby.m_game->get_spectator_join_updates([&](update_content update) {
             send_message(session->client, server_messages::game_update{ std::move(update) });
@@ -549,8 +562,9 @@ void game_manager::handle_message(client_messages::game_start &&args, session_pt
     }
 
     lobby.state = lobby_state::playing;
+    lobby.game_id = game_stats::get_next_game_id();
 
-    lobby.broadcast_message(server_messages::game_started{});
+    lobby.broadcast_message(server_messages::game_started{ lobby.game_id });
 
     auto guard = logging::push_context(std::format("game {}", lobby.name));
     lobby.m_game = std::make_unique<banggame::game>(lobby.options);
@@ -566,16 +580,8 @@ void game_manager::handle_message(client_messages::game_start &&args, session_pt
         }
     }
 
-    auto names = sample_elements_r<std::string_view>(bot_info.names, num_bots, session_rng);
-
-    auto propics = sample_elements_r<image_pixels_hash>(bot_info.propics, num_bots, session_rng);
-
     for (int i=0; i < num_bots; ++i) {
-        int bot_id = -1-i;
-        auto &bot = lobby.bots.emplace_back(bot_id, std::format("BOT {}", names[i % names.size()]), propics[i % propics.size()]);
-        user_ids.push_back(bot_id);
-
-        lobby.broadcast_message(bot.make_user_update());
+        user_ids.push_back(lobby.add_bot());
     }
     
     broadcast_lobby_update(lobby);
@@ -584,6 +590,9 @@ void game_manager::handle_message(client_messages::game_start &&args, session_pt
 }
 
 void game_manager::handle_message(client_messages::game_rejoin &&args, session_ptr session) {
+    if (!session->lobby) {
+        throw lobby_error("ERROR_PLAYER_NOT_IN_LOBBY");
+    }
     game_lobby &lobby = *session->lobby;
     game_user &user = lobby.find_user(session);
 
@@ -617,6 +626,34 @@ void game_manager::handle_message(client_messages::game_rejoin &&args, session_p
     lobby.m_game->get_rejoin_updates(user.user_id, [&](update_content update) {
         send_message(session->client, server_messages::game_update{ std::move(update) });
     });
+
+    broadcast_lobby_update(lobby);
+}
+
+void game_manager::handle_message(client_messages::game_replace_bot &&args, session_ptr session) {
+    if (!session->lobby) {
+        throw lobby_error("ERROR_PLAYER_NOT_IN_LOBBY");
+    }
+    game_lobby &lobby = *session->lobby;
+    game_user &user = lobby.find_user(session);
+
+    if (!user.is_lobby_owner()) {
+        throw lobby_error("ERROR_PLAYER_NOT_LOBBY_OWNER");
+    }
+
+    if (lobby.state != lobby_state::playing) {
+        throw lobby_error("ERROR_LOBBY_NOT_PLAYING");
+    }
+
+    if (args.user_id < 0) {
+        throw lobby_error("ERROR_CANNOT_REPLACE_BOT");
+    }
+
+    if (rn::contains(lobby.connected_user_ids, args.user_id)) {
+        throw lobby_error("ERROR_PLAYER_NOT_DISCONNECTED");
+    }
+
+    lobby.m_game->rejoin_user(args.user_id, lobby.add_bot());
 
     broadcast_lobby_update(lobby);
 }

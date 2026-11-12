@@ -5,7 +5,6 @@
 
 #include "game/game_table.h"
 #include "game/bot_suggestion.h"
-#include "game/prompts.h"
 
 #include "cards/filter_enums.h"
 
@@ -28,18 +27,15 @@ namespace banggame {
             target->discard_card(target_card);
         }
 
-        prompt_string pick_prompt(card_ptr target_card) const override {
-            if (target->is_bot()) {
-                MAYBE_RETURN(prompts::bot_check_discard_card(target, target_card));
-                if (is_ghost_card(target_card)) {
-                    return {1, "BOT_DISCARD_GHOST"};
-                }
-                auto is_penalty_card = [](card_ptr c) { return c->has_tag(tag_type::penalty); };
-                if (rn::any_of(target->m_table, is_penalty_card) && !is_penalty_card(target_card)) {
-                    return "BOT_DISCARD_PENALTY";
-                }
+        int evaluate_pick(card_ptr target_card) const override {
+            if (target_card->has_tag(tag_type::penalty)) {
+                return 5;
+            } else if (auto value = target_card->get_tag_value(tag_type::strong)) {
+                return -5 - *value;
+            } else if (is_ghost_card(target_card)) {
+                return -10;
             }
-            return {};
+            return 0;
         }
 
         game_string status_text(player_ptr owner) const override {
@@ -51,22 +47,18 @@ namespace banggame {
         }
     };
 
-    prompt_string effect_circus_wagon::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {
-        if (origin->is_bot()) {
-            if (bot_suggestion::is_target_enemy(origin, target)) {
-                if (rn::any_of(target->m_table, [](card_ptr target_card) {
-                    return target_card->has_tag(tag_type::jail);
-                })) {
-                    return {1, "BOT_ENEMY_HAS_JAIL"};
-                }
+    int effect_circus_wagon::evaluate(card_ptr, player_ptr origin, player_ptr target) const {
+        if (bot_suggestion::is_target_enemy(origin, target)) {
+            if (rn::any_of(target->m_table, [](card_ptr c) { return c->has_tag(tag_type::jail); })) {
+                return -10;
             } else {
-                return "BOT_TARGET_ENEMY";
+                return 4;
             }
         }
-        return {};
+        return -2;
     }
 
-    void effect_circus_wagon::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) {
+    void effect_circus_wagon::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) const {
         origin->m_game->queue_request<request_discard_table>(origin_card, origin, target);
     }
 }

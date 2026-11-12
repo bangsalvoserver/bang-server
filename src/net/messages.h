@@ -62,6 +62,10 @@ namespace banggame {
             int user_id;
         };
 
+        struct game_replace_bot {
+            int user_id;
+        };
+        
         struct [[=json::transparent]] game_action {
             json::json_document action;
         };
@@ -81,6 +85,7 @@ namespace banggame {
         client_messages::user_spectate,
         client_messages::game_start,
         client_messages::game_rejoin,
+        client_messages::game_replace_bot,
         client_messages::game_action
     >;
 
@@ -192,7 +197,9 @@ namespace banggame {
             json::raw_string update;
         };
 
-        struct game_started {};
+        struct game_started {
+            int game_id;
+        };
     }
 
     using server_message = std::variant<

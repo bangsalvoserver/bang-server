@@ -7,6 +7,8 @@
 
 #include "utils/json_serial.h"
 
+#include "game/game_stats.h"
+
 namespace banggame {
 
     struct game_lobby;
@@ -63,6 +65,7 @@ namespace banggame {
         virtual void start_game(std::span<int> user_ids) = 0;
         virtual bool is_game_over() const = 0;
         virtual void get_game_commands(bool enable_cheats, consumer_callback<chat_command> callback) const = 0;
+        virtual game_report get_game_report() const = 0;
     };
 }
 

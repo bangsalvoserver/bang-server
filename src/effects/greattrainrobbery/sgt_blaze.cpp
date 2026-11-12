@@ -15,7 +15,7 @@
 
 namespace banggame {
 
-    game_string modifier_sgt_blaze::get_error(card_ptr origin_card, player_ptr origin, card_ptr playing_card, const effect_context &ctx) {
+    game_string modifier_sgt_blaze::get_error(card_ptr origin_card, player_ptr origin, card_ptr playing_card, const effect_context &ctx) const {
         for (const effect_holder &effect : playing_card->get_effect_list(effect_list_type::effects)) {
             if (effect.target == TARGET_TYPE(players) || effect.target == TARGET_TYPE(card_per_player)) {
                 return {};
@@ -24,11 +24,11 @@ namespace banggame {
         return {"ERROR_NO_PLAYERS_TARGET", origin_card, playing_card};
     }
 
-    void effect_skip_player::add_context(card_ptr origin_card, player_ptr origin, player_ptr target, effect_context &ctx) {
+    void effect_skip_player::add_context(card_ptr origin_card, player_ptr origin, player_ptr target, effect_context &ctx) const {
         ctx.add(contexts::skipped_player{ target });
     }
 
-    void effect_skip_player::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) {
+    void effect_skip_player::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) const {
         origin->m_game->add_log("LOG_SKIP_PLAYER", origin_card, origin, target, ctx.get<contexts::playing_card>());
     }
 
@@ -68,7 +68,7 @@ namespace banggame {
         }
     };
 
-    void equip_sgt_blaze::on_enable(card_ptr origin_card, player_ptr origin) {
+    void equip_sgt_blaze::on_enable(card_ptr origin_card, player_ptr origin) const {
         origin->m_game->add_listener<event_type::on_locomotive_effect>({origin_card, 1}, [=](player_ptr target, shared_locomotive_context ctx) {
             if (origin == target) {
                 origin->m_game->queue_request<request_sgt_blaze>(origin_card, origin, ctx);

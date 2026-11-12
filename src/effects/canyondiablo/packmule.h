@@ -6,7 +6,7 @@
 namespace banggame {
 
     struct equip_packmule : event_equip {
-        void on_enable(card_ptr target_card, player_ptr target);
+        void on_enable(card_ptr target_card, player_ptr target) const;
     };
 
     DEFINE_EQUIP(packmule, equip_packmule)

@@ -48,6 +48,8 @@ namespace banggame {
         [[=transform(clamp_value(1, 3))]]
         int character_choice = 1;
 
+        bool all_characters = false;
+        
         [[=transform(clamp_value(3, 8))]]
         int max_players = 5;
         

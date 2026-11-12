@@ -7,16 +7,21 @@
 
 #include "game/game_table.h"
 #include "game/prompts.h"
+#include "game/bot_suggestion.h"
 
 namespace banggame {
 
-    game_string equip_jail::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {
-        MAYBE_RETURN(prompts::bot_check_target_enemy(origin, target, bot_suggestion::action_type::jail));
+    game_string equip_jail::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) const {
         MAYBE_RETURN(prompts::prompt_target_self(origin_card, origin, target));
         return {};
     }
 
-    void equip_jail::on_enable(card_ptr target_card, player_ptr target) {
+    int equip_jail::evaluate(card_ptr, player_ptr origin, player_ptr target) const {
+        if (bot_suggestion::is_target_enemy(origin, target, bot_suggestion::action_type::jail)) return 5;
+        return bot_suggestion::is_target_friend(origin, target) ? -5 : -1;
+    }
+
+    void equip_jail::on_enable(card_ptr target_card, player_ptr target) const {
         target->m_game->add_listener<event_type::on_predraw_check>(target_card, [=](player_ptr p, card_ptr e_card) {
             if (p == target && e_card == target_card) {
                 target->m_game->queue_request<request_check>(target, target_card, &card_sign::is_hearts, [=](bool result) {
@@ -24,6 +29,7 @@ namespace banggame {
                     if (result) {
                         target->m_game->add_log("LOG_JAIL_BREAK", target);
                     } else {
+                        target->m_game->call_event(event_type::on_jail_turn_skipped{ target });
                         target->skip_turn();
                     }
                 });
@@ -35,14 +41,14 @@ namespace banggame {
         return key.target_card->has_tag(tag_type::jail);
     };
 
-    bool effect_escape_jail::can_play(card_ptr origin_card, player_ptr origin) {
+    bool effect_escape_jail::can_play(card_ptr origin_card, player_ptr origin) const {
         if (auto req = origin->m_game->top_request<request_predraw>(target_is{origin})) {
             return rn::any_of(req->get_checking_cards(), checking_card_is_jail);
         }
         return false;
     }
 
-    void effect_escape_jail::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
+    void effect_escape_jail::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card) const {
         auto req = origin->m_game->top_request<request_predraw>();
         card_ptr jail_card = rn::find_if(req->get_checking_cards(), checking_card_is_jail)->target_card;
         req->remove_check(jail_card);

@@ -4,6 +4,9 @@
 #include "cards/game_enums.h"
 #include "cards/filter_enums.h"
 
+#include "effects/ghost_cards/ruleset.h"
+#include "effects/frontier/ruleset.h"
+
 namespace banggame::bot_suggestion {
 
     static bool is_positive_karma(const_player_ptr origin) {
@@ -270,5 +273,98 @@ namespace banggame::bot_suggestion {
         default:
             return false;
         }
+    }
+
+    int evaluate_attack(const_player_ptr origin, const_player_ptr target) {
+        const bool lethal = target->m_hp <= 1;
+
+        if (target->is_sheriff()) {
+            if (origin->is_outlaw()) {
+                if (target->m_hp <= 2) return 10;
+            } else if (lethal && (!origin->is_renegade() || origin->m_game->num_alive(true) > 2)) {
+                return -20;
+            }
+        }
+
+        if (is_target_enemy(origin, target, action_type::damage)) {
+            return lethal ? 6 : 5;
+        }
+
+        int score = is_target_friend(origin, target) ? -5 : -1;
+        if (lethal) {
+            score -= 5;
+        }
+        return score;
+    }
+
+    int evaluate_soft_attack(const_player_ptr origin, const_player_ptr target) {
+        if (is_target_enemy(origin, target)) {
+            return 4;
+        } else if (is_target_friend(origin, target)) {
+            return -5;
+        } else {
+            return -1;
+        }
+    }
+
+    int evaluate_help(const_player_ptr origin, const_player_ptr target) {
+        if (is_target_friend(origin, target)) {
+            return 4;
+        } else if (is_target_enemy(origin, target)) {
+            return -5;
+        } else {
+            return -2;
+        }
+    }
+
+    int evaluate_target_card(const_player_ptr origin, const_card_ptr target_card) {
+        player_ptr target = target_card->owner;
+        if (target->is_ghost()) {
+            const bool ghost_card = target_card->pocket == pocket_type::player_table && is_ghost_card(target_card);
+            if (is_target_enemy(origin, target)) {
+                return ghost_card ? 20 : -10;
+            } else if (is_target_friend(origin, target)) {
+                return ghost_card ? -10 : -20;
+            }
+            return -5;
+        }
+
+        if (target_card->pocket == pocket_type::player_table && target_card->is_purple()) {
+            if (player_ptr tracked_player = get_tracked_player(target_card)) {
+                return target_card->has_tag(tag_type::pardner_penalty)
+                    ? evaluate_help(origin, tracked_player)
+                    : evaluate_soft_attack(origin, tracked_player);
+            }
+            return 0;
+        }
+
+        if (is_target_enemy(origin, target)) {
+            if (target_card->pocket == pocket_type::player_table) {
+                if (target_card->has_tag(tag_type::penalty)) {
+                    return -5;
+                } else if (auto value = target_card->get_tag_value(tag_type::strong)) {
+                    return 8 + *value;
+                }
+            }
+            return 5;
+        } else if (is_target_friend(origin, target)) {
+            if (target_card->pocket == pocket_type::player_table) {
+                if (target_card->has_tag(tag_type::penalty)) {
+                    return 6;
+                } else if (auto value = target_card->get_tag_value(tag_type::strong)) {
+                    return -5 - *value;
+                }
+            }
+            return -4;
+        }
+
+        return -1;
+    }
+
+    int evaluate_discard_card(const_card_ptr target_card) {
+        if (auto value = target_card->get_tag_value(tag_type::strong)) {
+            return -5 - *value;
+        }
+        return 0;
     }
 }

@@ -17,7 +17,7 @@ namespace banggame {
             && origin_card->sign.is_jack_to_ace();
     }
 
-    void equip_ms_abigail::on_enable(card_ptr origin_card, player_ptr origin) {
+    void equip_ms_abigail::on_enable(card_ptr origin_card, player_ptr origin) const {
         origin->m_game->add_listener<event_type::apply_escapable_modifier>(origin_card,
             [=](card_ptr e_origin_card, player_ptr e_origin, const_player_ptr e_target, effect_flags e_flags, const interface_escapable &req) -> escape_type {
                 if (e_target == origin && effect_ms_abigail::can_escape(e_origin, e_origin_card, e_flags)) {
@@ -34,7 +34,7 @@ namespace banggame {
             });
     }
 
-    bool effect_ms_abigail::can_play(card_ptr origin_card, player_ptr origin) {
+    bool effect_ms_abigail::can_play(card_ptr origin_card, player_ptr origin) const {
         if (auto req = origin->m_game->top_request<interface_escapable>([&](const request_base &base) {
             return base.target == origin && effect_ms_abigail::can_escape(base.origin, base.origin_card, base.flags);
         })) {
@@ -43,12 +43,12 @@ namespace banggame {
         return false;
     }
 
-    prompt_string effect_ms_abigail::on_prompt(card_ptr origin_card, player_ptr origin) {
+    prompt_string effect_ms_abigail::on_prompt(card_ptr origin_card, player_ptr origin) const {
         auto req = origin->m_game->top_request<interface_escapable>();
         return req->escape_prompt(origin);
     }
 
-    void effect_ms_abigail::on_play(card_ptr origin_card, player_ptr origin) {
+    void effect_ms_abigail::on_play(card_ptr origin_card, player_ptr origin) const {
         auto req = origin->m_game->top_request();
         dynamic_cast<interface_escapable *>(req.get())->add_card(origin_card);
 

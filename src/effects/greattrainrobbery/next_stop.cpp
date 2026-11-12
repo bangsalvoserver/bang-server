@@ -8,7 +8,7 @@
 
 namespace banggame {
 
-    void effect_next_stop::on_play(card_ptr origin_card, player_ptr origin) {
+    void effect_next_stop::on_play(card_ptr origin_card, player_ptr origin) const {
         origin->m_game->play_sound(sound_id::train);
         
         origin->m_game->add_log("LOG_TRAIN_ADVANCE");

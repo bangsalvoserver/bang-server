@@ -5,6 +5,7 @@
 
 #include "game/game_table.h"
 #include "game/prompts.h"
+#include "game/bot_suggestion.h"
 
 namespace banggame {
 
@@ -17,9 +18,8 @@ namespace banggame {
         return nullptr;
     };
 
-    game_string equip_weapon::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {
+    game_string equip_weapon::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) const {
         if (range == 0) {
-            MAYBE_RETURN(prompts::bot_check_target_enemy(origin, target));
             return prompts::prompt_target_self(origin_card, origin, target);
         } else if (target == origin && origin->get_weapon_range() != 0) {
             if (card_ptr target_card = find_weapon_card(origin_card, target)) {
@@ -31,7 +31,18 @@ namespace banggame {
         return {};
     }
 
-    void equip_weapon::on_enable(card_ptr origin_card, player_ptr target) {
+    int equip_weapon::evaluate(card_ptr origin_card, player_ptr origin, player_ptr target) const {
+        if (range == 0) {
+            return bot_suggestion::evaluate_soft_attack(origin, target);
+        } else if (origin == target) {
+            if (auto value = origin_card->get_tag_value(tag_type::weapon)) {
+                return 5 + *value;
+            }
+        }
+        return 0;
+    }
+
+    void equip_weapon::on_enable(card_ptr origin_card, player_ptr target) const {
         if (card_ptr target_card = find_weapon_card(origin_card, target)) {
             target->m_game->add_log("LOG_DISCARDED_SELF_CARD", target, target_card);
             target->discard_card(target_card);
@@ -44,7 +55,7 @@ namespace banggame {
         });
     }
 
-    void equip_weapon::on_disable(card_ptr target_card, player_ptr target) {
+    void equip_weapon::on_disable(card_ptr target_card, player_ptr target) const {
         target->m_game->remove_listeners({ target_card, -5 });
     }
 }

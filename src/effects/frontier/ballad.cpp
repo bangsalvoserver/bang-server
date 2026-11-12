@@ -4,6 +4,7 @@
 
 #include "game/prompts.h"
 #include "game/bot_suggestion.h"
+#include "game/bot_suggestion.h"
 
 #include "effects/base/pick.h"
 #include "effects/base/resolve.h"
@@ -16,8 +17,7 @@ namespace banggame {
         return !target_card->is_black() && !target_card->is_train();
     }
 
-    prompt_string effect_ballad::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
-        MAYBE_RETURN(prompts::bot_check_target_enemy(origin, target));
+    prompt_string effect_ballad::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) const {
         MAYBE_RETURN(prompts::prompt_target_immunity(origin_card, origin, target, flags));
 
         if ((origin == target || target->empty_hand()) && rn::none_of(target->m_table, is_valid_ballad_card)) {
@@ -29,11 +29,15 @@ namespace banggame {
         return {};
     }
 
+    int effect_ballad::evaluate(card_ptr, player_ptr origin, player_ptr target) const {
+        return bot_suggestion::evaluate_soft_attack(origin, target);
+    }
+
     struct request_ballad_steal : request_dismissable, interface_picking {
         using request_dismissable::request_dismissable;
 
-        prompt_string pick_prompt(card_ptr target_card) const override {
-            return prompts::bot_check_target_enemy(target, origin);
+        int evaluate_pick(card_ptr) const override {
+            return bot_suggestion::evaluate_soft_attack(target, origin);
         }
 
         bool can_pick(card_ptr target_card) const override {
@@ -102,7 +106,7 @@ namespace banggame {
         }
     };
 
-    void effect_ballad::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) {
+    void effect_ballad::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) const {
         origin->m_game->add_log("LOG_PLAYED_CARD_ON", origin_card, origin, target);
         origin->m_game->queue_request<request_ballad>(origin_card, origin, target);
     }

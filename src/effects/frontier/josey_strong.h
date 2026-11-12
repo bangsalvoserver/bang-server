@@ -6,7 +6,7 @@
 namespace banggame {
 
     struct effect_josey_strong {
-        void on_play(card_ptr origin_card, player_ptr origin);
+        void on_play(card_ptr origin_card, player_ptr origin) const;
     };
 
     DEFINE_EFFECT(josey_strong, effect_josey_strong)

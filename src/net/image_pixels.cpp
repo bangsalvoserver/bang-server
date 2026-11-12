@@ -98,6 +98,8 @@ namespace banggame {
 
         return result;
     }
+    
+    static constexpr uint32_t max_image_dimension = 4096;
 
     image_pixels image_from_png_data_url(std::string_view data_url) {
         static constexpr std::string_view prefix = "data:image/png;base64,";
@@ -117,6 +119,13 @@ namespace banggame {
 
         // Allocate memory for the image buffer
         image.format = PNG_FORMAT_RGBA;
+
+        if (image.width == 0 || image.height == 0
+            || image.width > max_image_dimension
+            || image.height > max_image_dimension) {
+            png_image_free(&image);
+            throw png_error("Image dimensions out of range");
+        }
 
         image_pixels result{ image.width, image.height };
         if (!png_image_finish_read(&image, nullptr, result.pixels.data(), 0, nullptr)) {

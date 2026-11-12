@@ -6,7 +6,7 @@
 
 namespace banggame {
     
-    void equip_sacagaway::on_enable(card_ptr target_card, player_ptr target) {
+    void equip_sacagaway::on_enable(card_ptr target_card, player_ptr target) const {
         for (player_ptr p : target->m_game->range_alive_players(target)) {
             for (card_ptr c : p->m_hand) {
                 target->m_game->add_log("LOG_REVEALED_CARD", p, c);
@@ -15,7 +15,7 @@ namespace banggame {
         }
     }
 
-    void equip_sacagaway::on_disable(card_ptr target_card, player_ptr target) {
+    void equip_sacagaway::on_disable(card_ptr target_card, player_ptr target) const {
         for (player_ptr p : target->m_game->range_alive_players(target)) {
             for (card_ptr c : p->m_hand) {
                 c->set_visibility(card_visibility::show_owner, p);

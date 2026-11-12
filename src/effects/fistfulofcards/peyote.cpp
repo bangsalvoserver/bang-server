@@ -22,21 +22,21 @@ namespace banggame {
         }
     };
     
-    void equip_peyote::on_enable(card_ptr target_card, player_ptr target) {
+    void equip_peyote::on_enable(card_ptr target_card, player_ptr target) const {
         target->m_game->add_listener<event_type::on_turn_start>({target_card, -10}, [=](player_ptr p) {
             p->m_game->queue_request<request_peyote>(target_card, p);
         });
     }
 
-    void equip_peyote::on_disable(card_ptr target_card, player_ptr target) {
+    void equip_peyote::on_disable(card_ptr target_card, player_ptr target) const {
         target->m_game->remove_listeners(target_card);
     }
 
-    bool effect_peyote::can_play(card_ptr target_card, player_ptr target) {
+    bool effect_peyote::can_play(card_ptr target_card, player_ptr target) const {
         return target->m_game->top_request<request_peyote>(target_is{target}) != nullptr;
     }
 
-    void effect_peyote::on_play(card_ptr target_card, player_ptr target) {
+    void effect_peyote::on_play(card_ptr target_card, player_ptr target) const {
         auto req = target->m_game->top_request<request_peyote>();
 
         card_ptr drawn_card = target->m_game->top_of_deck();

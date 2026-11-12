@@ -8,7 +8,7 @@
 namespace banggame {
 
     struct equip_old_west_gang : feat_equip {
-        void on_enable(card_ptr target_card, player_ptr target);
+        void on_enable(card_ptr target_card, player_ptr target) const;
     };
 
     DEFINE_EQUIP(old_west_gang, equip_old_west_gang)

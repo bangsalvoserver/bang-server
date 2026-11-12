@@ -9,6 +9,7 @@
 #include "game/filters.h"
 #include "game/prompts.h"
 #include "game/bot_suggestion.h"
+#include "game/play_verify.h"
 
 namespace banggame {
 
@@ -32,17 +33,17 @@ namespace banggame {
             }
         }
 
-        prompt_string resolve_prompt() const override {
-            if (target->is_bot() && target->m_hp <= 2 && rn::any_of(target->m_hand, [&](card_ptr target_card) { return can_pick(target_card); })) {
-                return "BOT_MUST_RESPOND_DUEL";
+        int evaluate_resolve() const override {
+            if (target->m_hp <= 2 && rn::any_of(target->m_hand, [&](card_ptr target_card) { return can_pick(target_card); })) {
+                return -5;
             }
-            return {};
+            return 0;
         }
 
         bool can_pick(card_ptr target_card) const override {
             return target_card->pocket == pocket_type::player_hand && target_card->owner == target
                 && target_card->is_bang_card(target)
-                && !target->m_game->is_usage_disabled(target_card);
+                && !get_use_card_error(target, target_card);
         }
 
         void respond_with_bang() override {
@@ -58,6 +59,7 @@ namespace banggame {
 
         void on_resolve() override {
             pop_request();
+            target->m_game->call_event(event_type::on_duel_lost{ target });
             target->damage(origin_card, origin, 1);
         }
 
@@ -74,14 +76,17 @@ namespace banggame {
         using request_duel_base::request_duel_base;
     };
 
-    prompt_string effect_duel::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
-        MAYBE_RETURN(prompts::bot_check_target_enemy(origin, target, bot_suggestion::action_type::damage));
+    prompt_string effect_duel::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) const {
         MAYBE_RETURN(prompts::prompt_target_immunity(origin_card, origin, target, flags));
         MAYBE_RETURN(prompts::prompt_target_ghost(origin_card, origin, target));
         return {};
     }
 
-    void effect_duel::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
+    int effect_duel::evaluate(card_ptr, player_ptr origin, player_ptr target) const {
+        return bot_suggestion::evaluate_attack(origin, target);
+    }
+
+    void effect_duel::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) const {
         bot_suggestion::signal_hostile_action(origin, target, flags);
         
         target->m_game->add_log("LOG_PLAYED_CARD_ON", origin_card, origin, target);

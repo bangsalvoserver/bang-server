@@ -6,7 +6,7 @@
 
 namespace banggame {
 
-    void ruleset_crazy_greygory::on_apply(game_ptr game) {
+    void ruleset_crazy_greygory::on_apply(game_ptr game) const {
         game->add_listener<event_type::on_assign_characters>(nullptr, [](player_ptr first_player) {
             auto &characters_list = first_player->m_game->m_characters;
 

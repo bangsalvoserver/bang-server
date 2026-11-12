@@ -14,9 +14,8 @@ main_deck:
     image: 20_baro
     color: brown
     effects:
-      - none card self | table blue
-      - none card notself | table blue
-    mth_effect: switch_cards(0,1)
+      - gift_card card self | table blue
+      - switch_cards card notself | table blue
     tags:
       - skip_logs
   - name: MIRAGE
@@ -111,10 +110,8 @@ main_deck:
     equip:
       - lastwill
     responses:
-      - lastwill
-      - none max_cards(3, true) self
-      - none player alive notself
-    mth_response: lastwill(1,2)
+      - gift_card max_cards(3, true) self
+      - lastwill player alive notself
     tags:
       - preselect
   - name: INDIAN_GUIDE

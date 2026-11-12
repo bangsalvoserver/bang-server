@@ -6,8 +6,8 @@
 namespace banggame {
     
     struct equip_peyote {
-        void on_enable(card_ptr target_card, player_ptr target);
-        void on_disable(card_ptr target_card, player_ptr target);
+        void on_enable(card_ptr target_card, player_ptr target) const;
+        void on_disable(card_ptr target_card, player_ptr target) const;
     };
 
     DEFINE_EQUIP(peyote, equip_peyote)
@@ -18,8 +18,8 @@ namespace banggame {
         card_sign_function fn;
         effect_peyote(card_sign_function fn): fn{fn} {}
 
-        bool can_play(card_ptr origin_card, player_ptr origin);
-        void on_play(card_ptr origin_card, player_ptr origin);
+        bool can_play(card_ptr origin_card, player_ptr origin) const;
+        void on_play(card_ptr origin_card, player_ptr origin) const;
     };
 
     DEFINE_EFFECT(peyote, effect_peyote)

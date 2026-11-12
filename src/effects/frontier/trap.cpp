@@ -6,16 +6,20 @@
 
 #include "game/game_table.h"
 #include "game/prompts.h"
+#include "game/bot_suggestion.h"
 
 namespace banggame {
 
-    game_string equip_trap::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {
+    game_string equip_trap::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) const {
         MAYBE_RETURN(prompts::prompt_target_self(origin_card, origin, target));
-        MAYBE_RETURN(prompts::bot_check_target_enemy(origin, target));
         return {};
     }
 
-    void equip_trap::on_enable(card_ptr target_card, player_ptr target) {
+    int equip_trap::evaluate(card_ptr, player_ptr origin, player_ptr target) const {
+        return bot_suggestion::evaluate_soft_attack(origin, target);
+    }
+
+    void equip_trap::on_enable(card_ptr target_card, player_ptr target) const {
         target->m_game->add_listener<event_type::check_equip_card>(target_card, [=](player_ptr origin, card_ptr origin_card, player_ptr e_target, const effect_context &ctx) -> game_string {
             if (origin == target && origin_card->is_blue()) {
                 return "ERROR_CANT_EQUIP_BLUE_CARDS";
@@ -47,8 +51,8 @@ namespace banggame {
             target_player->equip_card(origin_card);
         }
 
-        prompt_string pick_prompt(player_ptr target_player) const override {
-            return prompts::bot_check_target_enemy(target, target_player);
+        int evaluate_pick(player_ptr target_player) const override {
+            return bot_suggestion::evaluate_soft_attack(target, target_player);
         }
 
         game_string status_text(player_ptr owner) const override {
@@ -60,7 +64,7 @@ namespace banggame {
         }
     };
 
-    void effect_trap::on_play(card_ptr origin_card, player_ptr origin) {
+    void effect_trap::on_play(card_ptr origin_card, player_ptr origin) const {
         origin->m_game->queue_request<request_check>(origin, origin_card, std::not_fn(&card_sign::is_spades),
             [=](card_sign sign) {
                 switch (sign.suit) {

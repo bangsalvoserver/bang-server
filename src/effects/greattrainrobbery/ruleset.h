@@ -31,15 +31,15 @@ namespace banggame {
             shared_locomotive_context ctx;
         };
 
-        struct get_locomotive_prompt {
-            using result_type = prompt_string;
+        struct evaluate_locomotive {
+            using result_type = int;
             player_ptr origin;
             int locomotive_count;
         };
     }
     
     struct ruleset_greattrainrobbery {
-        void on_apply(game_ptr game);
+        void on_apply(game_ptr game) const;
     };
 
     DEFINE_RULESET(greattrainrobbery, ruleset_greattrainrobbery)

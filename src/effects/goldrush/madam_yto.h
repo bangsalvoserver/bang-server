@@ -6,7 +6,7 @@
 namespace banggame {
 
     struct equip_madam_yto : event_equip {
-        void on_enable(card_ptr target_card, player_ptr origin);
+        void on_enable(card_ptr target_card, player_ptr origin) const;
     };
 
     DEFINE_EQUIP(madam_yto, equip_madam_yto)

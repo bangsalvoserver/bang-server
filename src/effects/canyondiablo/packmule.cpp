@@ -6,7 +6,7 @@
 
 namespace banggame {
     
-    void equip_packmule::on_enable(card_ptr target_card, player_ptr p) {
+    void equip_packmule::on_enable(card_ptr target_card, player_ptr p) const {
         p->m_game->add_listener<event_type::apply_maxcards_modifier>(target_card, [p](const_player_ptr origin, int &value) {
             if (origin == p) {
                 ++value;

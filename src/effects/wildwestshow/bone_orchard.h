@@ -6,7 +6,7 @@
 namespace banggame {
 
     struct equip_bone_orchard : event_equip {
-        void on_enable(card_ptr target_card, player_ptr target);
+        void on_enable(card_ptr target_card, player_ptr target) const;
     };
 
     DEFINE_EQUIP(bone_orchard, equip_bone_orchard)

@@ -26,7 +26,23 @@ namespace banggame {
     DEFINE_BOT_RULE(equip, rule_equip)
     DEFINE_BOT_RULE(tag_value, rule_tag_value, tag_type tag; std::optional<tag_int> value)
     DEFINE_BOT_RULE(tag_value_not, rule_tag_value_not, tag_type tag; std::optional<tag_int> value)
-    DEFINE_BOT_RULE(do_nothing, rule_do_nothing)
+    DEFINE_BOT_RULE(do_something, rule_do_something)
+    
+    using bot_condition = std::function_ref<bool(player_ptr)>;
+    
+    template<utils::fixed_string Name>
+    struct bot_condition_map;
+
+    #define DEFINE_BOT_CONDITION(name, rule_type, ...) \
+        struct rule_type { __VA_OPT__(__VA_ARGS__;) bool operator()(player_ptr) const;  }; \
+        template<> struct bot_condition_map<#name> { using type = rule_type; };
+
+    #define BOT_CONDITION(name) bot_condition_map<#name>::type
+
+    DEFINE_BOT_CONDITION(drawing_or_dismissable, condition_drawing_or_dismissable)
+    DEFINE_BOT_CONDITION(sheriff_first_turn, condition_sheriff_first_turn)
+    DEFINE_BOT_CONDITION(response, condition_response)
+    DEFINE_BOT_CONDITION(in_play, condition_in_play)
 }
 
 #endif

@@ -9,11 +9,11 @@
 
 namespace banggame {
 
-    bool effect_deathsave::can_play(card_ptr origin_card, player_ptr origin) {
+    bool effect_deathsave::can_play(card_ptr origin_card, player_ptr origin) const {
         return origin->m_game->top_request<request_death>(target_is{origin}) != nullptr;
     }
 
-    void effect_deathsave::on_play(card_ptr origin_card, player_ptr origin) {
+    void effect_deathsave::on_play(card_ptr origin_card, player_ptr origin) const {
         origin->m_game->top_request<request_death>()->tried_save = true;
     }
 
@@ -61,9 +61,8 @@ namespace banggame {
             }
 
             if (!target->alive()) {
-                card_ptr target_card = target->get_character();
-                target->m_game->add_disabler({target_card, 90}, [=](const_card_ptr c) {
-                    return c == target_card;
+                target->m_game->add_disabler({ target->get_character(), 90 }, [=](const_card_ptr c) {
+                    return c->pocket == pocket_type::player_character && c->owner == target;
                 });
 
                 for (card_ptr character : target->m_characters) {

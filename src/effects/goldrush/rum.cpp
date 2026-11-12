@@ -47,11 +47,8 @@ namespace banggame {
             return int(std::unique(suits.begin(), suits.end()) - suits.begin());
         }
 
-        prompt_string redraw_prompt(card_ptr target_card, player_ptr owner) const override {
-            if (owner->is_bot()) {
-                return "BOT_DONT_REDRAW_RUM";
-            }
-            return {};
+        int evaluate_redraw(card_ptr, player_ptr) const override {
+            return -5;
         }
 
         void resolve() override {
@@ -69,10 +66,7 @@ namespace banggame {
         }
     };
 
-    game_string effect_rum::on_prompt(card_ptr origin_card, player_ptr origin) {
-        if (origin->is_bot() && origin->m_max_hp - origin->m_hp < 2) {
-            return "BOT_WASTEFUL_RUM";
-        }
+    game_string effect_rum::on_prompt(card_ptr origin_card, player_ptr origin) const {
         MAYBE_RETURN(prompts::prompt_target_ghost(origin_card, origin, origin));
         if (origin->m_hp == origin->m_max_hp) {
             return {"PROMPT_CARD_NO_EFFECT", origin_card};
@@ -80,7 +74,14 @@ namespace banggame {
         return {};
     }
 
-    void effect_rum::on_play(card_ptr origin_card, player_ptr origin) {
+    int effect_rum::evaluate(card_ptr, player_ptr origin) const {
+        if (origin->m_max_hp - origin->m_hp < 2) {
+            return -5;
+        }
+        return 0;
+    }
+
+    void effect_rum::on_play(card_ptr origin_card, player_ptr origin) const {
         origin->m_game->queue_request<request_rum>(origin_card, origin);
     }
 

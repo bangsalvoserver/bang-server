@@ -5,140 +5,210 @@
 #include "possible_to_play.h"
 #include "request_timer.h"
 
+#include "effects/base/equip.h"
+
 #include "net/bot_info.h"
 #include "net/logging.h"
 
 namespace banggame {
 
-    static game_action generate_random_play(player_ptr origin, const playable_card_info &args) {
-        game_action ret {
-            .card = args.card,
-            .effect_list = args.effect_list
+    struct scored_action {
+        game_action action;
+        int score;
+    };
+
+    static scored_action generate_random_play(player_ptr origin, const playable_card_info &args) {
+        scored_action ret {
+            .action {
+                .card = args.card,
+                .effect_list = args.effect_list
+            },
+            .score = 0
         };
         effect_context ctx;
         
         for (const auto &[mod_card, mod_response] : args.modifiers) {
-            auto &targets = ret.modifiers.emplace_back(mod_card, mod_response).targets;
+            auto &targets = ret.action.modifiers.emplace_back(mod_card, mod_response).targets;
 
             mod_card->get_modifier(mod_response).add_context(mod_card, origin, ctx);
             for (const effect_holder &holder : mod_card->get_effect_list(mod_response)) {
-                const auto &target = targets.emplace_back(holder.random_target(mod_card, origin, ctx));
-                holder.add_context(mod_card, origin, target, ctx);
+                auto value = holder.random_target(mod_card, origin, ctx);
+                holder.add_context(mod_card, origin, value.target, ctx);
+                targets.emplace_back(std::move(value.target));
+                ret.score += value.score;
             }
         }
 
         const effect_list &effects = args.card->get_effect_list(args.effect_list);
         for (const effect_holder &holder : effects) {
-            const auto &target = ret.targets.emplace_back(holder.random_target(args.card, origin, ctx));
-            holder.add_context(args.card, origin, target, ctx);
+            auto value = holder.random_target(args.card, origin, ctx);
+            holder.add_context(args.card, origin, value.target, ctx);
+            ret.action.targets.emplace_back(std::move(value.target));
+            ret.score += value.score;
+        }
+        if (args.effect_list == effect_list_type::equip_effects && !ctx.contains<contexts::equip_target>()) {
+            ret.score += effect_equip_on{}.evaluate(args.card, origin, origin, ctx);
         }
 
         return ret;
     }
 
-    template<rn::input_range Rules, typename Nodes, typename Rng>
-        requires (rn::forward_range<Nodes> && rn::sized_range<Nodes>
-            && std::predicate<rn::range_value_t<Rules>, rn::range_value_t<Nodes>>)
-    rn::iterator_t<Nodes> get_selected_node(Rules &&rules, Nodes &nodes, Rng &rng) {
-        for (const auto &rule : rules) {
-            auto chosen = nodes.end();
-            size_t count = 0;
+    // A candidate action. The "greatest" candidate is the best one: lowest rule priority index,
+    // then highest score, then lowest random tiebreak. The tiebreak is drawn once per generation
+    // to randomize the order of otherwise equally ranked candidates.
+    struct candidate {
+        int score;
+        int priority;
+        uint32_t tiebreak;
+        size_t index; // index in the plays vector, or no_play for "do nothing"
 
-            for (auto it = nodes.begin(); it != nodes.end(); ++it) {
-                if (rule(*it)) {
-                    ++count;
-                    std::uniform_int_distribution<size_t> dist(0, count - 1);
-                    if (dist(rng) == 0) chosen = it;
+        static constexpr size_t no_play = static_cast<size_t>(-1);
+
+        auto operator<=>(const candidate &rhs) const {
+            if (auto cmp = rhs.priority <=> priority; cmp != 0) return cmp;
+            if (auto cmp = score <=> rhs.score; cmp != 0) return cmp;
+            return rhs.tiebreak <=> tiebreak;
+        }
+    };
+
+    // The priority is the index of the first matching rule; actions matching no rule come last.
+    static int get_rule_priority(player_ptr origin, card_node node) {
+        int priority = 0;
+        for (const bot_conditional_rules &rules : bot_info.settings.rules) {
+            if (rules.condition(origin)) {
+                for (const bot_rule &rule : rules.rules) {
+                    if (rule(node)) break;
+                    ++priority;
                 }
-            }
-
-            if (chosen != nodes.end()) {
-                return chosen;
+                break;
             }
         }
-        std::uniform_int_distribution<size_t> dist(0, nodes.size() - 1);
-        return rn::next(nodes.begin(), dist(rng));
+        return priority;
     }
 
-    static request_state execute_random_play(player_ptr origin, const bot_rule_list &bot_rules, const playable_cards_list &play_cards) {
+    static request_state execute_best_play(player_ptr origin, const playable_cards_list &play_cards) {
+        auto &rng = origin->m_game->bot_rng;
+
         auto timer = origin->m_game->top_request<request_timer>();
         bool add_empty = timer && timer->enabled();
-        
-        std::vector<card_node> node_set;
-        node_set.reserve(play_cards.size() * bot_info.settings.repeat_card_nodes + add_empty);
 
-        for (int i=0; i < bot_info.settings.max_random_tries; ++i) {
-            for (const playable_card_info &info : play_cards) {
-                for (int j=0; j<bot_info.settings.repeat_card_nodes; ++j) {
-                    node_set.push_back(&info);
-                }
-            }
-            
-            if (add_empty) {
-                node_set.push_back(nullptr);
-            }
-            
-            while (!node_set.empty()) {
-                auto it = get_selected_node(bot_rules, node_set, origin->m_game->bot_rng);
+        // Generate and score each action once initially; failed actions are regenerated in later rounds.
+        std::vector<scored_action> plays;
+        std::vector<candidate> candidates;
+        plays.reserve(play_cards.size());
+        candidates.reserve(play_cards.size() + add_empty);
 
-                card_node selected_node = *it; 
-                if (!selected_node) {
+        for (const playable_card_info &info : play_cards) {
+            auto &play = plays.emplace_back(generate_random_play(origin, info));
+            candidates.push_back(candidate {
+                .score = play.score,
+                .priority = get_rule_priority(origin, &info),
+                .tiebreak = static_cast<uint32_t>(rng()),
+                .index = plays.size() - 1
+            });
+        }
+
+        // doing nothing is worth 0: it is preferred to every harmful action
+        if (add_empty) {
+            candidates.push_back(candidate {
+                .score = 0,
+                .priority = get_rule_priority(origin, nullptr),
+                .tiebreak = static_cast<uint32_t>(rng()),
+                .index = candidate::no_play
+            });
+        }
+
+        // Attempts are made in rounds: every candidate is tried once per round, and the ones that fail
+        // are regenerated and wait for the next round, so that a failing card does not starve the others.
+        // A negative score, a prompt and an error all count as a failed attempt.
+        for (int round = 0; round <= bot_info.settings.max_retries; ++round) {
+            // from this round onward harmful and prompting actions are accepted
+            const bool bypass = round >= bot_info.settings.bypass_retries;
+
+            // building a heap is O(n). pop_heap moves the best candidate to the end of the heap range,
+            // so tried candidates stay in the vector, outside of the heap, until the next round
+            std::make_heap(candidates.begin(), candidates.end());
+
+            for (auto last = candidates.end(); last != candidates.begin(); --last) {
+                std::pop_heap(candidates.begin(), last);
+                candidate &best = *std::prev(last);
+
+                if (best.index == candidate::no_play) {
                     return request_states::done{};
                 }
 
-                auto last = std::prev(node_set.end());
-                rn::iter_swap(it, last);
-                node_set.erase(last, node_set.end());
+                const playable_card_info &info = play_cards[best.index];
+                scored_action &play = plays[best.index];
 
-                auto args = generate_random_play(origin, *selected_node);
-                args.bypass_prompt =
-                    (i >= bot_info.settings.bypass_empty_index && node_set.empty())
-                    || i >= bot_info.settings.bypass_unconditional_index;
+                if (best.score >= 0 || bypass) {
+                    play.action.bypass_prompt = bypass;
+                    auto result = verify_and_play(origin, play.action);
 
-                auto result = verify_and_play(origin, args);
-
-                if (std::visit(overloaded{
-                    [](play_verify_results::ok) {
-                        return true;
-                    },
-                    [&](play_verify_results::prompt prompt) {
-                        logging::trace("BOT PROMPT: message={}, i={}", std::string_view{prompt.message.message.format_str}, i);
-                        return false;
-                    },
-                    [&](play_verify_results::error error) {
-                        logging::trace("BOT ERROR: message={}, i={}", std::string_view{error.message.format_str}, i);
-                        return false;
+                    if (std::holds_alternative<play_verify_results::ok>(result)) {
+                        return request_states::next{};
+                    } else if (auto *prompt = std::get_if<play_verify_results::prompt>(&result)) {
+                        logging::trace("BOT PROMPT: message={}, score={}, round={}", std::string_view{prompt->message.message.format_str}, best.score, round);
+                    } else if (auto *error = std::get_if<play_verify_results::error>(&result)) {
+                        logging::trace("BOT ERROR: message={}, score={}, round={}", std::string_view{error->message.format_str}, best.score, round);
                     }
-                }, result)) {
-                    return request_states::next{};
                 }
+
+                // targets are chosen among equally scored elements at random, so a new attempt may differ
+                play = generate_random_play(origin, info);
+                best.score = play.score;
+                best.tiebreak = static_cast<uint32_t>(rng());
             }
         }
 
         // softlock
-        logging::warn("BOT ERROR: could not find card in execute_random_play()");
+        logging::warn("BOT ERROR: could not find card in execute_best_play()");
 
         return request_states::done{};
     }
 
-    request_state game::request_bot_play(bool instant) {
-        if (rn::none_of(m_players, &player::is_bot)) {
-            return request_states::done{};
-        } else if (!instant && m_options.bot_play_timer > game_duration{0}) {
-            return request_states::bot_play{ get_total_update_time() + std::chrono::duration_cast<ticks>(m_options.bot_play_timer) };
-        }
+    request_state game::request_bot_play(player_ptr origin, bool instant) {
+        if (origin) {
+            if (pending_requests()) {
+                if (!instant && m_options.bot_play_timer > game_duration{0}) {
+                    if (!get_all_playable_cards(origin, effect_list_type::responses).empty()) {
+                        return request_states::bot_play{ origin, get_total_update_time() + std::chrono::duration_cast<ticks>(m_options.bot_play_timer) };
+                    }
+                } else {       
+                    playable_cards_list play_cards = generate_playable_cards_list(origin, effect_list_type::responses);
+                    if (!play_cards.empty() && std::holds_alternative<request_states::next>(execute_best_play(origin, play_cards))) {
+                        return request_states::next{};
+                    }
+                }
+            } else if (origin == origin->m_game->m_playing) {
+                if (!instant && m_options.bot_play_timer > game_duration{0}) {
+                    if (!get_all_playable_cards(origin, effect_list_type::effects).empty()) {
+                        return request_states::bot_play{ origin, get_total_update_time() + std::chrono::duration_cast<ticks>(m_options.bot_play_timer) };
+                    }
+                } else {       
+                    playable_cards_list play_cards = generate_playable_cards_list(origin, effect_list_type::effects);
+                    if (!play_cards.empty() && std::holds_alternative<request_states::next>(execute_best_play(origin, play_cards))) {
+                        return request_states::next{};
+                    }
+                }
+            }
+        } else if (auto all_bots = m_players | rv::filter(&player::is_bot)) {
+            if (!instant && m_options.bot_play_timer > game_duration{0}) {
+                return request_states::bot_play{ nullptr, get_total_update_time() + std::chrono::duration_cast<ticks>(m_options.bot_play_timer) };
+            }
 
-        if (pending_requests()) {
-            for (player_ptr origin : m_players | rv::filter(&player::is_bot)) {
-                playable_cards_list play_cards = generate_playable_cards_list(origin, effect_list_type::responses);
-                
-                if (!play_cards.empty() && std::holds_alternative<request_states::next>(execute_random_play(origin, bot_info.settings.response_rules, play_cards))) {
+            if (pending_requests()) {
+                for (player_ptr p : all_bots) {
+                    playable_cards_list play_cards = generate_playable_cards_list(p, effect_list_type::responses);
+                    if (!play_cards.empty() && std::holds_alternative<request_states::next>(execute_best_play(p, play_cards))) {
+                        return request_states::next{};
+                    }
+                }
+            } else if (m_playing && m_playing->is_bot()) {
+                playable_cards_list play_cards = generate_playable_cards_list(m_playing, effect_list_type::effects);
+                if (!play_cards.empty() && std::holds_alternative<request_states::next>(execute_best_play(m_playing, play_cards))) {
                     return request_states::next{};
                 }
             }
-        } else if (m_playing && m_playing->is_bot()) {
-            playable_cards_list play_cards = generate_playable_cards_list(m_playing);
-            return execute_random_play(m_playing, bot_info.settings.in_play_rules, play_cards);
         }
         return request_states::done{};
     }

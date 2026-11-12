@@ -6,7 +6,7 @@
 
 namespace banggame {
 
-    void equip_bellestar::on_enable(card_ptr target_card, player_ptr p) {
+    void equip_bellestar::on_enable(card_ptr target_card, player_ptr p) const {
         p->m_game->add_listener<event_type::on_turn_start>(target_card, [=](player_ptr target) {
             if (p == target) {
                 p->m_game->add_disabler(target_card, [=](const_card_ptr c) {
@@ -21,7 +21,7 @@ namespace banggame {
         });
     }
 
-    void equip_bellestar::on_disable(card_ptr target_card, player_ptr target) {
+    void equip_bellestar::on_disable(card_ptr target_card, player_ptr target) const {
         target->m_game->remove_disabler({ target_card, 0 });
         target->m_game->remove_listeners({ target_card, 0 });
     }

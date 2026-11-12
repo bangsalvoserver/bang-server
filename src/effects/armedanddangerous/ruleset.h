@@ -10,7 +10,7 @@ namespace banggame {
     void drop_all_cubes(card_ptr target_card);
 
     struct ruleset_armedanddangerous {
-        void on_apply(game_ptr game);
+        void on_apply(game_ptr game) const;
     };
 
     DEFINE_RULESET(armedanddangerous, ruleset_armedanddangerous)

@@ -10,13 +10,13 @@
 
 namespace banggame {
 
-    void equip_blood_brothers::on_enable(card_ptr target_card, player_ptr target) {
+    void equip_blood_brothers::on_enable(card_ptr target_card, player_ptr target) const {
         target->m_game->add_listener<event_type::on_turn_start>({target_card, 2}, [=](player_ptr origin) {
             target->m_game->queue_request<request_can_play_card>(target_card, nullptr, origin);
         });
     }
 
-    game_string effect_blood_brothers::get_error(card_ptr origin_card, player_ptr origin, player_ptr target) {
+    game_string effect_blood_brothers::get_error(card_ptr origin_card, player_ptr origin, player_ptr target) const {
         if (origin->m_hp <= 1) {
             return "ERROR_CANT_SELF_DAMAGE";
         }
@@ -26,13 +26,16 @@ namespace banggame {
         return {};
     }
 
-    game_string effect_blood_brothers::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {
-        MAYBE_RETURN(prompts::bot_check_target_friend(origin, target));
+    game_string effect_blood_brothers::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) const {
         MAYBE_RETURN(prompts::prompt_target_ghost(origin_card, origin, target));
         return {};
     }
 
-    void effect_blood_brothers::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) {
+    int effect_blood_brothers::evaluate(card_ptr, player_ptr origin, player_ptr target) const {
+        return bot_suggestion::evaluate_help(origin, target);
+    }
+
+    void effect_blood_brothers::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) const {
         bot_suggestion::signal_helpful_action(origin, target);
         
         origin->damage(origin_card, origin, 1);

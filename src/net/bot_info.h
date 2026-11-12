@@ -13,13 +13,19 @@ namespace banggame {
 
     using bot_rule_list = std::span<const bot_rule>;
 
+    // A player-state condition selects which ordered rule list applies.
+    struct bot_conditional_rules {
+        bot_condition condition;
+        bot_rule_list rules;
+    };
+
+    using bot_conditional_rule_list = std::span<const bot_conditional_rules>;
+
     struct bot_settings {
-        int max_random_tries;
-        int bypass_empty_index;
-        int bypass_unconditional_index;
-        int repeat_card_nodes;
-        bot_rule_list response_rules;
-        bot_rule_list in_play_rules;
+        int max_retries;
+        int bypass_retries;
+        // Checked in order; bot AI uses the rules from the first matching condition.
+        bot_conditional_rule_list rules;
     };
 
     struct bot_info_t {

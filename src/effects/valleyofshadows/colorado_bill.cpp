@@ -10,7 +10,7 @@
 
 namespace banggame {
     
-    void equip_colorado_bill::on_enable(card_ptr origin_card, player_ptr origin) {
+    void equip_colorado_bill::on_enable(card_ptr origin_card, player_ptr origin) const {
         origin->m_game->add_listener<event_type::apply_bang_modifier>(origin_card, [=](player_ptr e_origin, shared_request_bang req) {
             if (e_origin == origin) {
                 bool indifferent = req->unavoidable || (req->target->empty_hand() && count_missed_cards(req->target) == 0);
@@ -29,7 +29,7 @@ namespace banggame {
         });
     }
     
-    void equip_colorado_bill2::on_enable(card_ptr target_card, player_ptr origin) {
+    void equip_colorado_bill2::on_enable(card_ptr target_card, player_ptr origin) const {
         origin->m_game->add_listener<event_type::on_missed>(target_card, [=](card_ptr missed_card, effect_flags flags, shared_request_bang req) {
             if (req->origin == origin && flags.check_all({effect_flag::is_bang, effect_flag::is_missed})) {
                 origin->m_game->queue_request<request_check>(origin, target_card, &card_sign::is_spades, [=](bool result) {

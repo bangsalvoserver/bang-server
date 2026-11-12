@@ -14,9 +14,10 @@ namespace banggame {
     }
     
     struct effect_poker {
-        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags);
-        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags);
-        void on_play(card_ptr origin_card, player_ptr origin);
+        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) const;
+        int evaluate(card_ptr origin_card, player_ptr origin, player_ptr target) const;
+        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) const;
+        void on_play(card_ptr origin_card, player_ptr origin) const;
     };
 
     DEFINE_EFFECT(poker, effect_poker)

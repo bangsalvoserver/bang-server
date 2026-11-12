@@ -198,7 +198,7 @@ namespace banggame {
         }
     };
 
-    void ruleset_legends::on_apply(game_ptr game) {
+    void ruleset_legends::on_apply(game_ptr game) const {
         game->add_listener<event_type::on_game_setup>({nullptr, 0}, [](player_ptr origin) {
             std::array<card_token_type, fame_tokens.size()> tokens;
 
@@ -217,11 +217,11 @@ namespace banggame {
         });
     }
 
-    bool ruleset_legends::is_valid_with(const expansion_set &set) {
+    bool ruleset_legends::is_valid_with(const expansion_set &set) const {
         return set.contains(GET_RULESET(legends_basemod));
     }
 
-    void ruleset_legends_basemod::on_apply(game_ptr game) {
+    void ruleset_legends_basemod::on_apply(game_ptr game) const {
         game->add_listener<event_type::count_initial_cards>({nullptr, 1}, [](const_player_ptr origin) {
             int count = 0;
             for (player_ptr p : origin->m_game->range_all_players(origin->m_game->m_first_player)) {

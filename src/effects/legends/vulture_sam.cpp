@@ -25,7 +25,7 @@ namespace banggame {
         throw game_error("Cannot find base character");
     }
 
-    void equip_vulture_sam_legend::on_enable(card_ptr origin_card, player_ptr origin) {
+    void equip_vulture_sam_legend::on_enable(card_ptr origin_card, player_ptr origin) const {
         origin->m_game->add_listener<event_type::on_player_death>(origin_card, [=](player_ptr target, bool tried_save) {
             if (origin == target) {
                 card_ptr old_character = origin->get_character();

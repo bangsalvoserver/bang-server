@@ -84,6 +84,11 @@ namespace banggame {
     };
 
     static constexpr auto ignored_player_flags = ignored_bitset<player_flag>();
+    
+    enum class card_flag {
+        inactive,
+        copied
+    };
 }
 
 #endif

@@ -7,7 +7,8 @@
 #include "cards/game_enums.h"
 
 #include "game/game_table.h"
-#include "game/prompts.h"
+#include "game/bot_suggestion.h"
+#include "game/play_verify.h"
 
 namespace banggame {
 
@@ -25,13 +26,13 @@ namespace banggame {
             }
         }
 
-        prompt_string pick_prompt(card_ptr target_card) const override {
-            return prompts::bot_check_discard_card(target, target_card);
+        int evaluate_pick(card_ptr target_card) const override {
+            return bot_suggestion::evaluate_discard_card(target_card);
         }
 
         bool can_pick(card_ptr target_card) const override {
             return target_card->pocket == pocket_type::player_hand && target_card->owner == target
-                && !target->m_game->is_usage_disabled(target_card);
+                && !get_use_card_error(target, target_card);
         }
 
         void on_pick(card_ptr target_card) override {
@@ -40,11 +41,11 @@ namespace banggame {
             target->discard_used_card(target_card);
         }
 
-        prompt_string resolve_prompt() const override {
-            if (target->is_bot() && target->m_hp <= 2 && rn::any_of(target->m_hand, [&](card_ptr c) { return can_pick(c); })) {
-                return "BOT_MUST_RESPOND_COYOTES";
+        int evaluate_resolve() const override {
+            if (target->m_hp <= 2 && rn::any_of(target->m_hand, [&](card_ptr c) { return can_pick(c); })) {
+                return -5;
             }
-            return {};
+            return 0;
         }
 
         void on_resolve() override {
@@ -61,7 +62,7 @@ namespace banggame {
         }
     };
 
-    void equip_coyotes::on_enable(card_ptr target_card, player_ptr target) {
+    void equip_coyotes::on_enable(card_ptr target_card, player_ptr target) const {
         target->m_game->add_listener<event_type::on_predraw_check>(target_card, [=](player_ptr e_player, card_ptr e_card) {
             if (e_player == target && e_card == target_card) {
                 target->m_game->queue_request<request_check>(target, target_card,

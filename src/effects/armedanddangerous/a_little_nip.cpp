@@ -12,11 +12,11 @@ namespace banggame {
         return effect_heal{contexts::selected_cubes::count_repeats(ctx, origin_card) + 1};
     }
     
-    prompt_string effect_a_little_nip::on_prompt(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
+    prompt_string effect_a_little_nip::on_prompt(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const {
         return build_effect_heal(origin_card, ctx).on_prompt(origin_card, origin);
     }
 
-    void effect_a_little_nip::on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
+    void effect_a_little_nip::on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const {
         build_effect_heal(origin_card, ctx).on_play(origin_card, origin);
     }
 

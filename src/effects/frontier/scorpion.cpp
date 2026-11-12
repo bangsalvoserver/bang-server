@@ -9,6 +9,7 @@
 #include "game/game_table.h"
 #include "game/prompts.h"
 #include "game/bot_suggestion.h"
+#include "game/bot_suggestion.h"
 
 namespace banggame {
 
@@ -47,13 +48,16 @@ namespace banggame {
         }
     };
 
-    game_string equip_scorpion::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {
-        MAYBE_RETURN(prompts::bot_check_target_enemy(origin, target));
+    game_string equip_scorpion::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) const {
         MAYBE_RETURN(prompts::prompt_target_self(origin_card, origin, target));
         return {};
     }
 
-    void equip_scorpion::on_enable(card_ptr target_card, player_ptr target) {
+    int equip_scorpion::evaluate(card_ptr, player_ptr origin, player_ptr target) const {
+        return bot_suggestion::evaluate_soft_attack(origin, target);
+    }
+
+    void equip_scorpion::on_enable(card_ptr target_card, player_ptr target) const {
         target->m_game->add_listener<event_type::on_equip_card>({target_card, -1}, [=](player_ptr origin, player_ptr e_target, card_ptr origin_card, const effect_context &ctx) {
             if (origin == target && origin_card != target_card && !origin_card->is_black()) {
                 target->m_game->queue_request<request_check>(target, target_card, std::not_fn(&card_sign::is_spades), [=](bool result) {

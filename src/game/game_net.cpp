@@ -65,16 +65,6 @@ namespace json {
         }
     };
 
-    template<typename Context> struct serializer<const banggame::mth_vtable *, Context> {
-        static void write(const banggame::mth_vtable *value, string_writer &writer) {
-            if (value) {
-                serialize(value->name, writer);
-            } else {
-                writer.Null();
-            }
-        }
-    };
-
     void serialize_card_data(const banggame::card_data &data, string_writer &writer) {
         writer.StartObject();
         write_object_fields(data, writer);

@@ -9,8 +9,8 @@ namespace banggame {
         int value;
         equip_update_max_hp(int value): value{value} {}
         
-        void on_enable(card_ptr target_card, player_ptr target);
-        void on_disable(card_ptr target_card, player_ptr target);
+        void on_enable(card_ptr target_card, player_ptr target) const;
+        void on_disable(card_ptr target_card, player_ptr target) const;
     };
 
     DEFINE_EQUIP(update_max_hp, equip_update_max_hp)

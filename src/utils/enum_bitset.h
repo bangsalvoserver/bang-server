@@ -104,6 +104,18 @@ namespace enums {
             m_value &= ~to_bit(value);
         }
 
+        constexpr void toggle(T value) {
+            m_value ^= to_bit(value);
+        }
+
+        constexpr void set(T value, bool active) {
+            if (active) {
+                add(value);
+            } else {
+                remove(value);
+            }
+        }
+
         constexpr void clear() {
             m_value = 0;
         }

@@ -15,13 +15,13 @@ namespace banggame {
         }
 
         bool can_pick(card_ptr target_card) const override;
-        prompt_string pick_prompt(card_ptr target_card) const override;
+        int evaluate_pick(card_ptr target_card) const override;
         void on_pick(card_ptr target_card) override;
         game_string status_text(player_ptr owner) const override;
     };
 
     struct equip_youl_grinner : event_equip {
-        void on_enable(card_ptr target_card, player_ptr target);
+        void on_enable(card_ptr target_card, player_ptr target) const;
     };
 
     DEFINE_EQUIP(youl_grinner, equip_youl_grinner)

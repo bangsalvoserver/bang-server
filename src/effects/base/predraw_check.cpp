@@ -70,7 +70,7 @@ namespace banggame {
         }
     }
 
-    void equip_predraw_check::on_enable(card_ptr target_card, player_ptr target) {
+    void equip_predraw_check::on_enable(card_ptr target_card, player_ptr target) const {
         target->m_game->add_listener<event_type::get_predraw_checks>({target_card, 10 + priority},
             [=, priority=priority](player_ptr origin, std::vector<event_card_key> &ret) {
                 if (origin == target) {
@@ -79,7 +79,7 @@ namespace banggame {
             });
     }
 
-    void equip_predraw_check::on_disable(card_ptr target_card, player_ptr target) {
+    void equip_predraw_check::on_disable(card_ptr target_card, player_ptr target) const {
         target->m_game->remove_listeners(event_card_key{target_card, 10 + priority});
     }
 }

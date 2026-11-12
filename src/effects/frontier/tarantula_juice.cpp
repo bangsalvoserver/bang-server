@@ -6,7 +6,7 @@
 
 namespace banggame {
     
-    void effect_tarantula_juice::on_play(card_ptr origin_card, player_ptr origin) {
+    void effect_tarantula_juice::on_play(card_ptr origin_card, player_ptr origin) const {
         origin->m_game->queue_request<request_check>(origin, origin_card, std::not_fn(&card_sign::is_spades),
             [=](card_sign sign) {
                 switch (sign.suit) {

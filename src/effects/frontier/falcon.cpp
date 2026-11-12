@@ -61,7 +61,7 @@ namespace banggame {
         }
     };
 
-    prompt_string effect_falcon::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
+    prompt_string effect_falcon::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) const {
         MAYBE_RETURN(prompts::prompt_target_immunity(origin_card, origin, target, flags));
         if (target->empty_hand() || target->m_game->check_flags(game_flag::hands_shown)) {
             return {"PROMPT_CARD_NO_EFFECT", origin_card};
@@ -69,7 +69,7 @@ namespace banggame {
         return {};
     }
 
-    void effect_falcon::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) {
+    void effect_falcon::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) const {
         origin->m_game->queue_request<request_falcon_target>(origin_card, origin, target);
     }
 }

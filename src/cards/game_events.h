@@ -26,6 +26,17 @@ namespace banggame::event_type {
         card_ptr &drawn_card;
     };
 
+    struct on_card_added_to_hand {
+        player_ptr origin;
+        card_ptr target_card;
+    };
+
+    struct on_extra_cards_drawn {
+        player_ptr origin;
+        card_ptr origin_card;
+        int ncards;
+    };
+
     struct on_play_card {
         player_ptr origin;
         card_ptr origin_card;
@@ -78,6 +89,12 @@ namespace banggame::event_type {
         player_ptr origin;
         card_ptr origin_card;
         const effect_context &ctx;
+    };
+
+    struct check_use_card {
+        using result_type = game_string;
+        player_ptr origin;
+        card_ptr origin_card;
     };
 
     struct check_character_modifier {
