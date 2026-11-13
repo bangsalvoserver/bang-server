@@ -25,7 +25,7 @@ namespace banggame {
         return flags;
     }
 
-    std::pair<std::nullptr_t, int> targeting_players::random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
+    scored_target<std::nullptr_t> targeting_players::random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
         int score = 0;
         for (player_ptr target : get_player_targets_range(origin_card, origin, player_filter, ctx)) {
             if (effect.on_prompt(origin_card, origin, target, {}, ctx)) score -= 2;

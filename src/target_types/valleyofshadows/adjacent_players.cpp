@@ -49,7 +49,7 @@ namespace banggame {
         }
     }
 
-    std::pair<player_list, int> targeting_adjacent_players::random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
+    scored_target<player_list> targeting_adjacent_players::random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
         return random_max_element(
             possible_targets(origin_card, origin, effect, ctx),
             [&](const player_list &targets) {

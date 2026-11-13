@@ -20,9 +20,9 @@ namespace banggame {
             }
         }
 
-        std::pair<card_ptr, int> random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
+        scored_target<card_ptr> random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
             if (ctx.contains<contexts::repeat_card>()) {
-                return { nullptr, 0 };
+                return nullptr;
             } else {
                 return random_max_element(
                     targeting_card::possible_targets(origin_card, origin, effect, ctx),

@@ -20,7 +20,7 @@ namespace banggame {
             }
         }
 
-        std::pair<player_ptr, int> random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
+        scored_target<player_ptr> random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
             if (auto targets = targeting_player::possible_targets(origin_card, origin, effect, ctx)) {
                 return random_max_element(
                     possible_targets(origin_card, origin, effect, ctx),
@@ -31,7 +31,7 @@ namespace banggame {
                     origin->m_game->bot_rng
                 );
             } else {
-                return { nullptr, 0 };
+                return nullptr;
             }
         }
 

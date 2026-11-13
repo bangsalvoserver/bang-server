@@ -19,7 +19,7 @@ namespace banggame {
         return contains_at_least(target_player.possible_targets(origin_card, origin, effect, ctx), extra_players);
     }
 
-    std::pair<targeting_player_per_cube::value_type, int> targeting_player_per_cube::random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
+    scored_target<targeting_player_per_cube::value_type> targeting_player_per_cube::random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
         auto players = target_player.possible_targets(origin_card, origin, effect, ctx);
 
         auto evaluate_fun = [&](player_ptr target) {

@@ -14,7 +14,7 @@ namespace banggame {
             return !get_error(origin_card, origin, effect, ctx);
         }
 
-        std::pair<value_type, int> random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
+        scored_target<value_type> random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
             if (effect.on_prompt(origin_card, origin, {}, ctx)) return { nullptr, -2 };
             return { nullptr, effect.evaluate(origin_card, origin, ctx) };
         }

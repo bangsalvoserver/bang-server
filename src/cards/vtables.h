@@ -192,7 +192,7 @@ namespace banggame {
         void (*serialize_args)(const effect_holder &effect, json::string_writer &writer);
 
         std::generator<play_card_target> (*possible_targets)(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx);
-        scored_target (*random_target)(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx);
+        scored_target<play_card_target> (*random_target)(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx);
         game_string (*get_error)(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const play_card_target &target);
         prompt_string (*on_prompt)(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const play_card_target &target);
         void (*add_context)(card_ptr origin_card, player_ptr origin, const effect_holder &effect, effect_context &ctx, const play_card_target &target);
@@ -203,7 +203,7 @@ namespace banggame {
         return this->target->possible_targets(origin_card, origin, *this, ctx);
     }
 
-    inline scored_target effect_holder::random_target(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const {
+    inline scored_target<play_card_target> effect_holder::random_target(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const {
         return this->target->random_target(origin_card, origin, *this, ctx);
     }
 

@@ -24,7 +24,7 @@ namespace banggame {
         }
         
         std::generator<player_list> possible_targets(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const;
-        std::pair<player_list, int> random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const;
+        scored_target<player_list> random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const;
         game_string get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const player_list &target) const;
         prompt_string on_prompt(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const player_list &target) const;
         void add_context(card_ptr origin_card, player_ptr origin, const effect_holder &effect, effect_context &ctx, const player_list &target) const;

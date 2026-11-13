@@ -17,7 +17,7 @@ namespace banggame {
         }
     }
 
-    std::pair<card_list, int> targeting_max_cards::random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
+    scored_target<card_list> targeting_max_cards::random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
         card_list candidates = rn::to<card_list>(target_card.possible_targets(origin_card, origin, effect, ctx));
         auto evaluate_fun = [&](card_ptr target) {
             if (effect.on_prompt(origin_card, origin, target, {}, ctx)) return -2;
@@ -30,14 +30,14 @@ namespace banggame {
             max_count = min_count;
         }
 
-        std::optional<std::pair<card_list, int>> best;
+        std::optional<scored_target<card_list>> best;
         size_t ties = 0;
         for (size_t count = min_count; count <= max_count; ++count) {
             auto candidate = random_max_elements(candidates, count, evaluate_fun, origin->m_game->bot_rng);
-            if (!best || candidate.second > best->second) {
+            if (!best || candidate.second > best->score) {
                 best = std::move(candidate);
                 ties = 1;
-            } else if (candidate.second == best->second) {
+            } else if (candidate.second == best->score) {
                 ++ties;
                 std::uniform_int_distribution<size_t> dist(0, ties - 1);
                 if (dist(origin->m_game->bot_rng) == 0) {

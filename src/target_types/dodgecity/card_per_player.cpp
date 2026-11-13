@@ -27,20 +27,20 @@ namespace banggame {
         return flags;
     }
 
-    std::pair<card_list, int> targeting_card_per_player::random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
+    scored_target<card_list> targeting_card_per_player::random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
         auto evaluate_fun = [&](card_ptr target_card) {
             if (effect.on_prompt(origin_card, origin, target_card, {}, ctx)) return -2;
             return effect.evaluate(origin_card, origin, target_card, ctx);
         };
 
-        std::pair<card_list, int> ret;
+        scored_target<card_list> ret;
         player_ptr skipped_player = ctx.get<contexts::skipped_player>();
         for (player_ptr target : origin->m_game->range_all_players(origin)) {
             if (target != skipped_player && !check_player_filter(origin_card, origin, player_filter, target, ctx)) {
                 if (auto targets = cards_target_set(origin, origin_card, card_filter, target, ctx)) {
                     auto [target, score] = random_max_element(targets, evaluate_fun, origin->m_game->bot_rng);
-                    ret.first.push_back(target);
-                    ret.second += score;
+                    ret.target.push_back(target);
+                    ret.score += score;
                 }
             }
         }

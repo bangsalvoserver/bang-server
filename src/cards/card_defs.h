@@ -122,10 +122,15 @@ namespace banggame {
     };
 
     using target_list = std::vector<play_card_target>;
-
+    
+    template<typename T>
     struct scored_target {
-        play_card_target target;
-        int score;
+        T target;
+        int score = 0;
+
+        scored_target() = default;
+        scored_target(T target, int score = 0): target{std::move(target)}, score{score} {}
+        scored_target(std::pair<T, int> pair): target{std::move(pair.first)}, score{pair.second} {}
     };
 
     struct effect_holder {
@@ -141,7 +146,7 @@ namespace banggame {
         bool can_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const;
 
         std::generator<play_card_target> possible_targets(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const;
-        scored_target random_target(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const;
+        scored_target<play_card_target> random_target(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const;
 
         game_string get_error(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const;
         game_string get_error(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) const;

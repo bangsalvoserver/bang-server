@@ -6,7 +6,7 @@ namespace banggame {
         return contains_at_least(target_card.possible_targets(origin_card, origin, effect, ctx), 1);
     }
 
-    std::pair<card_list, int> targeting_bang_or_cards::random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
+    scored_target<card_list> targeting_bang_or_cards::random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
         auto targets = target_card.possible_targets(origin_card, origin, effect, ctx);
         auto bang_targets = targets | rv::filter([&](card_ptr target_card) { return target_card->is_bang_card(origin); });
 
