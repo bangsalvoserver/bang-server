@@ -24,12 +24,12 @@ namespace banggame {
         request_tornado(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags = {})
             : request_picking(origin_card, origin, target, flags) {}
         
-        int evaluate_escape(player_ptr) const override {
+        int evaluate_escape(player_ptr owner) const override {
             return -5;
         }
 
         int evaluate_pick(card_ptr target_card) const override {
-            return bot_suggestion::evaluate_discard_card(target_card);
+            return bot_suggestion::evaluate_discard_card(target, target_card);
         }
         
         bool can_pick(card_ptr target_card) const override {
@@ -133,7 +133,7 @@ namespace banggame {
         return {};
     }
 
-    int effect_tornado2::evaluate(card_ptr, player_ptr origin, player_ptr target) const {
+    int effect_tornado2::evaluate(card_ptr origin_card, player_ptr origin, player_ptr target) const {
         int cards_gained = std::min(2, static_cast<int>(target->get_prev_player()->m_hand.size()));
         int cards_lost = std::min(2, static_cast<int>(target->m_hand.size()));
 
@@ -157,7 +157,7 @@ namespace banggame {
     int effect_tornado2_response::evaluate(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const {
         int score = 0;
         for (card_ptr target_card : ctx.get_all<contexts::selected_card>()) {
-            score += bot_suggestion::evaluate_discard_card(target_card);
+            score += bot_suggestion::evaluate_discard_card(origin, target_card);
         }
         return score;
     }

@@ -35,12 +35,13 @@ namespace banggame {
         }
 
         int evaluate_resolve() const override {
-            if (target->m_hp <= 2 && rn::any_of(target->m_hand, [&](card_ptr target_card) {
-                return !get_use_card_error(target, target_card);
-            })) {
-                return -5;
+            if (target->is_ghost()) {
+                return 5;
+            } else if (int diff = 2 - target->m_hp; diff >= 0) {
+                return -10 - diff * 5;
+            } else {
+                return 0;
             }
-            return 0;
         }
 
         game_string status_text(player_ptr owner) const override {
@@ -65,7 +66,7 @@ namespace banggame {
         return {};
     }
 
-    int effect_bandidos::evaluate(card_ptr, player_ptr origin, player_ptr target) const {
+    int effect_bandidos::evaluate(card_ptr origin_card, player_ptr origin, player_ptr target) const {
         return bot_suggestion::evaluate_attack(origin, target);
     }
 

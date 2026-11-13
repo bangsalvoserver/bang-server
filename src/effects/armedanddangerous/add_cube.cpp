@@ -96,7 +96,7 @@ namespace banggame {
         return {};
     }
 
-    int effect_add_cube::evaluate(card_ptr, player_ptr, card_ptr target) const {
+    int effect_add_cube::evaluate(card_ptr origin_card, player_ptr origin, card_ptr target) const {
         if (target->has_tag(tag_type::penalty)) {
             return -5;
         }

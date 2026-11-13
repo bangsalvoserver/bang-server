@@ -15,7 +15,7 @@ namespace banggame {
         return {};
     }
 
-    int effect_cattle_drive::evaluate(card_ptr, player_ptr origin) const {
+    int effect_cattle_drive::evaluate(card_ptr origin_card, player_ptr origin) const {
         if (get_table_count(origin) <= 2) {
             return -5;
         }

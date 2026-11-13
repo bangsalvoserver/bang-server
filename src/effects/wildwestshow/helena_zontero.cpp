@@ -67,7 +67,7 @@ namespace banggame {
             return origin_card;
         }
 
-        int evaluate_redraw(card_ptr, player_ptr) const override {
+        int evaluate_redraw(card_ptr target_card, player_ptr owner) const override {
             auto sign = get_modified_sign(drawn_card);
             if (sign.modified || sign.is_black()) {
                 return -5;

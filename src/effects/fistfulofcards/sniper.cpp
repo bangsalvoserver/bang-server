@@ -12,7 +12,7 @@ namespace banggame {
         return prompts::prompt_target_ghost(origin_card, origin, target);
     }
 
-    int effect_sniper::evaluate(card_ptr, player_ptr origin, player_ptr target) const {
+    int effect_sniper::evaluate(card_ptr origin_card, player_ptr origin, player_ptr target) const {
         return bot_suggestion::evaluate_attack(origin, target);
     }
 

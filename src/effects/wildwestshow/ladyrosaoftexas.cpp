@@ -24,7 +24,7 @@ namespace banggame {
         }
     }
 
-    int effect_ladyrosaoftexas::evaluate(card_ptr, player_ptr origin) const {
+    int effect_ladyrosaoftexas::evaluate(card_ptr origin_card, player_ptr origin) const {
         return bot_suggestion::evaluate_soft_attack(origin, get_swapping_player(origin));
     }
 

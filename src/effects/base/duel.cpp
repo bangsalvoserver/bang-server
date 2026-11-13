@@ -34,10 +34,11 @@ namespace banggame {
         }
 
         int evaluate_resolve() const override {
-            if (target->m_hp <= 2 && rn::any_of(target->m_hand, [&](card_ptr target_card) { return can_pick(target_card); })) {
+            if (target->is_ghost() || target->m_hp <= 2) {
                 return -5;
+            } else {
+                return 0;
             }
-            return 0;
         }
 
         bool can_pick(card_ptr target_card) const override {
@@ -82,7 +83,7 @@ namespace banggame {
         return {};
     }
 
-    int effect_duel::evaluate(card_ptr, player_ptr origin, player_ptr target) const {
+    int effect_duel::evaluate(card_ptr origin_card, player_ptr origin, player_ptr target) const {
         return bot_suggestion::evaluate_attack(origin, target);
     }
 

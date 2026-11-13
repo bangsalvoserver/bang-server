@@ -5,6 +5,7 @@
 
 #include "game/game_table.h"
 #include "game/possible_to_play.h"
+#include "game/bot_suggestion.h"
 
 namespace banggame {
 
@@ -24,11 +25,7 @@ namespace banggame {
     }
 
     int effect_draw_discard::evaluate(card_ptr origin_card, player_ptr origin) const {
-        card_ptr drawn_card = origin->m_game->m_discards.back();
-        if (auto value = drawn_card->get_tag_value(tag_type::strong)) {
-            return 5 + *value;
-        }
-        return 0;
+        return bot_suggestion::evaluate_draw_card(origin, origin->m_game->m_discards.back());
     }
     
     void effect_draw_discard::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) const {

@@ -13,7 +13,7 @@ namespace banggame {
         return req->escape_prompt(origin);
     }
 
-    int effect_escape_base::evaluate(card_ptr, player_ptr origin) const {
+    int effect_escape_base::evaluate(card_ptr origin_card, player_ptr origin) const {
         return origin->m_game->top_request<interface_escapable>()->evaluate_escape(origin);
     }
 

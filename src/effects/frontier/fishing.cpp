@@ -6,7 +6,7 @@
 
 namespace banggame {
 
-    int effect_fishing::evaluate(card_ptr, player_ptr origin) const {
+    int effect_fishing::evaluate(card_ptr origin_card, player_ptr origin) const {
         card_suit suit_mod = origin->m_game->call_event(event_type::get_suit_modifier{});
         if (suit_mod != card_suit::none && suit_mod != suit) {
             return -5;

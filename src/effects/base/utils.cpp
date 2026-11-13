@@ -25,7 +25,7 @@ namespace banggame {
     }
 
     int effect_set_playing::evaluate(card_ptr origin_card, player_ptr origin, card_ptr target_card) const {
-        return bot_suggestion::evaluate_discard_card(target_card);
+        return bot_suggestion::evaluate_discard_card(origin, target_card);
     }
     
     void effect_discard_playing::on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const {

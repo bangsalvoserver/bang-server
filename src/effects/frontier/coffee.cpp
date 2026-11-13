@@ -6,7 +6,7 @@
 
 namespace banggame {
 
-    int effect_coffee::evaluate(card_ptr, player_ptr origin) const {
+    int effect_coffee::evaluate(card_ptr origin_card, player_ptr origin) const {
         if (origin->m_hand.size() <= origin->max_cards_end_of_turn()) {
             return -5;
         }

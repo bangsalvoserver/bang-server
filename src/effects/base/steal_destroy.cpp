@@ -36,7 +36,7 @@ namespace banggame {
         return {};
     }
 
-    int effect_steal::evaluate(card_ptr, player_ptr origin, card_ptr target_card) const {
+    int effect_steal::evaluate(card_ptr origin_card, player_ptr origin, card_ptr target_card) const {
         return bot_suggestion::evaluate_target_card(origin, target_card);
     }
 
@@ -105,7 +105,7 @@ namespace banggame {
             effect_steal{}.on_resolve(origin_card, origin, target_card);
         }
 
-        int evaluate_escape(player_ptr) const override {
+        int evaluate_escape(player_ptr owner) const override {
             if (target_card->has_tag(tag_type::penalty)) {
                 return -5;
             }
@@ -157,8 +157,8 @@ namespace banggame {
         return {};
     }
 
-    int effect_discard::evaluate(card_ptr, player_ptr, card_ptr target_card) const {
-        return bot_suggestion::evaluate_discard_card(target_card);
+    int effect_discard::evaluate(card_ptr origin_card, player_ptr origin, card_ptr target_card) const {
+        return bot_suggestion::evaluate_discard_card(origin, target_card);
     }
 
     void effect_discard::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card) const {
@@ -180,7 +180,7 @@ namespace banggame {
         return {};
     }
 
-    int effect_discard_hand::evaluate(card_ptr, player_ptr origin) const {
+    int effect_discard_hand::evaluate(card_ptr origin_card, player_ptr origin) const {
         possible_to_play state{origin};
         if (rn::any_of(origin->m_hand, [&](card_ptr c) { return state.check(c); })) {
             return -5;
@@ -198,7 +198,7 @@ namespace banggame {
         return {};
     }
 
-    int effect_destroy::evaluate(card_ptr, player_ptr origin, card_ptr target_card) const {
+    int effect_destroy::evaluate(card_ptr origin_card, player_ptr origin, card_ptr target_card) const {
         return bot_suggestion::evaluate_target_card(origin, target_card);
     }
 
@@ -252,7 +252,7 @@ namespace banggame {
             effect_destroy{}.on_resolve(origin_card, origin, target_card);
         }
 
-        int evaluate_escape(player_ptr) const override {
+        int evaluate_escape(player_ptr owner) const override {
             if (target_card->has_tag(tag_type::penalty)) {
                 return -5;
             }

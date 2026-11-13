@@ -12,7 +12,7 @@ namespace banggame {
         return origin->m_game->top_request<interface_resolvable>()->resolve_prompt();
     }
 
-    int effect_resolve::evaluate(card_ptr, player_ptr origin) const {
+    int effect_resolve::evaluate(card_ptr origin_card, player_ptr origin) const {
         return origin->m_game->top_request<interface_resolvable>()->evaluate_resolve();
     }
 

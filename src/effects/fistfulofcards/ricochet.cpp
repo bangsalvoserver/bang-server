@@ -43,7 +43,7 @@ namespace banggame {
         }
     };
 
-    int effect_ricochet::evaluate(card_ptr, player_ptr origin, card_ptr target_card) const {
+    int effect_ricochet::evaluate(card_ptr origin_card, player_ptr origin, card_ptr target_card) const {
         return bot_suggestion::evaluate_target_card(origin, target_card);
     }
 

@@ -16,7 +16,7 @@ namespace banggame {
         return {};
     }
 
-    int effect_damage::evaluate(card_ptr, player_ptr origin) const {
+    int effect_damage::evaluate(card_ptr origin_card, player_ptr origin) const {
         if (origin->m_hp <= origin->m_max_hp - 2) {
             return -5;
         }

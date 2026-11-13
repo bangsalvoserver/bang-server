@@ -16,6 +16,7 @@ namespace banggame {
     struct effect_train_robbery_response {
         bool can_play(card_ptr origin_card, player_ptr origin) const;
         void add_context(card_ptr origin_card, player_ptr origin, card_ptr target, effect_context &ctx) const;
+        int evaluate(card_ptr origin_card, player_ptr origin, card_ptr target) const;
         void on_play(card_ptr origin_card, player_ptr origin, card_ptr target) const;
     };
 

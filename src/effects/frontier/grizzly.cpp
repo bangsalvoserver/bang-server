@@ -31,7 +31,7 @@ namespace banggame {
         return prompts::prompt_target_immunity(origin_card, origin, target, flags);
     }
 
-    int effect_grizzly::evaluate(card_ptr, player_ptr origin, player_ptr target) const {
+    int effect_grizzly::evaluate(card_ptr origin_card, player_ptr origin, player_ptr target) const {
         return bot_suggestion::evaluate_attack(origin, target);
     }
 

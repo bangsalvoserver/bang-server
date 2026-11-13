@@ -65,7 +65,7 @@ namespace banggame {
         return {};
     }
 
-    int effect_train_robbery::evaluate(card_ptr, player_ptr origin, player_ptr target) const {
+    int effect_train_robbery::evaluate(card_ptr origin_card, player_ptr origin, player_ptr target) const {
         if (!bot_suggestion::is_target_enemy(origin, target)) {
             return -5;
         } else if (rn::any_of(target->m_table, [](card_ptr c) { return c->has_tag(tag_type::jail); })) {
@@ -95,16 +95,21 @@ namespace banggame {
         ctx.add(contexts::train_robbery_target{ target_card });
     }
 
+    int effect_train_robbery_response::evaluate(card_ptr origin_card, player_ptr origin, card_ptr target_card) const {
+        if (target_card->has_tag(tag_type::penalty)) {
+            return 5;
+        }
+        return 0;
+    }
+
     void effect_train_robbery_response::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card) const {
         auto req = origin->m_game->top_request<request_train_robbery>();
         req->selected_cards.add(target_card);
     }
 
-    int effect_train_robbery_discard::evaluate(card_ptr, player_ptr origin, const effect_context &ctx) const {
-        if (origin->is_ghost()) {
-            return -5;
-        } else if (ctx.get<contexts::train_robbery_target>()->has_tag(tag_type::penalty)) {
-            return 5;
+    int effect_train_robbery_discard::evaluate(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const {
+        if (ctx.get<contexts::train_robbery_target>()->has_tag(tag_type::penalty)) {
+            return 10;
         }
         return 0;
     }
@@ -128,11 +133,9 @@ namespace banggame {
         }
     };
 
-    int effect_train_robbery_bang::evaluate(card_ptr, player_ptr origin, const effect_context &) const {
+    int effect_train_robbery_bang::evaluate(card_ptr origin_card, player_ptr origin, const effect_context &) const {
         if (origin->is_ghost()) {
             return 5;
-        } else if (rn::any_of(origin->m_table, [](card_ptr c) { return c->has_tag(tag_type::penalty); })) {
-            return -10;
         } else if (origin->m_hp <= 1 && count_missed_cards(origin) == 0) {
             return -5;
         }

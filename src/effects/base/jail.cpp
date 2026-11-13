@@ -16,9 +16,14 @@ namespace banggame {
         return {};
     }
 
-    int equip_jail::evaluate(card_ptr, player_ptr origin, player_ptr target) const {
-        if (bot_suggestion::is_target_enemy(origin, target, bot_suggestion::action_type::jail)) return 5;
-        return bot_suggestion::is_target_friend(origin, target) ? -5 : -1;
+    int equip_jail::evaluate(card_ptr origin_card, player_ptr origin, player_ptr target) const {
+        if (bot_suggestion::is_target_enemy(origin, target, bot_suggestion::action_type::jail)){
+            return 5;
+        } else if (bot_suggestion::is_target_friend(origin, target)) {
+            return -5;
+        } else {
+            return -1;
+        }
     }
 
     void equip_jail::on_enable(card_ptr target_card, player_ptr target) const {

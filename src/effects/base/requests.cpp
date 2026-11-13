@@ -73,7 +73,7 @@ namespace banggame {
     }
 
     int request_discard::evaluate_pick(card_ptr target_card) const {
-        return bot_suggestion::evaluate_discard_card(target_card);
+        return bot_suggestion::evaluate_discard_card(target, target_card);
     }
 
     bool request_discard::can_pick(card_ptr target_card) const {
@@ -123,7 +123,7 @@ namespace banggame {
     }
 
     int request_discard_pass::evaluate_pick(card_ptr target_card) const {
-        return bot_suggestion::evaluate_discard_card(target_card);
+        return bot_suggestion::evaluate_discard_card(target, target_card);
     }
 
     bool request_discard_pass::can_pick(card_ptr target_card) const {

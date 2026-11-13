@@ -47,7 +47,7 @@ namespace banggame {
             return int(std::unique(suits.begin(), suits.end()) - suits.begin());
         }
 
-        int evaluate_redraw(card_ptr, player_ptr) const override {
+        int evaluate_redraw(card_ptr target_card, player_ptr owner) const override {
             return -5;
         }
 
@@ -74,7 +74,7 @@ namespace banggame {
         return {};
     }
 
-    int effect_rum::evaluate(card_ptr, player_ptr origin) const {
+    int effect_rum::evaluate(card_ptr origin_card, player_ptr origin) const {
         if (origin->m_max_hp - origin->m_hp < 2) {
             return -5;
         }

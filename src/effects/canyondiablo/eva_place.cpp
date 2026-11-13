@@ -19,7 +19,7 @@ namespace banggame {
             drawn_card->move_to(pocket_type::selection, target);
         }
 
-        void on_pick(card_ptr) override {
+        void on_pick(card_ptr target_card) override {
             pop_request();
 
             target->m_game->add_log("LOG_DRAWN_CARD_FOR", target, drawn_card, origin_card);
@@ -36,7 +36,7 @@ namespace banggame {
             return resolve_type::dismiss;
         }
 
-        int evaluate_pick(card_ptr) const override {
+        int evaluate_pick(card_ptr target_card) const override {
             return drawn_card->sign.is_diamonds() ? 5 : -5;
         }
 

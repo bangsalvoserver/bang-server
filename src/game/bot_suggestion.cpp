@@ -276,6 +276,7 @@ namespace banggame::bot_suggestion {
     }
 
     int evaluate_attack(const_player_ptr origin, const_player_ptr target) {
+        // TODO: should prioritize attacking weaker targets better
         const bool lethal = target->m_hp <= 1;
 
         if (target->is_sheriff()) {
@@ -361,7 +362,16 @@ namespace banggame::bot_suggestion {
         return -1;
     }
 
-    int evaluate_discard_card(const_card_ptr target_card) {
+    int evaluate_draw_card(const_player_ptr origin, const_card_ptr target_card) {
+        // TODO: improve this to consider the state of the game
+        if (auto value = target_card->get_tag_value(tag_type::strong)) {
+            return 4 + *value;
+        }
+        return 0;
+    }
+
+    int evaluate_discard_card(const_player_ptr origin, const_card_ptr target_card) {
+        // TODO: improve this to consider the state of the game
         if (auto value = target_card->get_tag_value(tag_type::strong)) {
             return -5 - *value;
         }

@@ -75,7 +75,7 @@ namespace banggame {
         drawn_card = nullptr;
     }
 
-    int request_check_base::evaluate_redraw(card_ptr, player_ptr owner) const {
+    int request_check_base::evaluate_redraw(card_ptr target_card, player_ptr owner) const {
         draw_check_result result = get_result(drawn_card);
         if (result.indifferent) {
             return -5;

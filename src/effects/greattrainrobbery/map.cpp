@@ -8,6 +8,7 @@
 #include "cards/filter_enums.h"
 
 #include "game/game_table.h"
+#include "game/bot_suggestion.h"
 
 namespace banggame {
 
@@ -42,10 +43,15 @@ namespace banggame {
         }
 
         int evaluate_pick(card_ptr target_card) const override {
-            if (rn::all_of(target->m_game->m_selection, [](card_ptr c) { return c->has_tag(tag_type::strong); })) {
-                return -5;
+            int score = 0;
+            for (card_ptr selection_card : target->m_game->m_selection) {
+                if (target_card == selection_card) {
+                    score += bot_suggestion::evaluate_draw_card(target, selection_card);
+                } else {
+                    score += bot_suggestion::evaluate_discard_card(target, selection_card);
+                }
             }
-            return selection_picker::evaluate_pick(target_card);
+            return score;
         }
 
         void on_pick(card_ptr target_card) override {

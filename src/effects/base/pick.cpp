@@ -3,6 +3,7 @@
 #include "game/game_table.h"
 #include "game/game_options.h"
 #include "game/possible_to_play.h"
+#include "game/bot_suggestion.h"
 
 #include "cards/filter_enums.h"
 
@@ -30,10 +31,7 @@ namespace banggame {
     }
 
     int selection_picker::evaluate_pick(card_ptr target_card) const {
-        if (auto value = target_card->get_tag_value(tag_type::strong)) {
-            return 10 + *value;
-        }
-        return 0;
+        return bot_suggestion::evaluate_draw_card(target, target_card);
     }
 
     bool interface_picking_player::in_target_set(player_ptr target_player) const {

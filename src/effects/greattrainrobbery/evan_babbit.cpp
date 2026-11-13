@@ -19,7 +19,7 @@ namespace banggame {
         }
     }
 
-    int effect_evan_babbit::evaluate(card_ptr, player_ptr origin, player_ptr target) const {
+    int effect_evan_babbit::evaluate(card_ptr origin_card, player_ptr origin, player_ptr target) const {
         return bot_suggestion::evaluate_attack(origin, target);
     }
 

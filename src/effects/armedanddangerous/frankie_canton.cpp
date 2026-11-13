@@ -13,7 +13,7 @@ namespace banggame {
         return prompts::prompt_target_self(origin_card, origin, target_card->owner);
     }
 
-    int effect_frankie_canton::evaluate(card_ptr, player_ptr origin, card_ptr target) const {
+    int effect_frankie_canton::evaluate(card_ptr origin_card, player_ptr origin, card_ptr target) const {
         return bot_suggestion::evaluate_soft_attack(origin, target->owner);
     }
 

@@ -8,7 +8,7 @@
 
 namespace banggame {
 
-    int effect_full_steam::evaluate(card_ptr, player_ptr origin) const {
+    int effect_full_steam::evaluate(card_ptr origin_card, player_ptr origin) const {
         return origin->m_game->call_event(event_type::evaluate_locomotive{ origin, value });
     }
     

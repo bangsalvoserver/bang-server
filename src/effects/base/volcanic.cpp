@@ -6,7 +6,9 @@
 
 namespace banggame {
 
-    int equip_volcanic::evaluate(card_ptr, player_ptr, player_ptr target) const {
+    int equip_volcanic::evaluate(card_ptr origin_card, player_ptr origin, player_ptr target) const {
+        // TODO: the bot should not play volcanic if his character is Willy the Kid
+        // also, replacing the current weapon card should be considered in the scoring
         if (target->get_bangs_played() <= 0) {
             return -20;
         }

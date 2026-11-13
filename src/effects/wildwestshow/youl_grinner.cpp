@@ -14,7 +14,7 @@ namespace banggame {
     }
 
     int request_youl_grinner::evaluate_pick(card_ptr target_card) const {
-        return bot_suggestion::evaluate_discard_card(target_card);
+        return bot_suggestion::evaluate_discard_card(target, target_card);
     }
 
     void request_youl_grinner::on_pick(card_ptr target_card) {

@@ -31,7 +31,7 @@ namespace banggame {
         }
 
         int evaluate_pick(card_ptr target_card) const override {
-            return bot_suggestion::evaluate_discard_card(target_card);
+            return bot_suggestion::evaluate_discard_card(target, target_card);
         }
 
         bool can_pick(card_ptr target_card) const override {

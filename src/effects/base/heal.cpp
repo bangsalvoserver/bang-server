@@ -17,12 +17,25 @@ namespace banggame {
         return {};
     }
 
-    int effect_heal::evaluate(card_ptr, player_ptr origin, player_ptr target) const {
-        int score = bot_suggestion::evaluate_help(origin, target);
-        if (origin->is_deputy() && target->is_sheriff() && target->m_hp == 1) {
-            score += 10;
+    int effect_heal::evaluate(card_ptr origin_card, player_ptr origin, player_ptr target) const {
+        if (bot_suggestion::is_target_friend(origin, target)) {
+            int score = 4;
+            if (target->m_hp <= 2) {
+                if (target->is_sheriff()) {
+                    score += 10;
+                } else {
+                    ++score;
+                }
+            }
+            return score;
+        } else if (bot_suggestion::is_target_enemy(origin, target)) {
+            return -5;
+        } else if (target->is_sheriff() && target->m_hp <= 1) {
+            // Renegade will try to save the sheriff
+            return 2;
+        } else {
+            return -2;
         }
-        return score;
     }
 
     void effect_heal::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) const {

@@ -16,7 +16,7 @@ namespace banggame {
         return {};
     }
 
-    int effect_stampede::evaluate(card_ptr, player_ptr origin, player_ptr target) const {
+    int effect_stampede::evaluate(card_ptr origin_card, player_ptr origin, player_ptr target) const {
         return bot_suggestion::evaluate_soft_attack(origin, target);
     }
 

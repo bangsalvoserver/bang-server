@@ -9,7 +9,7 @@
 
 namespace banggame {
 
-    int effect_flint_westwood::evaluate(card_ptr, player_ptr origin, card_ptr target_card, const effect_context &ctx) const {
+    int effect_flint_westwood::evaluate(card_ptr origin_card, player_ptr origin, card_ptr target_card, const effect_context &ctx) const {
         return bot_suggestion::evaluate_soft_attack(origin, target_card->owner);
     }
 

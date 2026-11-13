@@ -53,7 +53,7 @@ namespace banggame {
         return {};
     }
 
-    int equip_scorpion::evaluate(card_ptr, player_ptr origin, player_ptr target) const {
+    int equip_scorpion::evaluate(card_ptr origin_card, player_ptr origin, player_ptr target) const {
         return bot_suggestion::evaluate_soft_attack(origin, target);
     }
 
