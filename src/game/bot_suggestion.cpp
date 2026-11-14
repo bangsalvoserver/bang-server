@@ -291,11 +291,15 @@ namespace banggame::bot_suggestion {
             return lethal ? 6 : 5;
         }
 
-        int score = is_target_friend(origin, target) ? -5 : -1;
-        if (lethal) {
-            score -= 5;
+        if (is_target_friend(origin, target)) {
+            if (lethal) {
+                return origin->is_sheriff() ? -20 : -10;
+            } else {
+                return -5;
+            }
         }
-        return score;
+        
+        return -1;
     }
 
     int evaluate_soft_attack(const_player_ptr origin, const_player_ptr target) {
@@ -353,10 +357,10 @@ namespace banggame::bot_suggestion {
                 if (target_card->has_tag(tag_type::penalty)) {
                     return 6;
                 } else if (auto value = target_card->get_tag_value(tag_type::strong)) {
-                    return -5 - *value;
+                    return -7 - *value;
                 }
             }
-            return -4;
+            return -6;
         }
 
         return -1;
