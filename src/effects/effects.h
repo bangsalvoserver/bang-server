@@ -17,5 +17,6 @@
 #include "stickofdynamite/effects.h"
 #include "crazy_greygory/effects.h"
 #include "frontier/effects.h"
+#include "vlcata/effects.h"
 
 #endif
