@@ -353,10 +353,10 @@ namespace banggame::bot_suggestion {
                 if (target_card->has_tag(tag_type::penalty)) {
                     return 6;
                 } else if (auto value = target_card->get_tag_value(tag_type::strong)) {
-                    return -5 - *value;
+                    return -7 - *value;
                 }
             }
-            return -4;
+            return -6;
         }
 
         return -1;
