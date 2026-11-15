@@ -136,7 +136,7 @@ namespace banggame {
     int effect_train_robbery_bang::evaluate(card_ptr origin_card, player_ptr origin, const effect_context &) const {
         if (origin->is_ghost()) {
             return 5;
-        } else if (origin->m_hp <= 1 && count_missed_cards(origin) == 0) {
+        } else if (int diff = 2 - origin->m_hp; diff >= 0 && count_missed_cards(origin) <= diff) {
             return -5;
         }
         return 0;
