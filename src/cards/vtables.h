@@ -7,28 +7,21 @@
 
 namespace banggame {
 
+    enum class effect_target_type {
+        none,
+        player,
+        card,
+    };
+
     struct effect_vtable {
         std::string_view name;
 
         bool (*can_play)(const void *effect_value, card_ptr origin_card, player_ptr origin, const effect_context &ctx);
-        
-        game_string (*get_error)(const void *effect_value, card_ptr origin_card, player_ptr origin, const effect_context &ctx);
-        prompt_string (*on_prompt)(const void *effect_value, card_ptr origin_card, player_ptr origin, effect_flags flags, const effect_context &ctx);
-        int (*evaluate)(const void *effect_value, card_ptr origin_card, player_ptr origin, const effect_context &ctx);
-        void (*add_context)(const void *effect_value, card_ptr origin_card, player_ptr origin, effect_context &ctx);
-        void (*on_play)(const void *effect_value, card_ptr origin_card, player_ptr origin, effect_flags flags, const effect_context &ctx);
-
-        game_string (*get_error_player)(const void *effect_value, card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx);
-        prompt_string (*on_prompt_player)(const void *effect_value, card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx);
-        int (*evaluate_player)(const void *effect_value, card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx);
-        void (*add_context_player)(const void *effect_value, card_ptr origin_card, player_ptr origin, player_ptr target, effect_context &ctx);
-        void (*on_play_player)(const void *effect_value, card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx);
-        
-        game_string (*get_error_card)(const void *effect_value, card_ptr origin_card, player_ptr origin, card_ptr target, const effect_context &ctx);
-        prompt_string (*on_prompt_card)(const void *effect_value, card_ptr origin_card, player_ptr origin, card_ptr target, effect_flags flags, const effect_context &ctx);
-        int (*evaluate_card)(const void *effect_value, card_ptr origin_card, player_ptr origin, card_ptr target, const effect_context &ctx);
-        void (*add_context_card)(const void *effect_value, card_ptr origin_card, player_ptr origin, card_ptr target, effect_context &ctx);
-        void (*on_play_card)(const void *effect_value, card_ptr origin_card, player_ptr origin, card_ptr target, effect_flags flags, const effect_context &ctx);
+        game_string (*get_error)(const void *effect_value, card_ptr origin_card, player_ptr origin, void *target, effect_target_type type, const effect_context &ctx);
+        prompt_string (*on_prompt)(const void *effect_value, card_ptr origin_card, player_ptr origin, void *target, effect_target_type type, effect_flags flags, const effect_context &ctx);
+        int (*evaluate)(const void *effect_value, card_ptr origin_card, player_ptr origin, void *target, effect_target_type type, const effect_context &ctx);
+        void (*add_context)(const void *effect_value, card_ptr origin_card, player_ptr origin, void *target, effect_target_type type, effect_context &ctx);
+        void (*on_play)(const void *effect_value, card_ptr origin_card, player_ptr origin, void *target, effect_target_type type, effect_flags flags, const effect_context &ctx);
     };
     
     inline bool effect_holder::can_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const {
@@ -36,63 +29,63 @@ namespace banggame {
     }
     
     inline game_string effect_holder::get_error(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const {
-        return type->get_error(effect_value, origin_card, origin, ctx);
+        return type->get_error(effect_value, origin_card, origin, nullptr, effect_target_type::none, ctx);
     }
 
     inline game_string effect_holder::get_error(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) const {
-        return type->get_error_player(effect_value, origin_card, origin, target, ctx);
+        return type->get_error(effect_value, origin_card, origin, target, effect_target_type::player, ctx);
     }
 
     inline game_string effect_holder::get_error(card_ptr origin_card, player_ptr origin, card_ptr target, const effect_context &ctx) const {
-        return type->get_error_card(effect_value, origin_card, origin, target, ctx);
+        return type->get_error(effect_value, origin_card, origin, target, effect_target_type::card, ctx);
     }
 
     inline prompt_string effect_holder::on_prompt(card_ptr origin_card, player_ptr origin, effect_flags flags, const effect_context &ctx) const {
-        return type->on_prompt(effect_value, origin_card, origin, flags, ctx);
+        return type->on_prompt(effect_value, origin_card, origin, nullptr, effect_target_type::none, flags, ctx);
     }
 
     inline prompt_string effect_holder::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx) const {
-        return type->on_prompt_player(effect_value, origin_card, origin, target, flags, ctx);
+        return type->on_prompt(effect_value, origin_card, origin, target, effect_target_type::player, flags, ctx);
     }
 
     inline prompt_string effect_holder::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target, effect_flags flags, const effect_context &ctx) const {
-        return type->on_prompt_card(effect_value, origin_card, origin, target, flags, ctx);
+        return type->on_prompt(effect_value, origin_card, origin, target, effect_target_type::card, flags, ctx);
     }
 
     inline int effect_holder::evaluate(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const {
-        return type->evaluate(effect_value, origin_card, origin, ctx);
+        return type->evaluate(effect_value, origin_card, origin, nullptr, effect_target_type::none, ctx);
     }
 
     inline int effect_holder::evaluate(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) const {
-        return type->evaluate_player(effect_value, origin_card, origin, target, ctx);
+        return type->evaluate(effect_value, origin_card, origin, target, effect_target_type::player, ctx);
     }
 
     inline int effect_holder::evaluate(card_ptr origin_card, player_ptr origin, card_ptr target, const effect_context &ctx) const {
-        return type->evaluate_card(effect_value, origin_card, origin, target, ctx);
+        return type->evaluate(effect_value, origin_card, origin, target, effect_target_type::card, ctx);
     }
 
     inline void effect_holder::add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) const {
-        type->add_context(effect_value, origin_card, origin, ctx);
+        type->add_context(effect_value, origin_card, origin, nullptr, effect_target_type::none, ctx);
     }
 
     inline void effect_holder::add_context(card_ptr origin_card, player_ptr origin, player_ptr target, effect_context &ctx) const {
-        type->add_context_player(effect_value, origin_card, origin, target, ctx);
+        type->add_context(effect_value, origin_card, origin, target, effect_target_type::player, ctx);
     }
 
     inline void effect_holder::add_context(card_ptr origin_card, player_ptr origin, card_ptr target, effect_context &ctx) const {
-        type->add_context_card(effect_value, origin_card, origin, target, ctx);
+        type->add_context(effect_value, origin_card, origin, target, effect_target_type::card, ctx);
     }
 
     inline void effect_holder::on_play(card_ptr origin_card, player_ptr origin, effect_flags flags, const effect_context &ctx) const {
-        type->on_play(effect_value, origin_card, origin, flags, ctx);
+        type->on_play(effect_value, origin_card, origin, nullptr, effect_target_type::none, flags, ctx);
     }
 
     inline void effect_holder::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx) const {
-        type->on_play_player(effect_value, origin_card, origin, target, flags, ctx);
+        type->on_play(effect_value, origin_card, origin, target, effect_target_type::player, flags, ctx);
     }
 
     inline void effect_holder::on_play(card_ptr origin_card, player_ptr origin, card_ptr target, effect_flags flags, const effect_context &ctx) const {
-        type->on_play_card(effect_value, origin_card, origin, target, flags, ctx);
+        type->on_play(effect_value, origin_card, origin, target, effect_target_type::card, flags, ctx);
     }
     
     template<utils::fixed_string Name> struct effect_vtable_map;

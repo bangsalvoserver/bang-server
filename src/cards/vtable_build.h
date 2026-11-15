@@ -22,6 +22,16 @@ namespace banggame {
         // the build_*_vtable functions would silently skip it.
         return *static_cast<const T *>(effect_value);
     }
+
+    template<typename Fun>
+    inline auto with_target(void *target, effect_target_type type, Fun &&fun) {
+        switch (type) {
+            case effect_target_type::none: return fun();
+            case effect_target_type::player: return fun(static_cast<player_ptr>(target));
+            case effect_target_type::card: return fun(static_cast<card_ptr>(target));
+            default: std::unreachable();
+        }
+    }
     
     template<typename T>
     constexpr effect_vtable build_effect_vtable(std::string_view name) {
@@ -35,112 +45,50 @@ namespace banggame {
                 return true;
             },
 
-            .get_error = [](const void *effect_value, card_ptr origin_card, player_ptr origin, const effect_context &ctx) -> game_string {
+            .get_error = [](const void *effect_value, card_ptr origin_card, player_ptr origin, void *target, effect_target_type type, const effect_context &ctx) -> game_string {
                 const T &value = effect_cast<T>(effect_value);
-                TRY_RETURN(value.get_error(origin_card, origin, ctx));
-                TRY_RETURN(value.get_error(origin_card, origin));
-                return {};
+                return with_target(target, type, [&](auto ... t) -> game_string {
+                    TRY_RETURN(value.get_error(origin_card, origin, t ..., ctx));
+                    TRY_RETURN(value.get_error(origin_card, origin, t ...));
+                    return {};
+                });
             },
 
-            .on_prompt = [](const void *effect_value, card_ptr origin_card, player_ptr origin, effect_flags flags, const effect_context &ctx) -> prompt_string {
+            .on_prompt = [](const void *effect_value, card_ptr origin_card, player_ptr origin, void *target, effect_target_type type, effect_flags flags, const effect_context &ctx) -> prompt_string {
                 const T &value = effect_cast<T>(effect_value);
-                TRY_RETURN(value.on_prompt(origin_card, origin, flags, ctx));
-                TRY_RETURN(value.on_prompt(origin_card, origin, ctx));
-                TRY_RETURN(value.on_prompt(origin_card, origin, flags));
-                TRY_RETURN(value.on_prompt(origin_card, origin));
-                return {};
+                return with_target(target, type, [&](auto ... t) -> prompt_string {
+                    TRY_RETURN(value.on_prompt(origin_card, origin, t ..., flags, ctx));
+                    TRY_RETURN(value.on_prompt(origin_card, origin, t ..., ctx));
+                    TRY_RETURN(value.on_prompt(origin_card, origin, t ..., flags));
+                    TRY_RETURN(value.on_prompt(origin_card, origin, t ...));
+                    return {};
+                });
             },
 
-            .evaluate = [](const void *effect_value, card_ptr origin_card, player_ptr origin, const effect_context &ctx) -> int {
+            .evaluate = [](const void *effect_value, card_ptr origin_card, player_ptr origin, void *target, effect_target_type type, const effect_context &ctx) -> int {
                 const T &value = effect_cast<T>(effect_value);
-                TRY_RETURN(value.evaluate(origin_card, origin, ctx));
-                TRY_RETURN(value.evaluate(origin_card, origin));
-                return 0;
+                return with_target(target, type, [&](auto ... t) -> int {
+                    TRY_RETURN(value.evaluate(origin_card, origin, t ..., ctx));
+                    TRY_RETURN(value.evaluate(origin_card, origin, t ...));
+                    return 0;
+                });
             },
 
-            .add_context = [](const void *effect_value, card_ptr origin_card, player_ptr origin, effect_context &ctx) {
+            .add_context = [](const void *effect_value, card_ptr origin_card, player_ptr origin, void *target, effect_target_type type, effect_context &ctx) -> void {
                 const T &value = effect_cast<T>(effect_value);
-                TRY_RETURN(value.add_context(origin_card, origin, ctx));
+                return with_target(target, type, [&](auto ... t) -> void {
+                    TRY_RETURN(value.add_context(origin_card, origin, t ..., ctx));
+                });
             },
 
-            .on_play = [](const void *effect_value, card_ptr origin_card, player_ptr origin, effect_flags flags, const effect_context &ctx) {
+            .on_play = [](const void *effect_value, card_ptr origin_card, player_ptr origin, void *target, effect_target_type type, effect_flags flags, const effect_context &ctx) -> void {
                 const T &value = effect_cast<T>(effect_value);
-                TRY_RETURN(value.on_play(origin_card, origin, flags, ctx));
-                TRY_RETURN(value.on_play(origin_card, origin, ctx));
-                TRY_RETURN(value.on_play(origin_card, origin, flags));
-                TRY_RETURN(value.on_play(origin_card, origin));
-            },
-
-            .get_error_player = [](const void *effect_value, card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) -> game_string {
-                const T &value = effect_cast<T>(effect_value);
-                TRY_RETURN(value.get_error(origin_card, origin, target, ctx));
-                TRY_RETURN(value.get_error(origin_card, origin, target));
-                return {};
-            },
-            
-            .on_prompt_player = [](const void *effect_value, card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx) -> prompt_string {
-                const T &value = effect_cast<T>(effect_value);
-                TRY_RETURN(value.on_prompt(origin_card, origin, target, flags, ctx));
-                TRY_RETURN(value.on_prompt(origin_card, origin, target, ctx));
-                TRY_RETURN(value.on_prompt(origin_card, origin, target, flags));
-                TRY_RETURN(value.on_prompt(origin_card, origin, target));
-                return {};
-            },
-            
-            .evaluate_player = [](const void *effect_value, card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) -> int {
-                const T &value = effect_cast<T>(effect_value);
-                TRY_RETURN(value.evaluate(origin_card, origin, target, ctx));
-                TRY_RETURN(value.evaluate(origin_card, origin, target));
-                return 0;
-            },
-
-            .add_context_player = [](const void *effect_value, card_ptr origin_card, player_ptr origin, player_ptr target, effect_context &ctx) {
-                const T &value = effect_cast<T>(effect_value);
-                TRY_RETURN(value.add_context(origin_card, origin, target, ctx));
-            },
-
-            .on_play_player = [](const void *effect_value, card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx) {
-                const T &value = effect_cast<T>(effect_value);
-                TRY_RETURN(value.on_play(origin_card, origin, target, flags, ctx));
-                TRY_RETURN(value.on_play(origin_card, origin, target, ctx));
-                TRY_RETURN(value.on_play(origin_card, origin, target, flags));
-                TRY_RETURN(value.on_play(origin_card, origin, target));
-            },
-
-            .get_error_card = [](const void *effect_value, card_ptr origin_card, player_ptr origin, card_ptr target, const effect_context &ctx) -> game_string {
-                const T &value = effect_cast<T>(effect_value);
-                TRY_RETURN(value.get_error(origin_card, origin, target, ctx));
-                TRY_RETURN(value.get_error(origin_card, origin, target));
-                return {};
-            },
-
-            .on_prompt_card = [](const void *effect_value, card_ptr origin_card, player_ptr origin, card_ptr target, effect_flags flags, const effect_context &ctx) -> prompt_string {
-                const T &value = effect_cast<T>(effect_value);
-                TRY_RETURN(value.on_prompt(origin_card, origin, target, flags, ctx));
-                TRY_RETURN(value.on_prompt(origin_card, origin, target, ctx));
-                TRY_RETURN(value.on_prompt(origin_card, origin, target, flags));
-                TRY_RETURN(value.on_prompt(origin_card, origin, target));
-                return {};
-            },
-            
-            .evaluate_card = [](const void *effect_value, card_ptr origin_card, player_ptr origin, card_ptr target, const effect_context &ctx) -> int {
-                const T &value = effect_cast<T>(effect_value);
-                TRY_RETURN(value.evaluate(origin_card, origin, target, ctx));
-                TRY_RETURN(value.evaluate(origin_card, origin, target));
-                return 0;
-            },
-
-            .add_context_card = [](const void *effect_value, card_ptr origin_card, player_ptr origin, card_ptr target, effect_context &ctx) {
-                const T &value = effect_cast<T>(effect_value);
-                TRY_RETURN(value.add_context(origin_card, origin, target, ctx));
-            },
-
-            .on_play_card = [](const void *effect_value, card_ptr origin_card, player_ptr origin, card_ptr target, effect_flags flags, const effect_context &ctx) {
-                const T &value = effect_cast<T>(effect_value);
-                TRY_RETURN(value.on_play(origin_card, origin, target, flags, ctx));
-                TRY_RETURN(value.on_play(origin_card, origin, target, ctx));
-                TRY_RETURN(value.on_play(origin_card, origin, target, flags));
-                TRY_RETURN(value.on_play(origin_card, origin, target));
+                return with_target(target, type, [&](auto ... t) -> void {
+                    TRY_RETURN(value.on_play(origin_card, origin, t ..., flags, ctx));
+                    TRY_RETURN(value.on_play(origin_card, origin, t ..., ctx));
+                    TRY_RETURN(value.on_play(origin_card, origin, t ..., flags));
+                    TRY_RETURN(value.on_play(origin_card, origin, t ...));
+                });
             }
         };
     }
