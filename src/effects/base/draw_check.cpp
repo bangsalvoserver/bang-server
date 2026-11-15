@@ -38,10 +38,13 @@ namespace banggame {
 
     int request_check_base::evaluate_pick(card_ptr target_card) const {
         auto result = get_result(target_card);
-        if (!result.indifferent && !result.lucky) {
+        if (result.lucky) {
+            return 5;
+        } else if (result.indifferent) {
+            return 0;
+        } else {
             return -5;
         }
-        return 0;
     }
 
     void request_check_base::on_pick(card_ptr target_card) {
