@@ -66,6 +66,28 @@ namespace banggame {
         origin->m_game->queue_request<request_lounge_car>(origin_card, origin);
     }
 
+    int effect_lounge_car_select::evaluate(card_ptr origin_card, player_ptr origin, card_ptr target_card, const effect_context &ctx) const {
+        if (rn::none_of(origin->m_game->m_players, [&](player_ptr target) {
+            return origin != target && rn::all_of(origin->m_game->m_selection, [&](card_ptr selection_card) {
+                return !get_equip_error(selection_card, selection_card == target_card ? target : origin);
+            });
+        })) {
+            return -50;
+        }
+
+        int score = 0;
+        for (card_ptr selection_card : origin->m_game->m_selection) {
+            if (selection_card != target_card) {
+                score += effect_equip_on{}.evaluate(selection_card, origin, origin, ctx);
+            }
+        }
+        return score;
+    }
+
+    void effect_lounge_car_select::add_context(card_ptr origin_card, player_ptr origin, card_ptr target_card, effect_context &ctx) const {
+        effect_gift_card{}.add_context(origin_card, origin, target_card, ctx);
+    }
+
     bool effect_lounge_car_response::can_play(card_ptr origin_card, player_ptr origin) const {
         return origin->m_game->top_request<request_lounge_car>(target_is{origin}) != nullptr;
     }

@@ -440,7 +440,7 @@ hidden:
       
   - name: LOUNGE_CAR
     responses:
-      - gift_card card | selection
+      - lounge_car_select card | selection
       - lounge_car_response player notself target_set
     tags:
       - preselect
