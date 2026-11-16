@@ -283,7 +283,7 @@ namespace banggame::bot_suggestion {
             if (origin->is_outlaw()) {
                 if (target->m_hp <= 2) return 10;
             } else if (lethal && (!origin->is_renegade() || origin->m_game->num_alive(true) > 2)) {
-                return -20;
+                return -50;
             }
         }
 
@@ -295,7 +295,7 @@ namespace banggame::bot_suggestion {
             if (lethal) {
                 return origin->is_sheriff() ? -20 : -10;
             } else {
-                return -5;
+                return -2;
             }
         }
         
