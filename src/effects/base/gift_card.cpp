@@ -12,12 +12,16 @@ namespace banggame {
     void effect_gift_card::add_context(card_ptr origin_card, player_ptr origin, card_ptr target_card, effect_context &ctx) const {
         ctx.add(contexts::gifted_card{ target_card });
     }
+
+    int effect_gift_card::evaluate(card_ptr origin_card, player_ptr origin, card_ptr target_card, const effect_context &ctx) const {
+        return bot_suggestion::evaluate_discard_card(origin, target_card);
+    }
     
-    int effect_gift_card::evaluate(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) const {
+    int effect_gift_card_to::evaluate(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) const {
         return bot_suggestion::evaluate_help(origin, target);
     }
 
-    void effect_gift_card::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) const {
+    void effect_gift_card_to::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) const {
         bot_suggestion::signal_helpful_action(origin, target);
         
         resolve_gift_card(origin_card, origin, ctx.get<contexts::gifted_card>(), target, used);

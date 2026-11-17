@@ -52,7 +52,7 @@ legends:
     responses:
       - kit_carlson_legend_response
       - gift_card card | selection
-      - gift_card player alive notself
+      - gift_card_to player alive notself
     tags:
       - preselect
   - name: LUCKY_DUKE

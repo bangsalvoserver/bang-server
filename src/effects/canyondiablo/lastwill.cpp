@@ -56,7 +56,7 @@ namespace banggame {
     }
 
     int effect_lastwill::evaluate(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) const {
-        return effect_gift_card{}.evaluate(origin_card, origin, target, ctx);
+        return bot_suggestion::evaluate_help(origin, target);
     }
 
     void effect_lastwill::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) const {

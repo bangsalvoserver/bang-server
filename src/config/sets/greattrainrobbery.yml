@@ -449,7 +449,7 @@ hidden:
     responses:
       - mail_car_response
       - gift_card card | selection
-      - gift_card player alive notself
+      - gift_card_to player alive notself
     tags:
       - preselect
   
