@@ -367,18 +367,45 @@ namespace banggame::bot_suggestion {
     }
 
     int evaluate_draw_card(const_player_ptr origin, const_card_ptr target_card) {
-        // TODO: improve this to consider the state of the game
         if (auto value = target_card->get_tag_value(tag_type::strong)) {
             return 4 + *value;
         }
+
+        if (origin->m_game->num_alive() <= 2 && target_card->has_tag(tag_type::beer)) {
+            return -2;
+        }
+
+        if (origin->m_hp < origin->m_max_hp && (target_card->has_tag(tag_type::beer)
+            || target_card->has_tag(tag_type::missedcard)
+            || target_card->has_tag(tag_type::count_as_missed))) {
+            return 2;
+        }
+
         return 0;
     }
 
     int evaluate_discard_card(const_player_ptr origin, const_card_ptr target_card) {
-        // TODO: improve this to consider the state of the game
         if (auto value = target_card->get_tag_value(tag_type::strong)) {
             return -5 - *value;
         }
+
+        if (target_card->pocket == pocket_type::player_table && target_card->has_tag(tag_type::penalty)) {
+            return 5;
+        }
+
+        if (origin->m_game->num_alive() <= 2 && target_card->has_tag(tag_type::beer)) {
+            return 4;
+        }
+
+        if (origin->m_hp < origin->m_max_hp && target_card->has_tag(tag_type::beer)) {
+            return -2;
+        }
+
+        if (origin->m_hp <= 2 && (target_card->has_tag(tag_type::missedcard)
+            || target_card->has_tag(tag_type::count_as_missed))) {
+            return -2;
+        }
+
         return 0;
     }
 }
