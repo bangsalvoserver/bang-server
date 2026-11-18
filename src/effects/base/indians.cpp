@@ -29,6 +29,10 @@ namespace banggame {
             }
         }
 
+        int evaluate_pick(card_ptr target_card) const override {
+            return bot_suggestion::evaluate_discard_card(target, target_card);
+        }
+
         int evaluate_resolve() const override {
             if (target->is_ghost()) {
                 return 5;
