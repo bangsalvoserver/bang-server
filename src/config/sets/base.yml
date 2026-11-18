@@ -169,6 +169,7 @@ main_deck:
       - beer
     tags:
       - beer
+      - healing
   - &cat_balou
     name: CAT_BALOU
     signs:
@@ -283,6 +284,8 @@ main_deck:
     color: brown
     effects:
       - heal players alive
+    tags:
+      - healing
   - &wells_fargo
     name: WELLS_FARGO
     signs:

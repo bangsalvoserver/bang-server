@@ -50,6 +50,7 @@ goldrush:
       - heal player alive
     tags:
       - buy_cost(1)
+      - healing
   - count: 3
     name: BOTTLE
     image: 04_bottiglia
@@ -170,6 +171,7 @@ goldrush:
       - heal
     tags:
       - buy_cost(3)
+      - healing
 
 button_row:
   - name: GAME_SELL_BEER
@@ -199,6 +201,7 @@ hidden:
       - heal
     tags:
       - card_choice(1)
+      - healing
   - name: BOTTLE_BANG
     image: main_deck/01_bang
     color: brown

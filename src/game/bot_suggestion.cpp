@@ -375,7 +375,7 @@ namespace banggame::bot_suggestion {
             return -2;
         }
 
-        if (origin->m_hp < origin->m_max_hp && (target_card->has_tag(tag_type::beer)
+        if (origin->m_hp < origin->m_max_hp && (target_card->has_tag(tag_type::healing)
             || target_card->has_tag(tag_type::missedcard)
             || target_card->has_tag(tag_type::count_as_missed))) {
             return 2;
@@ -397,7 +397,7 @@ namespace banggame::bot_suggestion {
             return 4;
         }
 
-        if (origin->m_hp < origin->m_max_hp && target_card->has_tag(tag_type::beer)) {
+        if (origin->m_hp < origin->m_max_hp && target_card->has_tag(tag_type::healing)) {
             return -2;
         }
 

@@ -129,6 +129,8 @@ main_deck:
       - discard extra_card self | hand
       - discard
       - heal player alive
+    tags:
+      - healing
   - name: WHISKY
     signs:
       - Q hearts
@@ -138,6 +140,8 @@ main_deck:
       - discard extra_card self | hand
       - discard
       - heal(2)
+    tags:
+      - healing
   - name: BIBLE
     signs:
       - 10 hearts
@@ -153,6 +157,8 @@ main_deck:
     color: green
     effects:
       - heal
+    tags:
+      - healing
   - name: CAN_CAN
     signs:
       - J clubs

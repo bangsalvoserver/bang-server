@@ -150,6 +150,8 @@ main_deck:
     color: brown
     effects:
       - heal
+    tags:
+      - healing
 
 character:
   - name: BLACK_FLOWER

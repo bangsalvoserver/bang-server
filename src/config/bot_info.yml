@@ -28,6 +28,7 @@ bots:
 
     - condition: sheriff_first_turn
       rules:
+      - tag_value(tag_type::healing)
       - equip
       - tag_value(tag_type::pass_turn)
     

@@ -66,6 +66,7 @@ namespace banggame {
         // Bot and prompt logic tags
         penalty, // whether this is a "bad" equip card
         strong, // controls bot decisions
+        healing, // whether this is a card that heals
         
         // Expansion logic tags
         force_allow, // bypass only_base_characters

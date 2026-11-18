@@ -217,6 +217,8 @@ main_deck:
     effects:
       - none self_cubes(3)
       - heal
+    tags:
+      - healing
   - name: LOCKPICK
     signs:
       - 2 clubs
