@@ -21,6 +21,7 @@ main_deck:
       - dynamite
     tags:
       - dynamite
+      - penalty(-1)
   - &scope
     name: SCOPE
     signs:

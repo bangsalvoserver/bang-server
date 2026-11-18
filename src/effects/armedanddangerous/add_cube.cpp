@@ -35,8 +35,8 @@ namespace banggame {
         }
         
         int evaluate_pick(card_ptr target_card) const override {
-            if (target_card->has_tag(tag_type::penalty)) {
-                return -10;
+            if (auto value = target_card->get_tag_value(tag_type::penalty)) {
+                if (*value >= 0) return -10;
             } else if (target_card->pocket == pocket_type::player_table) {
                 return 5;
             }
@@ -97,7 +97,7 @@ namespace banggame {
     }
 
     int effect_add_cube::evaluate(card_ptr origin_card, player_ptr origin, card_ptr target) const {
-        if (target->has_tag(tag_type::penalty)) {
+        if (auto value = target->get_tag_value(tag_type::penalty); value && *value >= 0) {
             return -5;
         }
         return 0;

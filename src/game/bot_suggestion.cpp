@@ -148,8 +148,8 @@ namespace banggame::bot_suggestion {
 
     void signal_remove_card(player_ptr origin, const_card_ptr target_card, effect_flags flags) {
         if (const_player_ptr owner = target_card->owner) {
-            if (target_card->pocket == pocket_type::player_table && target_card->has_tag(tag_type::penalty)) {
-                signal_helpful_action(origin, owner, flags);
+            if (auto value = target_card->get_tag_value(tag_type::penalty); value && target_card->pocket == pocket_type::player_table) {
+                if (*value >= 0) signal_helpful_action(origin, owner, flags);
             } else {
                 signal_hostile_action(origin, owner, flags);
             }
@@ -345,8 +345,8 @@ namespace banggame::bot_suggestion {
 
         if (is_target_enemy(origin, target)) {
             if (target_card->pocket == pocket_type::player_table) {
-                if (target_card->has_tag(tag_type::penalty)) {
-                    return -5;
+                if (auto value = target_card->get_tag_value(tag_type::penalty)) {
+                    return *value >= 0 ? -5 : 0;
                 } else if (auto value = target_card->get_tag_value(tag_type::strong)) {
                     return 8 + *value;
                 }
@@ -354,8 +354,8 @@ namespace banggame::bot_suggestion {
             return 5;
         } else if (is_target_friend(origin, target)) {
             if (target_card->pocket == pocket_type::player_table) {
-                if (target_card->has_tag(tag_type::penalty)) {
-                    return 6;
+                if (auto value = target_card->get_tag_value(tag_type::penalty)) {
+                    return *value >= 0 ? 6 : 0;
                 } else if (auto value = target_card->get_tag_value(tag_type::strong)) {
                     return -7 - *value;
                 }
