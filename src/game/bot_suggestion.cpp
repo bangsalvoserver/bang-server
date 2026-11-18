@@ -371,6 +371,10 @@ namespace banggame::bot_suggestion {
             return 4 + *value;
         }
 
+        if (origin->is_ghost()) {
+            return 0;
+        }
+
         if (origin->m_game->num_alive() <= 2 && target_card->has_tag(tag_type::beer)) {
             return -2;
         }
@@ -391,6 +395,10 @@ namespace banggame::bot_suggestion {
 
         if (target_card->pocket == pocket_type::player_table && target_card->has_tag(tag_type::penalty)) {
             return 5;
+        }
+
+        if (origin->is_ghost()) {
+            return 0;
         }
 
         if (origin->m_game->num_alive() <= 2 && target_card->has_tag(tag_type::beer)) {
