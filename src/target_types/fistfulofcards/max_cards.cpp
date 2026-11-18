@@ -18,34 +18,19 @@ namespace banggame {
     }
 
     scored_target<card_list> targeting_max_cards::random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
-        card_list candidates = rn::to<card_list>(target_card.possible_targets(origin_card, origin, effect, ctx));
+        auto targets = target_card.possible_targets(origin_card, origin, effect, ctx);
+
         auto evaluate_fun = [&](card_ptr target) {
             if (effect.on_prompt(origin_card, origin, target, {}, ctx)) return -2;
             return effect.evaluate(origin_card, origin, target, ctx);
         };
-
-        size_t max_count = ncards == 0 ? candidates.size() : std::min<size_t>(ncards, candidates.size());
-        size_t min_count = confirmable ? 1 : std::min<size_t>(std::max(ncards, 1), candidates.size());
-        if (!confirmable) {
-            max_count = min_count;
+        
+        if (ncards == 0) {
+            size_t count_targets = rn::count_if(targets, [&](card_ptr c) { return evaluate_fun(c) >= 0; });
+            return random_max_elements(targets, count_targets == 0 ? 1 : count_targets, evaluate_fun, origin->m_game->bot_rng);
+        } else {
+            return random_max_elements(targets, ncards, evaluate_fun, origin->m_game->bot_rng);
         }
-
-        std::optional<scored_target<card_list>> best;
-        size_t ties = 0;
-        for (size_t count = min_count; count <= max_count; ++count) {
-            auto candidate = random_max_elements(candidates, count, evaluate_fun, origin->m_game->bot_rng);
-            if (!best || candidate.second > best->score) {
-                best = std::move(candidate);
-                ties = 1;
-            } else if (candidate.second == best->score) {
-                ++ties;
-                std::uniform_int_distribution<size_t> dist(0, ties - 1);
-                if (dist(origin->m_game->bot_rng) == 0) {
-                    best = std::move(candidate);
-                }
-            }
-        }
-        return std::move(*best);
     }
 
     game_string targeting_max_cards::get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &targets) const {
