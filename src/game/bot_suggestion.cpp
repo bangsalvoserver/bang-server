@@ -355,7 +355,11 @@ namespace banggame::bot_suggestion {
         } else if (is_target_friend(origin, target)) {
             if (target_card->pocket == pocket_type::player_table) {
                 if (auto value = target_card->get_tag_value(tag_type::penalty)) {
-                    return *value >= 0 ? 6 : 0;
+                    if (*value >= 0) {
+                        return 6;
+                    } else if (origin != target) {
+                        return 0;
+                    }
                 } else if (auto value = target_card->get_tag_value(tag_type::strong)) {
                     return -7 - *value;
                 }
