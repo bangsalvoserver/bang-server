@@ -34,6 +34,10 @@ namespace banggame {
         return ctx.contains<contexts::temp_missable>();
     }
 
+    int effect_missed::evaluate(card_ptr origin_card, player_ptr origin) const {
+        return 3;
+    }
+
     game_string effect_missed::on_prompt(card_ptr origin_card, player_ptr origin) const {
         if (auto req = origin->m_game->top_request<request_bang>(target_is{origin})) {
             if (req->bang_strength > 1 && count_missed_cards(origin) < req->bang_strength) {

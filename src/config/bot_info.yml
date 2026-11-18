@@ -21,9 +21,7 @@ bots:
     
     - condition: response
       rules:
-      - pocket(pocket_type::player_character)
-      - pocket(pocket_type::player_table)
-      - pocket(pocket_type::player_hand)
+      - player_cards
       - do_something
 
     - condition: sheriff_first_turn
@@ -36,9 +34,7 @@ bots:
       rules:
       - tag_value(tag_type::strong)
       - equip
-      - pocket(pocket_type::player_table)
-      - pocket(pocket_type::player_hand)
-      - pocket(pocket_type::player_character)
+      - player_cards
       - tag_value_not(tag_type::pass_turn)
   
   names:

@@ -9,6 +9,10 @@ namespace banggame {
     bool effect_barrel::can_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const {
         return effect_missed{}.can_play(origin_card, origin, ctx);
     }
+
+    int effect_barrel::evaluate(card_ptr origin_card, player_ptr origin) const {
+        return 5;
+    }
     
     void effect_barrel::on_play(card_ptr origin_card, player_ptr target) const {
         if (auto req = target->m_game->top_request<interface_missable>()) {

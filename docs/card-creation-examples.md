@@ -480,12 +480,10 @@ settings:
       rules:
         - tag_value(tag_type::strong)          # anything tagged "strong"
         - equip                                # then: any equip card
-        - pocket(pocket_type::player_table)    # then: prefer playing from the table
-        - pocket(pocket_type::player_hand)     # then: from hand
-        - pocket(pocket_type::player_character) # then: a character ability
+        - player_cards                         # then: character, table, or hand cards
         - tag_value_not(tag_type::pass_turn)   # then: anything that isn't just "pass"
 ```
-`settings.rules` is an ordered list of conditional groups. Each group has a `condition` on the bot's current player state and an ordered list of card predicates. The bot uses the first matching group's rules; the index of the first matching predicate determines an action's priority (no match comes last). Built-in conditions are `in_play` and `response`, but `DEFINE_BOT_CONDITION` in `game/bot_rules.h` makes the condition set extensible. Built-in card predicates (`pocket`, `pocket_not`, `equip`, `tag_value`, `tag_value_not`, `do_something`) match generic card properties. The YAML is compiled by `config/parse_bots.py` into the `bot_info` object, then consulted for each bot decision.
+`settings.rules` is an ordered list of conditional groups. Each group's `condition` examines the current player state, and its ordered `rules` list contains card predicates. The bot uses only the first group whose condition matches. The index of the first matching predicate is the action's priority; an action matching none of that group's rules comes after all listed priorities. If no group matches, the default priority is 0. Built-in conditions are `drawing_or_dismissable`, `response`, `sheriff_first_turn`, and `in_play`; `DEFINE_BOT_CONDITION` in `game/bot_rules.h` registers additional conditions. Built-in predicates are `player_cards`, `equip`, `tag_value`, `tag_value_not`, and `do_something`. `player_cards` matches cards from a player's character, table, or hand. `tag_value(tag)` matches a present tag, while `tag_value(tag, value)` matches that exact value; `tag_value_not` matches an absent tag or a value different from the supplied one. `do_something` matches any actual play, but not the null pass action. The YAML is compiled by `config/parse_bots.py` into `bot_info`, then consulted for each bot decision.
 
 So for a typical new card, "driving" bot behavior means picking the right tag, not touching this list at all. If your new card is a big, important one-shot play — say a brown card, **Last Stand**, that should be prioritized the way other high-impact plays are — just tag it the same way they are:
 ```yaml

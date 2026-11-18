@@ -24,6 +24,10 @@ namespace banggame {
         return {};
     }
 
+    int effect_duck::evaluate(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const {
+        return 1;
+    }
+
     void effect_duck::on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const {
         if (contexts::selected_cubes::contains(ctx, origin_card)) {
             origin->m_game->add_log("LOG_STOLEN_SELF_CARD", origin, origin_card);

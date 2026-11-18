@@ -12,6 +12,7 @@ namespace banggame {
         int ncards;
         effect_draw(int ncards = 1) : ncards{ncards} {}
         
+        int evaluate(card_ptr origin_card, player_ptr origin) const;
         void on_play(card_ptr origin_card, player_ptr origin) const {
             on_play(origin_card, origin, origin);
         }

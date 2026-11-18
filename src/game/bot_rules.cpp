@@ -18,16 +18,12 @@ namespace banggame {
         return nullptr;
     }
 
-    bool rule_filter_by_pocket::operator()(card_node node) const {
+    bool rule_player_cards::operator()(card_node node) const {
         if (card_ptr origin_card = get_first_card(node)) {
-            return origin_card->pocket == pocket;
-        }
-        return false;
-    }
-
-    bool rule_filter_by_pocket_not::operator()(card_node node) const {
-        if (card_ptr origin_card = get_first_card(node)) {
-            return origin_card->pocket != pocket;
+            pocket_type pocket = origin_card->pocket;
+            return pocket == pocket_type::player_character
+                || pocket == pocket_type::player_table
+                || pocket == pocket_type::player_hand;
         }
         return false;
     }
