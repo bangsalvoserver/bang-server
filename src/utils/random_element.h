@@ -3,9 +3,11 @@
 
 #include "range_utils.h"
 
-template<typename T, rn::input_range R, typename Rng>
-std::vector<T> sample_elements_r(R &&range, size_t k, Rng &rng) {
-    std::vector<T> result;
+template<rn::input_range R, typename Rng>
+std::vector<rn::range_value_t<R>> sample_elements(R &&range, size_t k, Rng &rng) {
+    using value_t = rn::range_value_t<R>;
+
+    std::vector<value_t> result;
     
     auto it = rn::begin(range);
     auto end = rn::end(range);
@@ -26,11 +28,6 @@ std::vector<T> sample_elements_r(R &&range, size_t k, Rng &rng) {
     }
 
     return result;
-}
-
-template<rn::input_range R, typename Rng>
-auto sample_elements(R &&range, size_t count, Rng &rng) {
-    return sample_elements_r<rn::range_value_t<R>>(std::forward<R>(range), count, rng);
 }
 
 template<rn::input_range R, typename Rng>
@@ -93,22 +90,47 @@ std::pair<rn::range_value_t<R>, int> random_max_element(R &&range, ScoreFn &&sco
     return { std::move(*chosen), best };
 }
 
+// Returns the `count` highest scored elements of `range`, together
+// with the sum of their scores. Ties are broken uniformly at random.
+// The range is traversed exactly once and score_fn is called once per element.
 template<rn::input_range R, typename ScoreFn, typename Rng>
-auto random_max_elements(R &&range, size_t count, ScoreFn &&score_fn, Rng &rng) {
+std::pair<std::vector<rn::range_value_t<R>>, int> random_max_elements(R &&range, size_t count, ScoreFn &&score_fn, Rng &rng) {
     using value_t = rn::range_value_t<R>;
-    std::vector<value_t> candidates = rn::to<std::vector>(std::forward<R>(range));
-    std::vector<value_t> selected;
-    selected.reserve(std::min(count, candidates.size()));
 
-    int total_score = 0;
-    while (count > 0 && !candidates.empty()) {
-        --count;
-        auto [chosen, score] = random_max_element(candidates, score_fn, rng);
-        selected.push_back(chosen);
-        total_score += score;
-        candidates.erase(rn::find(candidates, chosen));
+    struct entry {
+        int score;
+        uint32_t tiebreak;
+        value_t value;
+
+        auto operator < (const entry &rhs) const {
+            return std::tie(rhs.score, rhs.tiebreak) < std::tie(score, tiebreak);
+        }
+    };
+
+    std::vector<entry> top;
+    top.reserve(std::min<size_t>(count, 16));
+
+    for (auto &&elem : range) {
+        entry cand{ score_fn(elem), static_cast<uint32_t>(rng()), value_t(elem) };
+
+        if (top.size() < count) {
+            top.push_back(std::move(cand));
+            std::push_heap(top.begin(), top.end());
+        } else if (cand < top.front()) {
+            std::pop_heap(top.begin(), top.end());
+            top.back() = std::move(cand);
+            std::push_heap(top.begin(), top.end());
+        }
     }
-    return std::pair{ std::move(selected), total_score };
+
+    std::vector<value_t> selected;
+    selected.reserve(top.size());
+    int total_score = 0;
+    for (entry &e : top) {
+        total_score += e.score;
+        selected.push_back(std::move(e.value));
+    }
+    return { std::move(selected), total_score };
 }
 
 #endif
