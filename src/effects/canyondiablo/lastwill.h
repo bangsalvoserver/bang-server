@@ -13,6 +13,14 @@ namespace banggame {
 
     DEFINE_EQUIP(lastwill, equip_lastwill)
 
+    struct effect_lastwill_select {
+        int evaluate(card_ptr origin_card, player_ptr origin, card_ptr target_card) const;
+        void add_context(card_ptr origin_card, player_ptr origin, card_ptr target_card, effect_context &ctx) const;
+        game_string get_error(card_ptr origin_card, player_ptr origin, card_ptr target_card) const;
+    };
+
+    DEFINE_EFFECT(lastwill_select, effect_lastwill_select)
+
     struct effect_lastwill {
         bool can_play(card_ptr origin_card, player_ptr origin) const;
 

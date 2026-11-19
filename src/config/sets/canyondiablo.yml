@@ -110,7 +110,7 @@ main_deck:
     equip:
       - lastwill
     responses:
-      - gift_card max_cards(3, true) self
+      - lastwill_select max_cards(3, true) self
       - lastwill player alive notself
     tags:
       - preselect
