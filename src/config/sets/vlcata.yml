@@ -1,0 +1,131 @@
+character:
+  # 1. BEJCEK - Up to 3 times per turn, discard a card to draw 1 card, works + ability that if played that blue card with bang dmg +1 card he gets a card 
+  - name: BEJCEK
+    image: 29_bejcek
+    rulesets: [vlcata]
+    effects:
+      - max_usages(3)
+      - discard card self | hand
+      - draw(1)
+
+  # 2. PATKA - Once per turn, discard a card with efect on all players (Saloon etc) to draw 2 cards, Once discard X card draw X-1 card
+  - name: PATKA
+    image: 29_patka
+    rulesets: [vlcata]
+    effects:
+      - max_usages(1)
+      - discard card self | hand
+      - draw(2)
+
+  # 3. ANEZKA - Once per turn, discard 2 cards to heal any alive player (another player only 1 times her no limit), works slightly
+  - name: ANEZKA
+    image: 29_anezka
+    rulesets: [vlcata]
+    effects:
+      - max_usages(1)
+      - discard cards(2) self
+      - heal player alive
+ 
+  # 4. TERKA_P - Bang  can heal and can discard 3 cards to heal 1 life (Sid Ketchup like)
+  - name: TERKA_P
+    image: 29_terka_p
+    responses:
+      - discard cards(3) self | hand
+      - heal
+
+
+  # 5. JULKA - 9 HP, starts with 5 cards, loses 1 HP at the end of turn if HP > 3
+  - name: JULKA
+    image: 29_julka
+    equip:
+      - initial_cards(5)
+      - julka
+    tags:
+      - max_hp(9)
+
+
+  # 6. HARRY - Up to 2 times per turn, change 1 card and steal random card from another player
+  - name: HARRY
+    image: 29_harry
+    effects:
+      - max_usages(2)
+      - none card self | hand
+      - none random_if_hand_card notself | hand
+    mth_effect: flint_westwood(1,1)
+
+  # 7. VERCA - Discard a green card to draw 2 cards and green cards are already active
+  - name: VERCA
+    image: 29_verca
+    effects:
+      - discard card self | hand
+      - draw(2)
+
+  # 8. MARTIN - At the end of turn, draw 1 extra card if not played Bang
+  - name: MARTIN
+    image: 29_martin
+    effects:
+      - max_usages(1)
+      - draw(1)
+
+  # 9. TUCTUC - When is healed draw 2 cards (do as Bart Casidy if +HP)
+  - name: TUCTUC
+    image: 29_tuctuc
+    effects:
+      - max_usages(1)
+      - discard card self | hand
+      - heal
+
+  # 10. MIKI - Take 2 from 4 cards in drawing phase
+  - name: MIKI
+    image: 29_miki
+    effects:
+      - max_usages(1)
+      - draw(2)
+
+  # 11. LIBOR - Bang card deal 2 HP and if libor doesnt play alcohol card he loses 1 HP after that
+  - name: LIBOR
+    image: 29_libor
+    effects:
+      - max_usages(1)
+      - bang player alive reachable notself | hand
+
+# 12. ELIS - Discard a non-spades hand card to play Missed! works!
+  - name: ELIS
+    image: 29_elis
+    responses:
+      - discard card self | hand not_spades
+      - missed
+
+  # GROUP 3: NOT TESTING
+  # - name: HOROUS
+  #   image: 29_horous
+  # - name: VUDCE
+  #   image: 29_vudce
+  # - name: JEDNORUCKA_RIZEK
+  #   image: 29_jednorucka_rizek
+  # - name: PETUNA
+  #   image: 29_petuna
+  # - name: SMIG
+  #   image: 29_smig
+  # - name: CYRIL
+  #   image: 29_cyril
+  # - name: VENA
+  #   image: 29_vena
+  # - name: HELENA
+  #   image: 29_helena
+  # - name: SIMI
+  #   image: 29_simi
+  # - name: EL_BAGITO
+  #   image: 29_el_bagito
+  # - name: KRECEK
+  #   image: 29_krecek
+  # - name: EDIE
+  #   image: 29_edie
+  # - name: KOTEL
+  #   image: 29_kotel
+  # - name: TERMIT
+  #   image: 29_termit
+  # - name: SITEJ
+  #   image: 29_sitej
+  # - name: BUDHA
+  #   image: 29_budha
