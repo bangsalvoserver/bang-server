@@ -53,6 +53,7 @@ namespace banggame {
     DEFINE_EFFECT(discard_hand, effect_discard_hand)
 
     struct effect_destroy {
+        game_string get_error(card_ptr origin_card, player_ptr origin, card_ptr target) const;
         prompt_string on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target, effect_flags flags) const;
         int evaluate(card_ptr origin_card, player_ptr origin, card_ptr target) const;
         void on_play(card_ptr origin_card, player_ptr origin, card_ptr target, effect_flags flags = {}) const;

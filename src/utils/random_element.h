@@ -8,22 +8,24 @@ std::vector<rn::range_value_t<R>> sample_elements(R &&range, size_t k, Rng &rng)
     using value_t = rn::range_value_t<R>;
 
     std::vector<value_t> result;
-    
-    auto it = rn::begin(range);
-    auto end = rn::end(range);
-    
-    if (it != end) {
-        result.reserve(k);
-        size_t count = 0;
 
-        for (; it != end && count < k; ++it, ++count) {
-            result.push_back(*it);
-        }
+    if (k != 0) {   
+        auto it = rn::begin(range);
+        auto end = rn::end(range);
+        
+        if (it != end) {
+            result.reserve(k);
+            size_t count = 0;
 
-        for (; it != end; ++it, ++count) {
-            std::uniform_int_distribution<size_t> dist(0, count);
-            size_t idx = dist(rng);
-            if (idx < k) result[idx] = *it;
+            for (; it != end && count < k; ++it, ++count) {
+                result.push_back(*it);
+            }
+
+            for (; it != end; ++it, ++count) {
+                std::uniform_int_distribution<size_t> dist(0, count);
+                size_t idx = dist(rng);
+                if (idx < k) result[idx] = *it;
+            }
         }
     }
 

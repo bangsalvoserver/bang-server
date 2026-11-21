@@ -6,9 +6,9 @@
 namespace banggame {
 
     struct effect_duck {
-        game_string on_prompt(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const;
-        int evaluate(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const;
-        void on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const;
+        game_string on_prompt(card_ptr origin_card, player_ptr origin, int ncubes) const;
+        int evaluate(card_ptr origin_card, player_ptr origin, int ncubes) const;
+        void on_play(card_ptr origin_card, player_ptr origin, int ncubes) const;
     };
 
     DEFINE_EFFECT(duck, effect_duck)

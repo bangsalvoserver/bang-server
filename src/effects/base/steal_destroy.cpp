@@ -192,6 +192,10 @@ namespace banggame {
         origin->m_game->queue_request<request_discard_hand>(origin_card, origin, origin);
     }
 
+    game_string effect_destroy::get_error(card_ptr origin_card, player_ptr origin, card_ptr target_card) const {
+        return {};
+    }
+
     prompt_string effect_destroy::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card, effect_flags flags) const {
         MAYBE_RETURN(prompts::prompt_target_self_card(origin_card, origin, target_card));
         MAYBE_RETURN(prompts::prompt_target_immunity(origin_card, origin, target_card->owner, flags));

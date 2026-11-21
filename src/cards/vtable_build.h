@@ -29,6 +29,7 @@ namespace banggame {
             case effect_target_type::none: return fun();
             case effect_target_type::player: return fun(static_cast<player_ptr>(target));
             case effect_target_type::card: return fun(static_cast<card_ptr>(target));
+            case effect_target_type::integer: return fun(*static_cast<int*>(target));
             default: std::unreachable();
         }
     }

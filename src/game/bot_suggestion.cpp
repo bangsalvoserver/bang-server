@@ -288,18 +288,18 @@ namespace banggame::bot_suggestion {
         }
 
         if (is_target_enemy(origin, target, action_type::damage)) {
-            return lethal ? 6 : 5;
+            return lethal ? 8 : 7;
         }
 
         if (is_target_friend(origin, target)) {
             if (lethal) {
                 return origin->is_sheriff() ? -20 : -10;
             } else {
-                return -2;
+                return -3;
             }
         }
         
-        return -1;
+        return -2;
     }
 
     int evaluate_soft_attack(const_player_ptr origin, const_player_ptr target) {

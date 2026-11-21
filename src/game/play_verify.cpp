@@ -8,8 +8,6 @@
 #include "cards/filter_enums.h"
 #include "cards/game_events.h"
 
-#include "target_types/armedanddangerous/select_cubes.h"
-
 #include "prompts.h"
 #include "filters.h"
 #include "game_table.h"
@@ -42,10 +40,12 @@ namespace banggame {
             cards.add(c);
         }
 
-        std::unordered_map<card_ptr, int> cubes;
-        for (card_ptr c : contexts::selected_cubes::get_all_cubes(ctx)) {
-            if (++cubes[c] > c->num_cubes()) {
-                return {"ERROR_NOT_ENOUGH_CUBES_ON", c};
+        if (auto cubes = ctx.get_all<contexts::selected_cube>()) {
+            std::unordered_map<card_ptr, int> cubes_by_card;
+            for (card_ptr c : cubes) {
+                if (++cubes_by_card[c] > c->num_cubes()) {
+                    return {"ERROR_NOT_ENOUGH_CUBES_ON", c};
+                }
             }
         }
 

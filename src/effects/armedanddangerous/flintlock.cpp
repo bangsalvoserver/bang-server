@@ -4,12 +4,14 @@
 
 #include "game/game_table.h"
 
-#include "target_types/armedanddangerous/select_cubes.h"
-
 namespace banggame {
 
-    void effect_flintlock::on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const {
-        if (contexts::selected_cubes::contains(ctx, origin_card)) {
+    int effect_flintlock::evaluate(card_ptr origin_card, player_ptr origin, int ncubes) const {
+        return ncubes;
+    }
+
+    void effect_flintlock::on_play(card_ptr origin_card, player_ptr origin, int ncubes) const {
+        if (ncubes != 0) {
             origin->m_game->add_listener<event_type::on_missed>(origin_card, [=](card_ptr missed_card, effect_flags flags, shared_request_bang req) {
                 if (origin == req->origin) {
                     origin->m_game->queue_action([=]{

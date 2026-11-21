@@ -21,6 +21,10 @@ namespace banggame {
         return {};
     }
 
+    int effect_beer::evaluate(card_ptr origin_card, player_ptr origin) const {
+        return origin->m_hp < origin->m_max_hp ? 10 : 0;
+    }
+
     void effect_beer::on_play(card_ptr origin_card, player_ptr target) const {
         if (target->m_game->num_alive() > 2) {
             target->heal(origin_card, target, get_beer_heal_amount(target));

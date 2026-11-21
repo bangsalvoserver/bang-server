@@ -17,6 +17,10 @@ namespace banggame {
         return {};
     }
 
+    int effect_heal::evaluate(card_ptr origin_card, player_ptr origin) const {
+        return 10 + amount;
+    }
+
     int effect_heal::evaluate(card_ptr origin_card, player_ptr origin, player_ptr target) const {
         if (bot_suggestion::is_target_friend(origin, target)) {
             int score = 4;

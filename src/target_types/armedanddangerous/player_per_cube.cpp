@@ -20,6 +20,9 @@ namespace banggame {
     }
 
     scored_target<targeting_player_per_cube::value_type> targeting_player_per_cube::random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
+        auto all_cubes = target_cubes.get_all_cubes(origin, ctx);
+        targeting_select_cubes::remove_bomb_cube(all_cubes);
+        
         auto players = target_player.possible_targets(origin_card, origin, effect, ctx);
 
         auto evaluate_fun = [&](player_ptr target) {
@@ -27,7 +30,7 @@ namespace banggame {
             return effect.evaluate(origin_card, origin, target, ctx);
         };
 
-        const size_t max_count = std::min<size_t>(count_cubes(origin), rn::distance(players) - extra_players);
+        const size_t max_count = std::min<size_t>(all_cubes.size(), rn::distance(players) - extra_players);
 
         const size_t count_targets = rn::count_if(players, [&](player_ptr p) { return evaluate_fun(p) >= 0; });
 
@@ -35,7 +38,7 @@ namespace banggame {
             ? std::min(count_targets - extra_players, max_count)
             : 0;
 
-        auto random_cubes = sample_elements(target_cubes.get_all_cubes(origin), ncubes, origin->m_game->bot_rng);
+        auto random_cubes = sample_elements(all_cubes, ncubes, origin->m_game->bot_rng);
         auto [random_players, score] = random_max_elements(players, ncubes + extra_players, evaluate_fun, origin->m_game->bot_rng);
         return { value_type{ std::move(random_cubes), std::move(random_players) }, score };
     }

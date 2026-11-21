@@ -10,7 +10,7 @@
 namespace banggame {
 
     int effect_draw::evaluate(card_ptr origin_card, player_ptr origin) const {
-        return 2 + ncards;
+        return ncards;
     }
 
     void effect_draw::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) const {

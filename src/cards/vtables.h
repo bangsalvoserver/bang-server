@@ -11,6 +11,7 @@ namespace banggame {
         none,
         player,
         card,
+        integer,
     };
 
     struct effect_vtable {
@@ -40,6 +41,10 @@ namespace banggame {
         return type->get_error(effect_value, origin_card, origin, target, effect_target_type::card, ctx);
     }
 
+    inline game_string effect_holder::get_error(card_ptr origin_card, player_ptr origin, int target, const effect_context &ctx) const {
+        return type->get_error(effect_value, origin_card, origin, &target, effect_target_type::integer, ctx);
+    }
+
     inline prompt_string effect_holder::on_prompt(card_ptr origin_card, player_ptr origin, effect_flags flags, const effect_context &ctx) const {
         return type->on_prompt(effect_value, origin_card, origin, nullptr, effect_target_type::none, flags, ctx);
     }
@@ -50,6 +55,10 @@ namespace banggame {
 
     inline prompt_string effect_holder::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target, effect_flags flags, const effect_context &ctx) const {
         return type->on_prompt(effect_value, origin_card, origin, target, effect_target_type::card, flags, ctx);
+    }
+
+    inline prompt_string effect_holder::on_prompt(card_ptr origin_card, player_ptr origin, int target, effect_flags flags, const effect_context &ctx) const {
+        return type->on_prompt(effect_value, origin_card, origin, &target, effect_target_type::integer, flags, ctx);
     }
 
     inline int effect_holder::evaluate(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const {
@@ -64,6 +73,10 @@ namespace banggame {
         return type->evaluate(effect_value, origin_card, origin, target, effect_target_type::card, ctx);
     }
 
+    inline int effect_holder::evaluate(card_ptr origin_card, player_ptr origin, int target, const effect_context &ctx) const {
+        return type->evaluate(effect_value, origin_card, origin, &target, effect_target_type::integer, ctx);
+    }
+
     inline void effect_holder::add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) const {
         type->add_context(effect_value, origin_card, origin, nullptr, effect_target_type::none, ctx);
     }
@@ -76,6 +89,10 @@ namespace banggame {
         type->add_context(effect_value, origin_card, origin, target, effect_target_type::card, ctx);
     }
 
+    inline void effect_holder::add_context(card_ptr origin_card, player_ptr origin, int target, effect_context &ctx) const {
+        type->add_context(effect_value, origin_card, origin, &target, effect_target_type::integer, ctx);
+    }
+
     inline void effect_holder::on_play(card_ptr origin_card, player_ptr origin, effect_flags flags, const effect_context &ctx) const {
         type->on_play(effect_value, origin_card, origin, nullptr, effect_target_type::none, flags, ctx);
     }
@@ -86,6 +103,10 @@ namespace banggame {
 
     inline void effect_holder::on_play(card_ptr origin_card, player_ptr origin, card_ptr target, effect_flags flags, const effect_context &ctx) const {
         type->on_play(effect_value, origin_card, origin, target, effect_target_type::card, flags, ctx);
+    }
+
+    inline void effect_holder::on_play(card_ptr origin_card, player_ptr origin, int target, effect_flags flags, const effect_context &ctx) const {
+        type->on_play(effect_value, origin_card, origin, &target, effect_target_type::integer, flags, ctx);
     }
     
     template<utils::fixed_string Name> struct effect_vtable_map;

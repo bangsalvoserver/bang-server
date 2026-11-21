@@ -386,7 +386,6 @@ Reusable components independent of the "Bang!" domain, used across all other mod
 | `function_ref.h` | A lightweight, non-owning reference to a function (an allocation-free alternative to `std::function`). |
 | `json_serial.h` | A generic JSON (de)serialization framework based on compile-time reflection (`serializer<T>`, `deserializer<T>`), used for all network messages and state updates. |
 | `parse_string.h` | Generic string→type parsing (`string_parser<T>`), used e.g. for `expansion_set` and `game_options::set_option`. |
-| `combinations.h` | `utils::combinations<T>(elems, n)`, a coroutine generator yielding every n-element combination of a vector — used by *Armed & Dangerous*'s `select_cubes` target type (`targeting_select_cubes::possible_targets`) to enumerate every valid way to pick `ncubes` cubes out of a player's available ones. |
 | `int_set.h` | An efficient set of small integers (bitset). |
 | `nullable.h` | A wrapper for optional values with custom semantics. |
 | `random_element.h` | Extraction of a uniformly random element from a range, throwing a plain `std::runtime_error` if the range is empty; used by several card effects that need a random pick from a non-empty collection. |

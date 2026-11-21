@@ -9,8 +9,6 @@
 
 #include "effects/base/predraw_check.h"
 
-#include "target_types/armedanddangerous/select_cubes.h"
-
 #include "ruleset.h"
 
 namespace banggame {
@@ -68,7 +66,7 @@ namespace banggame {
 
     void equip_bomb::on_enable(card_ptr target_card, player_ptr target) const {
         target->m_game->add_listener<event_type::get_select_cubes_prompt>(target_card, [=](player_ptr origin, const effect_context &ctx) -> game_string {
-            if (origin == target && !target->is_ghost() && contexts::selected_cubes::count_selected_on(ctx, target_card) >= target_card->num_cubes()) {
+            if (origin == target && !target->is_ghost() && rn::count(ctx.get_all<contexts::selected_cube>(), target_card) >= target_card->num_cubes()) {
                 return {"PROMPT_EXPLODE_BOMB", target_card};
             }
             return {};
