@@ -217,7 +217,7 @@ character:
 hidden:
   - name: TORNADO
     responses:
-      - none cards(2) self | hand
+      - gift_card cards(2) self | hand
       - tornado2_response
     tags:
       - preselect

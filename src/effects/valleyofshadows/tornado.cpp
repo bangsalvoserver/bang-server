@@ -156,7 +156,7 @@ namespace banggame {
 
     int effect_tornado2_response::evaluate(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const {
         int score = 0;
-        for (card_ptr target_card : ctx.get_all<contexts::selected_card>()) {
+        for (card_ptr target_card : ctx.get_all<contexts::gifted_card>()) {
             score += bot_suggestion::evaluate_discard_card(origin, target_card);
         }
         return score;
@@ -164,6 +164,6 @@ namespace banggame {
 
     void effect_tornado2_response::on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const {
         auto req = origin->m_game->top_request<request_tornado2>();
-        req->on_resolve(ctx.get_all<contexts::selected_card>() | rn::to<card_list>());
+        req->on_resolve(ctx.get_all<contexts::gifted_card>() | rn::to<card_list>());
     }
 }
