@@ -288,18 +288,18 @@ namespace banggame::bot_suggestion {
         }
 
         if (is_target_enemy(origin, target, action_type::damage)) {
-            return lethal ? 6 : 5;
+            return lethal ? 8 : 7;
         }
 
         if (is_target_friend(origin, target)) {
             if (lethal) {
                 return origin->is_sheriff() ? -20 : -10;
             } else {
-                return -2;
+                return -3;
             }
         }
         
-        return -1;
+        return -2;
     }
 
     int evaluate_soft_attack(const_player_ptr origin, const_player_ptr target) {
@@ -394,7 +394,7 @@ namespace banggame::bot_suggestion {
 
     int evaluate_discard_card(const_player_ptr origin, const_card_ptr target_card) {
         if (auto value = target_card->get_tag_value(tag_type::strong)) {
-            return -5 - *value;
+            return -2 - *value;
         }
 
         if (target_card->pocket == pocket_type::player_table && target_card->has_tag(tag_type::penalty)) {
@@ -415,7 +415,7 @@ namespace banggame::bot_suggestion {
 
         if (origin->m_hp <= 2 && (target_card->has_tag(tag_type::missedcard)
             || target_card->has_tag(tag_type::count_as_missed))) {
-            return -2;
+            return -3;
         }
 
         return 0;
