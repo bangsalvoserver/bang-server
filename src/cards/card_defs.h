@@ -290,6 +290,10 @@ namespace banggame {
         struct selected_card {
             card_ptr value;
         };
+
+        struct selected_cube {
+            card_ptr value;
+        };
     }
 
 }

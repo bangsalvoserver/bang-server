@@ -12,8 +12,7 @@ main_deck:
     image: 17_carovana
     color: brown
     effects:
-      - none select_cubes_repeat(2)
-      - caravan
+      - caravan(2) select_cubes_repeat(2)
       - changewws
     tags:
       - strong(4)
@@ -27,8 +26,7 @@ main_deck:
     image: 17_cicchetto
     color: brown
     effects:
-      - none select_cubes_repeat(3)
-      - a_little_nip
+      - a_little_nip select_cubes_repeat(3)
   - name: QUICK_SHOT
     signs:
       - 3 spades
@@ -45,8 +43,8 @@ main_deck:
     image: 17_flintlock
     color: brown
     effects:
-      - bang select_cubes_player(2) alive reachable notself
-      - flintlock
+      - bang player alive reachable notself
+      - flintlock select_cubes_repeat(2, 1)
     tags:
       - skip_logs
       - ranged_effect
@@ -67,8 +65,7 @@ main_deck:
     color: brown
     responses:
       - missed
-      - none select_cubes_optional(2)
-      - duck
+      - duck select_cubes_repeat(2, 1)
     tags:
       - strong(2)
   - <<: *missed
@@ -95,8 +92,8 @@ main_deck:
     image: 17_squaw
     color: brown
     effects:
-      - none select_cubes_optional(2)
       - squaw card | table
+      - squaw select_cubes_repeat(2, 1)
     tags:
       - skip_logs
   - name: ACE_UP_THE_SLEEVE

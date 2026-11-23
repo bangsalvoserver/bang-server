@@ -65,7 +65,7 @@ namespace banggame {
                 return {"ERROR_TARGET_EMPTY_TABLE", origin_card, target};
 
             case target_player_filter::not_empty_cubes:
-                if (count_cubes(target) != 0) continue;
+                if (rn::any_of(cube_slots(target), [](card_ptr c) { return c->num_cubes() != 0; })) continue;
                 return {"ERROR_TARGET_EMPTY_CUBES", origin_card, target};
 
             case target_player_filter::reachable:

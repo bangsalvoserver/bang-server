@@ -6,13 +6,16 @@
 
 #include "game/possible_to_play.h"
 
+#include "select_cubes.h"
+
 namespace banggame {
 
     static auto make_move_cube_target_set(player_ptr origin, card_ptr origin_card, const effect_context &ctx) {
         return origin->m_table
             | rv::filter(&card::is_orange)
             | rv::for_each([](card_ptr slot) {
-                return rv::repeat(slot, max_cubes_per_card - slot->num_cubes());
+                int score = slot->has_tag(tag_type::penalty) ? -1 : 0;
+                return rv::repeat(scored_cube{slot, score}, max_cubes_per_card - slot->num_cubes());
             });
     }
 
@@ -21,12 +24,15 @@ namespace banggame {
             && contains_at_least(make_move_cube_target_set(origin, origin_card, ctx), 1);
     }
 
-    card_list targeting_move_cube_slot::random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
-        return random_elements(
-            make_move_cube_target_set(origin, origin_card, ctx),
-            std::min(origin->get_character()->num_cubes(), max_cubes),
-            origin->m_game->bot_rng
-        );
+    scored_target<card_list> targeting_move_cube_slot::random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
+        auto targets = make_move_cube_target_set(origin, origin_card, ctx);
+        
+        int positive_count = rn::count_if(targets, [](const auto &cube) { return cube.score >= 0; });
+        int ncubes = std::min({ origin->get_character()->num_cubes(), max_cubes, std::max(1, positive_count) });
+
+        auto [random_cubes, cube_score] = random_max_elements(targets, ncubes, origin->m_game->bot_rng, &scored_cube::score, &scored_cube::target);
+
+        return { std::move(random_cubes), positive_count >= ncubes ? 0 : -20 };
     }
 
     game_string targeting_move_cube_slot::get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &targets) const {

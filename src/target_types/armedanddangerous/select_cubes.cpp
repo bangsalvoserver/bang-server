@@ -1,19 +1,44 @@
 #include "select_cubes.h"
 
+#include "cards/filter_enums.h"
+
 #include "effects/armedanddangerous/ruleset.h"
 
 #include "game/game_table.h"
 
-#include "utils/combinations.h"
-
 namespace banggame {
 
-    std::generator<card_list> targeting_select_cubes::possible_targets(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
-        return utils::combinations(rn::to<card_list>(get_all_cubes(origin)), ncubes);
+    scored_cube_list get_all_cubes(player_ptr origin, const effect_context &ctx) {
+        scored_cube_list result;
+        for (card_ptr slot : cube_slots(origin)) {
+            int count = slot->num_cubes();
+            count -= rn::count(ctx.get_all<contexts::selected_cube>(), slot);
+
+            int score = 0;
+            if (slot->pocket == pocket_type::player_character) {
+                score += 5;
+            }
+            if (auto value = slot->get_tag_value(tag_type::penalty)) {
+                score += *value >= 0 ? 10 : -3;
+            }
+            for (int i=0; i<count; ++i) {
+                result.emplace_back(slot, score + i);
+            }
+        }
+        return result;
     }
 
-    card_list targeting_select_cubes::random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
-        return random_elements(get_all_cubes(origin), ncubes, origin->m_game->bot_rng);
+    bool targeting_select_cubes::is_possible(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
+        return get_all_cubes(origin, ctx).size() >= ncubes;
+    }
+
+    scored_target<card_list> targeting_select_cubes::random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
+        auto all_cubes = get_all_cubes(origin, ctx);
+        int positive_count = rn::count_if(all_cubes, [](const auto &cube) { return cube.score >= 0; });
+
+        auto [random_cubes, cube_score] = random_max_elements(all_cubes, ncubes, origin->m_game->bot_rng, &scored_cube::score, &scored_cube::target);
+        
+        return { std::move(random_cubes), positive_count >= ncubes ? 0 : -20 };
     }
 
     game_string targeting_select_cubes::get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &target_cards) const {
@@ -33,7 +58,9 @@ namespace banggame {
     }
 
     void targeting_select_cubes::add_context(card_ptr origin_card, player_ptr origin, const effect_holder &effect, effect_context &ctx, const card_list &target_cards) const {
-        ctx.add(contexts::selected_cubes{ origin_card, target_cards });
+        for (card_ptr target_card : target_cards) {
+            ctx.add(contexts::selected_cube{ target_card });
+        }
     }
 
     void targeting_select_cubes::on_play(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &target_cards) const {
