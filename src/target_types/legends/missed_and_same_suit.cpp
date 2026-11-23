@@ -33,7 +33,7 @@ namespace banggame {
         auto range = target_card.possible_targets(origin_card, origin, effect, ctx);
         auto missed_cards = missed_cards_with_same_suits_range(origin, range, ncards);
         card_ptr missed_card = random_element(missed_cards, origin->m_game->bot_rng);
-        auto result = sample_elements(
+        auto result = random_elements(
             cards_with_same_suits_range(range, missed_card),
             ncards - 1, origin->m_game->bot_rng
         );

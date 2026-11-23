@@ -38,7 +38,7 @@ namespace banggame {
         for (player_ptr target : origin->m_game->range_all_players(origin)) {
             if (target != skipped_player && !check_player_filter(origin_card, origin, player_filter, target, ctx)) {
                 if (auto targets = cards_target_set(origin, origin_card, card_filter, target, ctx)) {
-                    auto [target, score] = random_max_element(targets, evaluate_fun, origin->m_game->bot_rng);
+                    auto [target, score] = random_max_element(targets, origin->m_game->bot_rng, evaluate_fun);
                     ret.target.push_back(target);
                     ret.score += score;
                 }

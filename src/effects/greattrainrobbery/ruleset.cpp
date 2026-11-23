@@ -22,7 +22,7 @@ namespace banggame {
     static void init_stations_and_train(player_ptr origin) {
         origin->m_game->remove_cards(origin->m_game->m_stations);
 
-        origin->m_game->add_cards_to(sample_elements(
+        origin->m_game->add_cards_to(random_elements(
             origin->m_game->m_stations_deck,
             std::max(int(origin->m_game->m_players.size()), 4),
             origin->m_game->rng

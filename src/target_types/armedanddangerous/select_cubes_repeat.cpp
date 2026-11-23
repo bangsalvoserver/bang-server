@@ -8,7 +8,7 @@ namespace banggame {
         size_t max_count = count_cubes(origin) / ncubes;
         size_t num_repeats = std::uniform_int_distribution<size_t>{0, max_count}(origin->m_game->bot_rng);
 
-        return sample_elements(get_all_cubes(origin), ncubes * num_repeats, origin->m_game->bot_rng);
+        return random_elements(get_all_cubes(origin), ncubes * num_repeats, origin->m_game->bot_rng);
     }
     
     void targeting_select_cubes_repeat::add_context(card_ptr origin_card, player_ptr origin, const effect_holder &effect, effect_context &ctx, const card_list &target) const {

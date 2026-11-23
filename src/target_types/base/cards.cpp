@@ -16,10 +16,11 @@ namespace banggame {
     scored_target<card_list> targeting_cards::random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
         return random_max_elements(
             target_card.possible_targets(origin_card, origin, effect, ctx), ncards,
+            origin->m_game->bot_rng,
             [&](card_ptr target) {
                 if (effect.on_prompt(origin_card, origin, target, {}, ctx)) return -2;
                 return effect.evaluate(origin_card, origin, target, ctx);
-            }, origin->m_game->bot_rng
+            }
         );
     }
 

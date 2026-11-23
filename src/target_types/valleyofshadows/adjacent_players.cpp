@@ -52,6 +52,7 @@ namespace banggame {
     scored_target<player_list> targeting_adjacent_players::random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
         return random_max_element(
             possible_targets(origin_card, origin, effect, ctx),
+            origin->m_game->bot_rng,
             [&](const player_list &targets) {
                 int score = 0;
                 for (player_ptr target : targets) {
@@ -59,8 +60,7 @@ namespace banggame {
                     else score += effect.evaluate(origin_card, origin, target, ctx);
                 }
                 return score;
-            },
-            origin->m_game->bot_rng
+            }
         );
     }
 

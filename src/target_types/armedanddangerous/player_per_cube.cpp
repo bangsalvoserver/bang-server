@@ -35,8 +35,8 @@ namespace banggame {
             ? std::min(count_targets - extra_players, max_count)
             : 0;
 
-        auto random_cubes = sample_elements(target_cubes.get_all_cubes(origin), ncubes, origin->m_game->bot_rng);
-        auto [random_players, score] = random_max_elements(players, ncubes + extra_players, evaluate_fun, origin->m_game->bot_rng);
+        auto random_cubes = random_elements(target_cubes.get_all_cubes(origin), ncubes, origin->m_game->bot_rng);
+        auto [random_players, score] = random_max_elements(players, ncubes + extra_players, origin->m_game->bot_rng, evaluate_fun);
         return { value_type{ std::move(random_cubes), std::move(random_players) }, score };
     }
 

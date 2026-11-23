@@ -22,7 +22,7 @@ namespace banggame {
     }
 
     card_list targeting_move_cube_slot::random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
-        return sample_elements(
+        return random_elements(
             make_move_cube_target_set(origin, origin_card, ctx),
             std::min(origin->get_character()->num_cubes(), max_cubes),
             origin->m_game->bot_rng

@@ -27,9 +27,9 @@ namespace banggame {
         
         if (ncards == 0) {
             size_t count_targets = rn::count_if(targets, [&](card_ptr c) { return evaluate_fun(c) >= 0; });
-            return random_max_elements(targets, count_targets == 0 ? 1 : count_targets, evaluate_fun, origin->m_game->bot_rng);
+            return random_max_elements(targets, count_targets == 0 ? 1 : count_targets, origin->m_game->bot_rng, evaluate_fun);
         } else {
-            return random_max_elements(targets, ncards, evaluate_fun, origin->m_game->bot_rng);
+            return random_max_elements(targets, ncards, origin->m_game->bot_rng, evaluate_fun);
         }
     }
 

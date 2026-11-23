@@ -13,7 +13,7 @@ namespace banggame {
     }
 
     card_list targeting_select_cubes::random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
-        return sample_elements(get_all_cubes(origin), ncubes, origin->m_game->bot_rng);
+        return random_elements(get_all_cubes(origin), ncubes, origin->m_game->bot_rng);
     }
 
     game_string targeting_select_cubes::get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &target_cards) const {

@@ -16,9 +16,9 @@ namespace banggame {
         };
 
         if (rn::begin(bang_targets) != rn::end(bang_targets)) {
-            return random_max_elements(bang_targets, 1, evaluate_fun, origin->m_game->bot_rng);
+            return random_max_elements(bang_targets, 1, origin->m_game->bot_rng, evaluate_fun);
         }
-        return random_max_elements(targets, ncards, evaluate_fun, origin->m_game->bot_rng);
+        return random_max_elements(targets, ncards, origin->m_game->bot_rng, evaluate_fun);
     }
 
     game_string targeting_bang_or_cards::get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &targets) const {

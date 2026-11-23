@@ -20,7 +20,7 @@ namespace banggame {
     }
 
     static void add_greygory_deck_characters(card_ptr origin_card, player_ptr origin, bool allow_expansions) {
-        card_list characters = sample_elements(get_possible_cards(origin_card, origin, allow_expansions), 2, origin->m_game->rng);
+        card_list characters = random_elements(get_possible_cards(origin_card, origin, allow_expansions), 2, origin->m_game->rng);
 
         origin->m_game->add_cards_to(characters, pocket_type::player_character, origin, card_visibility::shown);
         for (card_ptr c : characters) {
