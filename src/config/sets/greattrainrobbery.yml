@@ -7,6 +7,8 @@ main_deck:
     responses:
       - missed
       - cactus
+    tags:
+      - missedlike
   - name: DRAGOON
     signs:
       - J spades
@@ -24,6 +26,8 @@ main_deck:
     color: brown
     responses:
       - evaded
+    tags:
+      - missedlike
   - name: FULL_STEAM
     signs:
       - 2 spades

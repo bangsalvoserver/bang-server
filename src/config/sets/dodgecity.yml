@@ -109,6 +109,8 @@ main_deck:
     responses:
       - missed
       - draw
+    tags:
+      - missedlike
   - name: SPRINGFIELD
     signs:
       - K spades

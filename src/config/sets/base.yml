@@ -261,6 +261,7 @@ main_deck:
       - missedcard
     tags:
       - missedcard
+      - missedlike
   - &panic
     name: PANIC
     signs:

@@ -67,6 +67,7 @@ namespace banggame {
         penalty, // whether this is a "bad" equip card
         strong, // controls bot decisions
         healing, // whether this is a card that heals
+        missedlike, // whether this is a card that be used to avoid a Bang!
         
         // Expansion logic tags
         force_allow, // bypass only_base_characters

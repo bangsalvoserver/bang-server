@@ -68,6 +68,7 @@ main_deck:
       - duck select_cubes_repeat(2, 1)
     tags:
       - strong(2)
+      - missedlike
   - <<: *missed
     signs:
       - K spades

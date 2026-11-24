@@ -383,9 +383,7 @@ namespace banggame::bot_suggestion {
             return -2;
         }
 
-        if (origin->m_hp < origin->m_max_hp && (target_card->has_tag(tag_type::healing)
-            || target_card->has_tag(tag_type::missedcard)
-            || target_card->has_tag(tag_type::count_as_missed))) {
+        if (origin->m_hp < origin->m_max_hp && (target_card->has_tag(tag_type::healing) || target_card->has_tag(tag_type::missedlike))) {
             return 2;
         }
 
@@ -413,8 +411,7 @@ namespace banggame::bot_suggestion {
             return -2;
         }
 
-        if (origin->m_hp <= 2 && (target_card->has_tag(tag_type::missedcard)
-            || target_card->has_tag(tag_type::count_as_missed))) {
+        if (origin->m_hp <= 2 && target_card->has_tag(tag_type::missedlike)) {
             return -3;
         }
 

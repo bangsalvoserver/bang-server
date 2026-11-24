@@ -27,6 +27,7 @@ main_deck:
       - mirage
     tags:
       - count_as_missed
+      - missedlike
   - name: BLOOD_PACT
     signs:
       - J hearts
@@ -50,6 +51,7 @@ main_deck:
       - disarm
     tags:
       - count_as_missed
+      - missedlike
   - name: MOLOTOV
     signs:
       - A hearts
@@ -198,6 +200,7 @@ main_deck:
       - bang conditional_player alive notself range_1
     tags:
       - count_as_missed
+      - missedlike
   - name: ON_THE_HOUSE
     signs:
       - K hearts

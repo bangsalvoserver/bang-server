@@ -107,6 +107,7 @@ main_deck:
       - backfire
     tags:
       - count_as_missed
+      - missedlike
   - name: SAVED
     signs:
       - 5 hearts
