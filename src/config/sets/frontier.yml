@@ -166,7 +166,7 @@ main_deck:
       - predraw_check(-3)
       - coyotes
     tags:
-      - penalty
+      - penalty(-1)
   - name: FEUD
     image: 28_faida
     signs:
