@@ -6,20 +6,31 @@
 
 namespace banggame {
 
-    scored_target<card_list> targeting_select_cubes_repeat::random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
-        auto all_cubes = get_all_cubes(origin, ctx);
-
-        int max_count = rn::count_if(all_cubes, [](const auto &cube) { return cube.score >= 0; }) / ncubes;
+    static auto get_possible_targets(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const scored_cube_list &all_cubes, int ncubes, int max_repeats) {
+        int max_count = all_cubes.size() / ncubes;
         if (max_repeats != 0 && max_count > max_repeats) {
             max_count = max_repeats;
         }
+
+        return rv::iota(0, max_count + 1) | rv::filter([=, &ctx](int n) {
+            return !effect.get_error(origin_card, origin, n, ctx);
+        });
+    }
+
+    bool targeting_select_cubes_repeat::is_possible(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
+        return !rn::empty(get_possible_targets(origin_card, origin, effect, ctx, get_all_cubes(origin, ctx), ncubes, max_repeats));
+    }
+
+    scored_target<card_list> targeting_select_cubes_repeat::random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) const {
+        auto all_cubes = get_all_cubes(origin, ctx);
+        
+        int positive_count = rn::count_if(all_cubes, [](const auto &cube) { return cube.score >= 0; });
         
         auto [num_repeats, score] = random_max_element(
-            rv::iota(0, max_count + 1) | rv::filter([&](int n) {
-                return !effect.get_error(origin_card, origin, n, ctx);
-            }),
+            get_possible_targets(origin_card, origin, effect, ctx, all_cubes, ncubes, max_repeats),
             origin->m_game->bot_rng,
             [&](int n) {
+                if (n * ncubes > positive_count) return -20;
                 if (effect.on_prompt(origin_card, origin, n, {}, ctx)) return -2;
                 return effect.evaluate(origin_card, origin, n, ctx);
             }
