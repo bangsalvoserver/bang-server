@@ -1,5 +1,7 @@
 #include "rust.h"
 
+#include "cards/filter_enums.h"
+
 #include "game/game_table.h"
 #include "game/prompts.h"
 
@@ -37,6 +39,17 @@ namespace banggame {
     prompt_string effect_rust::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) const {
         MAYBE_RETURN(prompts::prompt_target_immunity(origin_card, origin, target, flags));
         return {};
+    }
+
+    int effect_rust::evaluate(card_ptr origin_card, player_ptr origin, player_ptr target) const {
+        for (card_ptr slot : cube_slots(target)) {
+            if (auto value = slot->get_tag_value(tag_type::penalty)) {
+                if (*value < 0 && slot->num_cubes() <= 1) {
+                    return bot_suggestion::evaluate_attack(origin, target);
+                }
+            }
+        }
+        return bot_suggestion::evaluate_soft_attack(origin, target);
     }
     
     void effect_rust::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) const {
