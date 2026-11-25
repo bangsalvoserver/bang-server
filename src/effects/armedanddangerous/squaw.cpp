@@ -2,6 +2,8 @@
 
 #include "effects/base/steal_destroy.h"
 
+#include "cards/game_enums.h"
+
 #include "game/game_table.h"
 #include "game/prompts.h"
 #include "game/bot_suggestion.h"
@@ -30,13 +32,13 @@ namespace banggame {
         return {};
     }
 
-    prompt_string effect_squaw::on_prompt(card_ptr origin_card, player_ptr origin, int ncubes, effect_flags flags, const effect_context &ctx) const {
+    prompt_string effect_squaw::on_prompt(card_ptr origin_card, player_ptr origin, int ncubes, const effect_context &ctx) const {
         card_ptr target_card = ctx.get<contexts::squaw_target>();
         if (target_card->owner) {
             if (ncubes != 0) {
-                return effect_steal{}.on_prompt(origin_card, origin, target_card, flags);
+                return effect_steal{}.on_prompt(origin_card, origin, target_card, effect_flag::single_target);
             } else {
-                return effect_destroy{}.on_prompt(origin_card, origin, target_card, flags);
+                return effect_destroy{}.on_prompt(origin_card, origin, target_card, effect_flag::single_target);
             }
         }
         return {};
@@ -46,13 +48,13 @@ namespace banggame {
         return ncubes;
     }
 
-    void effect_squaw::on_play(card_ptr origin_card, player_ptr origin, int ncubes, effect_flags flags, const effect_context &ctx) const {
+    void effect_squaw::on_play(card_ptr origin_card, player_ptr origin, int ncubes, const effect_context &ctx) const {
         card_ptr target_card = ctx.get<contexts::squaw_target>();
         if (target_card->owner) {
             if (ncubes != 0) {
-                effect_steal{}.on_play(origin_card, origin, target_card, flags);
+                effect_steal{}.on_play(origin_card, origin, target_card, effect_flag::single_target);
             } else {
-                effect_destroy{}.on_play(origin_card, origin, target_card, flags);
+                effect_destroy{}.on_play(origin_card, origin, target_card, effect_flag::single_target);
             }
         }
     }
