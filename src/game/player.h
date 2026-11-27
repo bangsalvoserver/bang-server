@@ -28,7 +28,7 @@ namespace banggame {
 
         player(game_ptr game, int id): m_game(game), id(id) {}
 
-        void equip_card(card_ptr card, bool skip_enable = false);
+        void equip_card(card_ptr card, bool skip_enable = false, bool instant = false);
         card_ptr find_equipped_card(const_card_ptr card) const;
 
         void enable_equip(card_ptr target_card);
@@ -36,8 +36,8 @@ namespace banggame {
 
         card_ptr random_hand_card() const;
         
-        void add_to_hand(card_ptr card);
-        void draw_card(int ncards = 1, card_ptr origin_card = nullptr);
+        void add_to_hand(card_ptr card, bool instant = false);
+        void draw_card(int ncards = 1, card_ptr origin_card = nullptr, bool instant = false);
 
         bool disown_card(card_ptr target_card, bool used = false);
         

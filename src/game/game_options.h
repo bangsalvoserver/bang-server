@@ -24,6 +24,7 @@ namespace banggame {
         bool prompt_target_immunity = false;
         bool allow_bot_rejoin = false;
         bool only_base_characters = false;
+        bool instant_initial_draw = false;
         int scenario_deck_size = 12;
         game_duration auto_resolve_timer = 1000ms;
         game_duration damage_timer = 1500ms;

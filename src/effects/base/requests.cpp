@@ -34,10 +34,12 @@ namespace banggame {
 
             target->m_game->add_log("LOG_CHARACTER_CHOICE", target, character);
 
-            character->set_visibility(card_visibility::shown);
+            bool instant = target->m_game->m_options.instant_initial_draw;
+
+            character->set_visibility(card_visibility::shown, nullptr, instant);
 
             target->m_max_hp = target->get_character_max_hp();
-            target->set_hp(target->m_max_hp);
+            target->set_hp(target->m_max_hp, instant);
 
             target->enable_equip(character);
         }, 190);

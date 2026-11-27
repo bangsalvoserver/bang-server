@@ -550,7 +550,7 @@ namespace banggame {
             for (int i=0; i<cycles; ++i) {
                 for (const auto &[p, ncards] : rv::zip(players, initial_cards)) {
                     if (p->m_hand.size() < ncards) {
-                        p->draw_card();
+                        p->draw_card(1, nullptr, m_options.instant_initial_draw);
                     }
                 }
             }

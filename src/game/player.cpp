@@ -46,9 +46,9 @@ namespace banggame {
         return alive() || m_player_flags.check(player_flag::keep_alive);
     }
 
-    void player::equip_card(card_ptr target, bool skip_enable) {
+    void player::equip_card(card_ptr target, bool skip_enable, bool instant) {
         pocket_position position = target->has_tag(tag_type::weapon) ? pocket_position::begin : pocket_position::end;
-        target->move_to(pocket_type::player_table, this, card_visibility::shown, false, position);
+        target->move_to(pocket_type::player_table, this, card_visibility::shown, instant, position);
         if (!skip_enable) {
             enable_equip(target);
         }
@@ -269,18 +269,18 @@ namespace banggame {
         return rn::all_of(m_table, &card::is_black);
     }
 
-    void player::add_to_hand(card_ptr target) {
+    void player::add_to_hand(card_ptr target, bool instant) {
         if (target->deck == card_deck_type::train) {
-            equip_card(target);
+            equip_card(target, false, instant);
         } else {
             target->move_to(pocket_type::player_hand, this, m_game->check_flags(game_flag::hands_shown)
-                ? card_visibility::shown : card_visibility::show_owner);
+                ? card_visibility::shown : card_visibility::show_owner, instant);
         }
         m_game->call_event(event_type::on_drawn_any_card{ target });
         m_game->call_event(event_type::on_card_added_to_hand{ this, target });
     }
 
-    void player::draw_card(int ncards, card_ptr origin_card) {
+    void player::draw_card(int ncards, card_ptr origin_card, bool instant) {
         if (origin_card) {
             m_game->call_event(event_type::on_extra_cards_drawn{ this, origin_card, ncards });
         }
@@ -306,7 +306,7 @@ namespace banggame {
                     m_game->add_log(update_target::includes(this), "LOG_DRAWN_CARD", this, drawn_card);
                 }
             }
-            add_to_hand(drawn_card);
+            add_to_hand(drawn_card, instant);
         }
     }
 
