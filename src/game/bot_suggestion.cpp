@@ -375,6 +375,10 @@ namespace banggame::bot_suggestion {
             return 4 + *value;
         }
 
+        if (target_card->has_tag(tag_type::jail)) {
+            return 1;
+        }
+
         if (origin->is_ghost()) {
             return 0;
         }
