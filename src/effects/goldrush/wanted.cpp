@@ -18,11 +18,14 @@ namespace banggame {
     }
 
     int equip_wanted::evaluate(card_ptr origin_card, player_ptr origin, player_ptr target) const {
-        if (bot_suggestion::is_target_enemy(origin, target, bot_suggestion::action_type::jail)){
+        switch (bot_suggestion::get_alignment(origin, target)) {
+        case bot_suggestion::player_alignment::enemy:
             return 5;
-        } else if (bot_suggestion::is_target_friend(origin, target)) {
+        case bot_suggestion::player_alignment::friendly:
             return -5;
-        } else {
+        case bot_suggestion::player_alignment::maybe_enemy:
+        case bot_suggestion::player_alignment::neutral:
+        default:
             return -1;
         }
     }

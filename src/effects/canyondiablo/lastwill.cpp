@@ -81,7 +81,7 @@ namespace banggame {
 
     int effect_lastwill::evaluate(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) const {
         // do not use evaluate_help here, because effect_lastwill_select::evaluate could return a number too high
-        if (bot_suggestion::is_target_friend(origin, target)) {
+        if (bot_suggestion::get_alignment(origin, target) == bot_suggestion::player_alignment::friendly) {
             return 10;
         }
         return -50;

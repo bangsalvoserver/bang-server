@@ -522,12 +522,12 @@ which YAML can then reference exactly like any other rule, e.g. `color(card_colo
 
 Bot preferences belong in `evaluate`. Evaluation methods return an integer score: higher scores are preferred when the bot chooses among candidate targets or picks, and negative scores can discourage a candidate. Return `0` when the choice has no special preference. These scores never make an action illegal and do not affect human choices; use `get_error` only for actual rules violations.
 
-For example, if a healing card should favor friends, score its player target using the shared role heuristic:
+For example, if a healing card should favor friends, score its player target using the shared role heuristic, `bot_suggestion::get_alignment`:
 
 ```cpp
 struct effect_comrades_aid {
     int evaluate(card_ptr, player_ptr origin, player_ptr target) const {
-        if (bot_suggestion::is_target_friend(origin, target)) {
+        if (bot_suggestion::get_alignment(origin, target) == bot_suggestion::player_alignment::friendly) {
             return 5;
         }
         return -5;
@@ -541,15 +541,26 @@ struct effect_comrades_aid {
 
 Use the appropriate evaluation hook for the decision being made: `evaluate` on effects/equips/handlers, `evaluate_pick` on a pending card or player pick, `evaluate_resolve` for resolving a request, `evaluate_escape` for escaping, and `evaluate_redraw` for redraw decisions. Pick and resolve request interfaces default to `0`, so only override them when that request has a preference. Prefer shared helpers such as `bot_suggestion::evaluate_attack`, `evaluate_soft_attack`, and `evaluate_help` when their semantics fit.
 
+When a card needs its own judgment about a player target, call `bot_suggestion::get_alignment(origin, target)`, which returns a `player_alignment` from the point of view of `origin`:
+
+| Value | Meaning |
+|-------|---------|
+| `enemy` | The bot is confident the target is hostile (known role, accumulated karma, or free-for-all). |
+| `maybe_enemy` | The target's side is not certain, but a hidden-role bot with no better information should still treat it as a likely enemy (for example, a Sheriff or Deputy looking at a player with neutral karma). |
+| `friendly` | The target is an ally. `origin` is always friendly to itself. |
+| `neutral` | The target is neither a friend nor a worthwhile enemy (for example, a Renegade looking at a player it does not need to fight yet, or any target in a 3-player game that is not its designated opponent). |
+
+Handle all four values explicitly in a `switch`. Most effects treat `enemy` and `maybe_enemy` the same way, but effects where a mistaken target is costly (such as placing Jail) should accept only `enemy` and score `maybe_enemy` like `neutral`. `maybe_enemy` is not a synonym for "not a friend": unlike the old `is_target_enemy`/`is_target_friend` pair, the alignment is computed once, so do not combine it with extra role checks to recover the old `action_type::damage`/`jail` behaviour.
+
 Keep `on_prompt` for human-facing warnings or confirmations, such as target immunity. A prompt can still cause the bot's verifier to retry a candidate, so bot-only preference prompts should be migrated to `evaluate` rather than added to new effects.
 
 ---
 
 ## Case 11 — Scoring targets for bots
 
-Target handlers use `random_max_element` to select among legal targets with the highest score. Effects provide that score through `evaluate`: `bot_suggestion::evaluate_attack` accounts for damage and lethal HP, while `bot_suggestion::evaluate_soft_attack` uses `action_type::neutral` and ignores HP. For effects that hit several players, `targeting_players::random_target` sums the evaluation for each affected player. Equal-scoring target choices remain random.
+Target handlers use `random_max_element` to select among legal targets with the highest score. Effects provide that score through `evaluate`: `bot_suggestion::evaluate_attack` accounts for damage and lethal HP, while `bot_suggestion::evaluate_soft_attack` ignores HP and treats `enemy` and `maybe_enemy` targets alike. For effects that hit several players, `targeting_players::random_target` sums the evaluation for each affected player. Equal-scoring target choices remain random.
 
-For example, `effect_bang::evaluate` delegates to `evaluate_attack`, so the bot considers alignment and whether the target is close to death. A non-damaging effect that should prefer enemies can use `evaluate_soft_attack` instead. The scoring affects bot target selection without making an otherwise legal choice invalid for a human or bot.
+For example, `effect_bang::evaluate` delegates to `evaluate_attack`, so the bot considers alignment (`enemy` scores higher than `maybe_enemy`) and whether the target is close to death. A non-damaging effect that should prefer enemies can use `evaluate_soft_attack` instead. The scoring affects bot target selection without making an otherwise legal choice invalid for a human or bot.
 
 ---
 

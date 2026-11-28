@@ -22,7 +22,11 @@ namespace banggame {
     }
 
     int effect_heal::evaluate(card_ptr origin_card, player_ptr origin, player_ptr target) const {
-        if (bot_suggestion::is_target_friend(origin, target)) {
+        switch (bot_suggestion::get_alignment(origin, target)) {
+        case bot_suggestion::player_alignment::enemy:
+        case bot_suggestion::player_alignment::maybe_enemy:
+            return -5;
+        case bot_suggestion::player_alignment::friendly: {
             int score = 4;
             if (target->m_hp <= 2) {
                 if (target->is_sheriff()) {
@@ -32,13 +36,15 @@ namespace banggame {
                 }
             }
             return score;
-        } else if (bot_suggestion::is_target_enemy(origin, target)) {
-            return -5;
-        } else if (target->is_sheriff() && target->m_hp <= 1) {
-            // Renegade will try to save the sheriff
-            return 2;
-        } else {
-            return -2;
+        }
+        case bot_suggestion::player_alignment::neutral:
+        default:
+            if (target->is_sheriff() && target->m_hp <= 1) {
+                // Renegade will try to save the sheriff
+                return 2;
+            } else {
+                return -2;
+            }
         }
     }
 

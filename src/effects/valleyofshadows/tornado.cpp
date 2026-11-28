@@ -137,13 +137,16 @@ namespace banggame {
         int cards_gained = std::min(2, static_cast<int>(target->get_prev_player()->m_hand.size()));
         int cards_lost = std::min(2, static_cast<int>(target->m_hand.size()));
 
-        if (bot_suggestion::is_target_friend(origin, target)) {
-            return (cards_gained - cards_lost) * 5;
-        }
-        if (bot_suggestion::is_target_enemy(origin, target)) {
+        switch (bot_suggestion::get_alignment(origin, target)) {
+        case bot_suggestion::player_alignment::enemy:
+        case bot_suggestion::player_alignment::maybe_enemy:
             return (cards_gained - cards_lost) * -5;
+        case bot_suggestion::player_alignment::friendly:
+            return (cards_gained - cards_lost) * 5;
+        case bot_suggestion::player_alignment::neutral:
+        default:
+            return 0;
         }
-        return 0;
     }
     
     void effect_tornado2::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) const {

@@ -196,8 +196,19 @@ namespace banggame {
     prompt_string effect_perform_feat::on_prompt(card_ptr origin_card, player_ptr origin) const {
         if (origin_card->deck == card_deck_type::feats && is_legend(origin) && rn::none_of(origin->m_game->range_other_players(origin),
             [&, can_kill = can_damage_legend_kill(origin)](player_ptr target) {
-                return is_valid_damage_legend_target(origin, target, can_kill)
-                    && (!origin->is_bot() || bot_suggestion::is_target_enemy(origin, target));
+                if (!is_valid_damage_legend_target(origin, target, can_kill)) return false;
+                if (origin->is_bot()) {
+                    switch (bot_suggestion::get_alignment(origin, target)) {
+                    case bot_suggestion::player_alignment::enemy:
+                    case bot_suggestion::player_alignment::maybe_enemy:
+                        return true;
+                    case bot_suggestion::player_alignment::friendly:
+                    case bot_suggestion::player_alignment::neutral:
+                    default:
+                        return false;
+                    }
+                }
+                return true;
             })
         ) {
             return {2, "PROMPT_CLAIM_NO_TARGET"};

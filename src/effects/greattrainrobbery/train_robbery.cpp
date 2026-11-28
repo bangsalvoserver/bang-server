@@ -66,12 +66,19 @@ namespace banggame {
     }
 
     int effect_train_robbery::evaluate(card_ptr origin_card, player_ptr origin, player_ptr target) const {
-        if (!bot_suggestion::is_target_enemy(origin, target)) {
+        switch (bot_suggestion::get_alignment(origin, target)) {
+        case bot_suggestion::player_alignment::enemy:
+        case bot_suggestion::player_alignment::maybe_enemy:
+            if (rn::any_of(target->m_table, [](card_ptr c) { return c->has_tag(tag_type::jail); })) {
+                return -3;
+            } else {
+                return 0;
+            }
+        case bot_suggestion::player_alignment::friendly:
+        case bot_suggestion::player_alignment::neutral:
+        default:
             return -5;
-        } else if (rn::any_of(target->m_table, [](card_ptr c) { return c->has_tag(tag_type::jail); })) {
-            return -3;
         }
-        return 0;
     }
 
     void effect_train_robbery::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) const {

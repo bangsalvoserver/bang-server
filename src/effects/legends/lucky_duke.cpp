@@ -38,10 +38,17 @@ namespace banggame {
 
         int evaluate_pick(card_ptr target_card) const override {
             auto result = req->get_result(target_card);
-            if (!result.indifferent && result.lucky != bot_suggestion::is_target_friend(target, origin)) {
-                return -5;
+            if (result.indifferent) return 0;
+
+            switch (bot_suggestion::get_alignment(target, origin)) {
+            case bot_suggestion::player_alignment::enemy:
+            case bot_suggestion::player_alignment::maybe_enemy:
+                return result.lucky ? -5 : 0;
+            case bot_suggestion::player_alignment::friendly:
+            case bot_suggestion::player_alignment::neutral:
+            default:
+                return result.lucky ? 0 : -5;
             }
-            return 0;
         }
         
         game_string status_text(player_ptr owner) const override {

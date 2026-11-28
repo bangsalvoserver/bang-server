@@ -5,10 +5,11 @@
 
 namespace banggame::bot_suggestion {
 
-    enum class action_type {
-        neutral,
-        damage,
-        jail,
+    enum class player_alignment {
+        enemy,
+        maybe_enemy,
+        friendly,
+        neutral
     };
 
     void signal_hostile_action(player_ptr origin, const_player_ptr target, effect_flags flags = {});
@@ -17,9 +18,7 @@ namespace banggame::bot_suggestion {
 
     void signal_remove_card(player_ptr origin, const_card_ptr target_card, effect_flags flags = {});
 
-    bool is_target_enemy(const_player_ptr origin, const_player_ptr target, action_type type = action_type::neutral);
-
-    bool is_target_friend(const_player_ptr origin, const_player_ptr target);
+    player_alignment get_alignment(const_player_ptr origin, const_player_ptr target);
 
     int evaluate_attack(const_player_ptr origin, const_player_ptr target);
 

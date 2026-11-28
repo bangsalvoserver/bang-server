@@ -156,47 +156,44 @@ namespace banggame::bot_suggestion {
         }
     }
 
-    bool is_target_enemy(const_player_ptr origin, const_player_ptr target, action_type type) {
-        if (origin == target) return false;
-        if (origin->m_game->check_flags(game_flag::free_for_all)) return true;
+    player_alignment get_alignment(const_player_ptr origin, const_player_ptr target) {
+        if (origin == target) return player_alignment::friendly;
+        if (origin->m_game->check_flags(game_flag::free_for_all)) return player_alignment::enemy;
 
         switch (origin->m_role) {
         case player_role::outlaw:
         case player_role::shadow_outlaw:
             if (is_role_known(origin, target)) {
-                return target->is_sheriff_or_deputy();
-            } else {
-                return is_positive_karma(target);
-            }
-        case player_role::sheriff:
-            if (is_role_known(origin, target)) {
-                return target->is_outlaw_or_renegade();
-            } else if (type == action_type::damage && rn::none_of(origin->m_game->m_players, [](player_ptr p) { return p->in_game() && p->is_outlaw(); })) {
-                // when all targets are deputy or renegade the sheriff will damage everyone until they are 1 hp
-                // "neutral" actions will target neutral or negative players, as per the default
-                return target->m_hp > 1;
-            } else if (is_negative_karma(target)) {
-                return true;
+                if (target->is_sheriff_or_deputy()) {
+                    return player_alignment::enemy;
+                } else if (target->is_outlaw()) {
+                    return player_alignment::friendly;
+                } else if (target->is_renegade()) {
+                    return player_alignment::maybe_enemy;
+                }
             } else if (is_positive_karma(target)) {
-                return false;
-            } else if (type == action_type::damage) {
-                // the sheriff won't kill neutral targets
-                return target->m_hp > 1;
-            } else {
-                // don't equip jail on neutral targets
-                return type != action_type::jail;
+                return player_alignment::enemy;
+            } else if (is_negative_karma(target)) {
+                return player_alignment::friendly;
             }
+            return player_alignment::neutral;
+        case player_role::sheriff:
         case player_role::deputy:
         case player_role::shadow_deputy:
             if (is_role_known(origin, target)) {
-                return target->is_outlaw_or_renegade();
-            } else if (is_negative_karma(target)) {
-                return true;
-            } else if (is_positive_karma(target)) {
-                return false;
-            } else {
-                return type != action_type::jail;
+                if (target->is_outlaw_or_renegade()) {
+                    return player_alignment::enemy;
+                } else if (target->is_sheriff_or_deputy()) {
+                    return player_alignment::friendly;
+                }
+            } else if (!origin->is_sheriff() || rn::any_of(origin->m_game->m_players, [](player_ptr p) { return p->in_game() && p->is_outlaw(); })) {
+                if (is_negative_karma(target)) {
+                    return player_alignment::enemy;
+                } else if (is_positive_karma(target)) {
+                    return player_alignment::friendly;
+                }
             }
+            return player_alignment::maybe_enemy;
         case player_role::renegade: {
             int num_law = 0;
             int num_bandit = 0;
@@ -209,69 +206,56 @@ namespace banggame::bot_suggestion {
             }
 
             if (num_bandit > num_law) {
-                if (origin == target) {
-                    return false;
-                } else if (is_role_known(origin, target)) {
-                    return target->is_outlaw_or_renegade();
+                if (is_role_known(origin, target)) {
+                    if (target->is_outlaw_or_renegade()) {
+                        return player_alignment::enemy;
+                    } else if (target->is_sheriff_or_deputy()) {
+                        return player_alignment::neutral;
+                    }
                 } else if (is_negative_karma(target)) {
-                    return true;
+                    return player_alignment::enemy;
                 } else if (is_positive_karma(target)) {
-                    return false;
-                } else {
-                    return type != action_type::jail;
+                    return player_alignment::neutral;
                 }
+                return player_alignment::maybe_enemy;
             } else if (num_law > 1) {
                 if (is_role_known(origin, target)) {
-                    return target->is_deputy();
+                    if (target->is_deputy()) {
+                        return player_alignment::enemy;
+                    } else {
+                        return player_alignment::neutral;
+                    }
                 } else if (is_negative_karma(target)) {
-                    return false;
+                    return player_alignment::neutral;
                 } else if (is_positive_karma(target)) {
-                    return true;
-                } else {
-                    return type != action_type::jail;
+                    return player_alignment::enemy;
                 }
-            } else if (target->is_sheriff() && num_bandit > 0) {
-                // the renegade will not damage the sheriff if he has <= 2 hp
-                // but will still target him with "neutral" actions
-                return type != action_type::damage || target->m_hp > 2;
-            } else {
-                return true;
+                return player_alignment::maybe_enemy;
+            } else if (target->is_sheriff() && num_bandit > 0 && target->m_hp <= 2) {
+                return player_alignment::neutral;
             }
+            return player_alignment::enemy;
         }
         case player_role::outlaw_3p:
-            return origin->m_game->num_alive(true) <= 2 || target->m_role == player_role::deputy_3p;
+            if (origin->m_game->num_alive(true) <= 2 || target->m_role == player_role::deputy_3p) {
+                return player_alignment::enemy;
+            } else {
+                return player_alignment::neutral;
+            }
         case player_role::deputy_3p:
-            return origin->m_game->num_alive(true) <= 2 || target->m_role == player_role::renegade_3p;
+            if (origin->m_game->num_alive(true) <= 2 || target->m_role == player_role::renegade_3p) {
+                return player_alignment::enemy;
+            } else {
+                return player_alignment::neutral;
+            }
         case player_role::renegade_3p:
-            return origin->m_game->num_alive(true) <= 2 || target->m_role == player_role::outlaw_3p;
-        default:
-            return true;
-        }
-    }
-
-    bool is_target_friend(const_player_ptr origin, const_player_ptr target) {
-        if (origin == target) return true;
-        if (origin->m_game->check_flags(game_flag::free_for_all)) return false;
-
-        switch (origin->m_role) {
-        case player_role::outlaw:
-        case player_role::shadow_outlaw:
-            if (is_role_known(origin, target)) {
-                return target->is_outlaw();
+            if (origin->m_game->num_alive(true) <= 2 || target->m_role == player_role::outlaw_3p) {
+                return player_alignment::enemy;
             } else {
-                return is_negative_karma(target);
+                return player_alignment::neutral;
             }
-        case player_role::sheriff:
-        case player_role::deputy:
-        case player_role::shadow_deputy:
-            if (is_role_known(origin, target)) {
-                return target->is_sheriff_or_deputy();
-            } else {
-                return is_positive_karma(target);
-            }
-        case player_role::renegade:
         default:
-            return false;
+            return player_alignment::neutral;
         }
     }
 
@@ -287,37 +271,49 @@ namespace banggame::bot_suggestion {
             }
         }
 
-        if (is_target_enemy(origin, target, action_type::damage)) {
+        switch (get_alignment(origin, target)) {
+        case player_alignment::enemy:
             return lethal ? 8 : 7;
-        }
-
-        if (is_target_friend(origin, target)) {
+        case player_alignment::maybe_enemy:
+            if (lethal) {
+                return origin->is_sheriff() ? -5 : 6;
+            } else {
+                return 5;
+            }
+        case player_alignment::friendly:
             if (lethal) {
                 return origin->is_sheriff() ? -20 : -10;
             } else {
                 return -3;
             }
+        case player_alignment::neutral:
+        default:
+            return -2;
         }
-        
-        return -2;
     }
 
     int evaluate_soft_attack(const_player_ptr origin, const_player_ptr target) {
-        if (is_target_enemy(origin, target)) {
+        switch (get_alignment(origin, target)) {
+        case player_alignment::enemy:
+        case player_alignment::maybe_enemy:
             return 4;
-        } else if (is_target_friend(origin, target)) {
+        case player_alignment::friendly:
             return -5;
-        } else {
+        case player_alignment::neutral:
+        default:
             return -1;
         }
     }
 
     int evaluate_help(const_player_ptr origin, const_player_ptr target) {
-        if (is_target_friend(origin, target)) {
-            return 4;
-        } else if (is_target_enemy(origin, target)) {
+        switch (get_alignment(origin, target)) {
+        case player_alignment::enemy:
+        case player_alignment::maybe_enemy:
             return -5;
-        } else {
+        case player_alignment::friendly:
+            return 4;
+        case player_alignment::neutral:
+        default:
             return -2;
         }
     }
@@ -325,13 +321,17 @@ namespace banggame::bot_suggestion {
     int evaluate_target_card(const_player_ptr origin, const_card_ptr target_card) {
         player_ptr target = target_card->owner;
         if (target->is_ghost()) {
-            const bool ghost_card = target_card->pocket == pocket_type::player_table && is_ghost_card(target_card);
-            if (is_target_enemy(origin, target)) {
+            bool ghost_card = target_card->pocket == pocket_type::player_table && is_ghost_card(target_card);
+            switch (get_alignment(origin, target)) {
+            case player_alignment::enemy:
+            case player_alignment::maybe_enemy:
                 return ghost_card ? 20 : -10;
-            } else if (is_target_friend(origin, target)) {
+            case player_alignment::friendly:
                 return ghost_card ? -10 : -20;
+            case player_alignment::neutral:
+            default:
+                return -5;
             }
-            return -5;
         }
 
         if (target_card->pocket == pocket_type::player_table && target_card->is_purple()) {
@@ -343,7 +343,9 @@ namespace banggame::bot_suggestion {
             return 0;
         }
 
-        if (is_target_enemy(origin, target)) {
+        switch (get_alignment(origin, target)) {
+        case player_alignment::enemy:
+        case player_alignment::maybe_enemy:
             if (target_card->pocket == pocket_type::player_table) {
                 if (auto value = target_card->get_tag_value(tag_type::penalty)) {
                     return *value >= 0 ? -5 : 0;
@@ -352,7 +354,7 @@ namespace banggame::bot_suggestion {
                 }
             }
             return 5;
-        } else if (is_target_friend(origin, target)) {
+        case player_alignment::friendly:
             if (target_card->pocket == pocket_type::player_table) {
                 if (auto value = target_card->get_tag_value(tag_type::penalty)) {
                     if (*value >= 0) {
@@ -365,9 +367,10 @@ namespace banggame::bot_suggestion {
                 }
             }
             return -6;
+        case player_alignment::neutral:
+        default:
+            return -1;
         }
-
-        return -1;
     }
 
     int evaluate_draw_card(const_player_ptr origin, const_card_ptr target_card) {

@@ -49,9 +49,15 @@ namespace banggame {
         }
 
         int evaluate_pick(card_ptr target_card) const override {
-            bool enemy = bot_suggestion::is_target_enemy(target, saved);
-            bool picks_hand = target_card->pocket == pocket_type::player_hand;
-            return enemy == picks_hand ? 5 : -5;
+            switch (bot_suggestion::get_alignment(target, saved)) {
+            case bot_suggestion::player_alignment::enemy:
+            case bot_suggestion::player_alignment::maybe_enemy:
+                return target_card->pocket == pocket_type::player_hand ? 5 : -5;
+            case bot_suggestion::player_alignment::friendly:
+            case bot_suggestion::player_alignment::neutral:
+            default:
+                return target_card->pocket == pocket_type::player_hand ? -5 : 5;
+            }
         }
 
         bool can_pick(card_ptr target_card) const override {

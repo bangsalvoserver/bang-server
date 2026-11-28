@@ -80,18 +80,22 @@ namespace banggame {
 
     int request_check_base::evaluate_redraw(card_ptr target_card, player_ptr owner) const {
         draw_check_result result = get_result(drawn_card);
-        if (result.indifferent) {
-            return -5;
-        } else if (result.defensive_redraw) {
-            if (result.lucky || !bot_suggestion::is_target_friend(owner, target)) return -5;
-        } else if (bot_suggestion::is_target_enemy(owner, target)) {
-            if (!result.lucky) return -5;
-        } else if (bot_suggestion::is_target_friend(owner, target)) {
-            if (result.lucky) return -5;
-        } else {
+        if (result.indifferent) return -5;
+
+        switch (bot_suggestion::get_alignment(owner, target)) {
+        case bot_suggestion::player_alignment::enemy:
+        case bot_suggestion::player_alignment::maybe_enemy:
+            if (result.defensive_redraw) {
+                return -5;
+            } else {
+                return result.lucky ? 5 : -5;
+            }
+        case bot_suggestion::player_alignment::friendly:
+            return result.lucky ? -5 : 5;
+        case bot_suggestion::player_alignment::neutral:
+        default:
             return -5;
         }
-        return 5;
     }
 
     void request_check_base::resolve() {
